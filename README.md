@@ -37,11 +37,71 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 # One Page 專案進度紀錄
 
+## 進度符號說明
+- o：已完成
+- v：已驗證（可選）
+- x：不做或要刪除
+- [ ]：尚未完成
+
 ## 目前進度
-- 已完成 Next.js + TypeScript + Tailwind CSS 專案初始化
-- 已安裝 Firebase SDK
-- 已建立 src/components、src/firebase、src/utils 資料夾
-- 專案已正確串接 Firebase（待填入 firebaseConfig.ts）
+- o Next.js + TypeScript + Tailwind CSS 初始化
+- o Firebase 初始化（Auth、Firestore、Storage）
+- o 專案資料夾結構規劃（components、modules、admin、utils...）
+- o 商品列表（ProductList）
+- o Vercel 自動部署設定
+
+## 建議的開發步驟（模組化流程）
+
+### 1. 專案基礎架構
+- o Next.js + TypeScript + Tailwind CSS 初始化
+- o Firebase 初始化（Auth、Firestore、Storage）
+- o 專案資料夾結構規劃（components、modules、admin、utils...）
+
+### 2. UI/UX 設計
+- [ ] 選定 UI 套件（如 shadcn/ui、Radix UI、Tailwind UI）
+- [ ] 設計首頁、商品區塊、購物車、結帳、登入、後台管理等 wireframe
+
+### 3. 前台功能模組
+- o 商品列表（ProductList）
+- [ ] 商品詳情（ProductDetail）
+- [ ] 購物車（Cart）
+- [ ] 結帳流程（Checkout）
+- [ ] 金流串接（如綠界、藍新、Line Pay）
+- [ ] 訂單查詢
+
+### 4. 後台管理模組
+- [ ] 登入/權限管理（Firebase Auth）
+- [ ] 商品管理（CRUD）
+- [ ] 訂單管理
+- [ ] 會員管理
+- [ ] 內容管理（Banner、FAQ...）
+
+### 5. 物流串接
+- [ ] 串接物流 API（如黑貓、7-11、全家）
+
+### 6. 部署與測試
+- o 設定自動部署（Vercel）
+- o 每次功能完成自動部署，直接雲端測試
+
+---
+
+## 進度追蹤說明
+- 每完成一個功能模組，請標記 o。
+- 若已驗證可用，可標記 v。
+- 若決定不做或要刪除，請標記 x。
+- 若有新需求或調整，請直接補充在本文件。
+- 重要架構或決策也可記錄於此，方便團隊或個人後續追蹤。
+
+---
+
+## 下一步建議
+1. 選定 UI 套件，設計 wireframe。
+2. 實作商品詳情（ProductDetail）元件與頁面。
+3. 實作購物車（Cart）與結帳流程（Checkout）。
+4. 後台管理模組與會員系統。
+5. 完成前台購物流程後，再進行金流、物流串接。
+
+---
 
 ## 專案架構
 - 使用 Next.js (App Router, src/ 目錄)
