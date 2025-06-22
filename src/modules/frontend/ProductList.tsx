@@ -37,8 +37,8 @@ export default function ProductList() {
       <h2 className="text-2xl font-bold mb-8 tracking-widest">IN STOCK</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((product) => (
-          <Link href={`/product/${product.id}`} className="block w-full h-full">
-            <Card key={product.id} className="shadow-none border hover:shadow-lg transition-shadow duration-200 bg-white cursor-pointer">
+          <Link href={`/product/${product.id}`} className="block w-full h-full" key={product.id}>
+            <Card className="shadow-none border hover:shadow-lg transition-shadow duration-200 bg-white cursor-pointer">
               <CardContent className="flex flex-col items-center p-4">
                 {product.imageUrl ? (
                   <img
