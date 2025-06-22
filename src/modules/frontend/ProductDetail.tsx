@@ -31,8 +31,8 @@ export default function ProductDetail() {
   const [address, setAddress] = useState("");
   // 商品選項
   const [quantity, setQuantity] = useState(1);
-  const [size, setSize] = useState(SIZE_OPTIONS[0]);
-  const [color, setColor] = useState(COLOR_OPTIONS[0]);
+  const [size, setSize] = useState("");
+  const [color, setColor] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -42,37 +42,46 @@ export default function ProductDetail() {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setProduct({ id: docSnap.id, ...docSnap.data() } as Product);
+        // 預設選第一個尺寸/顏色
+        const data = docSnap.data();
+        if (data.sizes && Array.isArray(data.sizes) && data.sizes.length > 0) {
+          setSize(data.sizes[0]);
+        } else {
+          setSize("");
+        }
+        if (data.colors && Array.isArray(data.colors) && data.colors.length > 0) {
+          setColor(data.colors[0]);
+        } else {
+          setColor("");
+        }
       }
       setLoading(false);
     }
     fetchProduct();
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!product || !name || !email || !phone || !address) return;
-    setSubmitting(true);
-    const orderRef = await addDoc(collection(db, "orders"), {
-      name,
-      email,
-      phone,
-      address,
-      product: {
+  // 加入購物車
+  const handleAddToCart = () => {
+    if (!product) return;
+    const cartRaw = localStorage.getItem("cart");
+    let cart = cartRaw ? JSON.parse(cartRaw) : [];
+    // 判斷同商品同尺寸顏色是否已存在
+    const idx = cart.findIndex((item: any) => item.id === product.id && item.size === size && item.color === color);
+    if (idx > -1) {
+      cart[idx].quantity += quantity;
+    } else {
+      cart.push({
         id: product.id,
         name: product.name,
         price: product.price,
         imageUrl: product.imageUrl,
         size,
         color,
-      },
-      quantity,
-      total: product.price * quantity,
-      status: "待匯款",
-      createdAt: Timestamp.now(),
-    });
-    setOrderId(orderRef.id);
-    setSubmitting(false);
-    setShowModal(true);
+        quantity,
+      });
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("已加入購物車！");
   };
 
   if (loading) return <div className="text-center py-12 text-lg">載入中...</div>;
@@ -103,7 +112,8 @@ export default function ProductDetail() {
             <div>
               <label className="block text-sm mb-1">尺寸</label>
               <select value={size} onChange={e => setSize(e.target.value)} className="border rounded px-2 py-1">
-                {SIZE_OPTIONS.map(opt => (
+                {(product.sizes ?? []).length === 0 && <option value="">無尺寸</option>}
+                {(product.sizes ?? []).map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
@@ -111,7 +121,8 @@ export default function ProductDetail() {
             <div>
               <label className="block text-sm mb-1">顏色</label>
               <select value={color} onChange={e => setColor(e.target.value)} className="border rounded px-2 py-1">
-                {COLOR_OPTIONS.map(opt => (
+                {(product.colors ?? []).length === 0 && <option value="">無顏色</option>}
+                {(product.colors ?? []).map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
@@ -142,53 +153,12 @@ export default function ProductDetail() {
           <div className="font-bold text-lg">NT$ {(product.price * quantity).toLocaleString()}</div>
         </div>
       </div>
-      {/* 結帳表單 */}
-      <form onSubmit={handleSubmit} className="mt-4 max-w-lg mx-auto bg-gray-50 p-6 rounded border space-y-4">
-        <h2 className="text-lg font-bold mb-2">直接結帳</h2>
-        <div>
-          <label className="block mb-1">收件人姓名</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">電話</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">收件地址</label>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <Button type="submit" className="w-full py-4 text-lg font-bold" disabled={submitting}>
-          {submitting ? "送出中..." : `購買 NT$ ${(product.price * quantity).toLocaleString()}`}
+      {/* 加入購物車按鈕 */}
+      <div className="mt-4 max-w-lg mx-auto">
+        <Button className="w-full py-4 text-lg font-bold" onClick={handleAddToCart}>
+          加入購物車
         </Button>
-      </form>
+      </div>
       {/* 匯款資訊 Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

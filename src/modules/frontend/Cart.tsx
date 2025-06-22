@@ -8,6 +8,8 @@ interface CartItem {
   price: number;
   imageUrl?: string;
   quantity: number;
+  size?: string;
+  color?: string;
 }
 
 export default function Cart() {
@@ -55,6 +57,10 @@ export default function Cart() {
             <div className="flex-1">
               <div className="font-medium text-base mb-1">{item.name}</div>
               <div className="text-gray-700 mb-2">NT$ {item.price.toLocaleString()}</div>
+              <div className="text-sm text-gray-600 mb-1">
+                {item.size && <>尺寸：{item.size}　</>}
+                {item.color && <>顏色：{item.color}</>}
+              </div>
               <div className="flex items-center gap-2">
                 <span>數量：</span>
                 <input
