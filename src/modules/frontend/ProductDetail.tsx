@@ -13,6 +13,14 @@ interface Product {
   description?: string;
 }
 
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl?: string;
+  quantity: number;
+}
+
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -36,9 +44,9 @@ export default function ProductDetail() {
     if (!product) return;
     const stored = localStorage.getItem("cart");
     let cart = stored ? JSON.parse(stored) : [];
-    const exist = cart.find((item: any) => item.id === product.id);
+    const exist = cart.find((item: CartItem) => item.id === product.id);
     if (exist) {
-      cart = cart.map((item: any) =>
+      cart = cart.map((item: CartItem) =>
         item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
