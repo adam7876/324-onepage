@@ -24,16 +24,10 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [orderId, setOrderId] = useState("");
-  // 結帳表單欄位
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   // 商品選項
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -64,9 +58,17 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (!product) return;
     const cartRaw = localStorage.getItem("cart");
-    let cart = cartRaw ? JSON.parse(cartRaw) : [];
+    const cart: Array<{
+      id: string;
+      name: string;
+      price: number;
+      imageUrl?: string;
+      size?: string;
+      color?: string;
+      quantity: number;
+    }> = cartRaw ? JSON.parse(cartRaw) : [];
     // 判斷同商品同尺寸顏色是否已存在
-    const idx = cart.findIndex((item: any) => item.id === product.id && item.size === size && item.color === color);
+    const idx = cart.findIndex((item) => item.id === product.id && item.size === size && item.color === color);
     if (idx > -1) {
       cart[idx].quantity += quantity;
     } else {
