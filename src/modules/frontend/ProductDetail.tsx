@@ -20,7 +20,6 @@ export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
   // 商品選項
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState("");
