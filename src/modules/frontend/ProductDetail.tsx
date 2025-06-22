@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { doc, getDoc, collection, addDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
 import { Button } from "../../components/ui/button";
+import Image from "next/image";
 
 interface Product {
   id: string;
@@ -15,15 +16,11 @@ interface Product {
   colors?: string[];
 }
 
-const SIZE_OPTIONS = ["S", "M", "L", "XL"];
-const COLOR_OPTIONS = ["白色", "黑色", "灰色", "藍色"];
-
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [orderId, setOrderId] = useState("");
   // 商品選項
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState("");
@@ -94,10 +91,13 @@ export default function ProductDetail() {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 flex items-center justify-center">
           {product.imageUrl ? (
-            <img
+            <Image
               src={product.imageUrl}
               alt={product.name}
+              width={320}
+              height={384}
               className="w-full max-w-xs h-96 object-cover rounded bg-gray-100"
+              style={{ objectFit: "cover" }}
             />
           ) : (
             <div className="w-full max-w-xs h-96 flex items-center justify-center bg-gray-100 rounded text-gray-400">
@@ -145,7 +145,14 @@ export default function ProductDetail() {
         <div className="font-bold mb-2">目前已經選購</div>
         <div className="flex items-center gap-4">
           {product.imageUrl && (
-            <img src={product.imageUrl} alt={product.name} className="w-16 h-16 object-cover rounded bg-gray-200" />
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              width={64}
+              height={64}
+              className="w-16 h-16 object-cover rounded bg-gray-200"
+              style={{ objectFit: "cover" }}
+            />
           )}
           <div className="flex-1">
             <div>{product.name}</div>
@@ -161,27 +168,7 @@ export default function ProductDetail() {
           加入購物車
         </Button>
       </div>
-      {/* 匯款資訊 Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-lg text-center relative">
-            <div className="text-green-600 text-4xl mb-2">✓</div>
-            <div className="text-xl font-bold mb-2">已經收到您的訂單</div>
-            <div className="mb-4">訂單編號：<span className="font-mono text-pink-600">{orderId}</span></div>
-            <div className="bg-gray-50 p-4 rounded border mb-4 text-left">
-              <div className="font-bold mb-2">匯款資訊（範例）</div>
-              <div>銀行名稱：台灣銀行</div>
-              <div>分行：台北分行</div>
-              <div>戶名：王小明</div>
-              <div>帳號：123-456-789012</div>
-              <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
-            </div>
-            <Button className="w-full mt-2" onClick={() => setShowModal(false)}>
-              關閉
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* 已移除訂單 Modal，購物車式不再需要 */}
     </section>
   );
 } 

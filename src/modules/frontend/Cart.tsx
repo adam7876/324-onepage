@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
+import Image from "next/image";
 
 interface CartItem {
   id: string;
@@ -49,11 +50,16 @@ export default function Cart() {
       <div className="flex flex-col gap-6">
         {cart.map((item) => (
           <div key={item.id} className="flex gap-4 items-center border-b pb-4">
-            <img
-              src={item.imageUrl}
-              alt={item.name}
-              className="w-24 h-24 object-cover rounded bg-gray-100"
-            />
+            {item.imageUrl && (
+              <Image
+                src={item.imageUrl}
+                alt={item.name}
+                width={96}
+                height={96}
+                className="w-24 h-24 object-cover rounded bg-gray-100"
+                style={{ objectFit: "cover" }}
+              />
+            )}
             <div className="flex-1">
               <div className="font-medium text-base mb-1">{item.name}</div>
               <div className="text-gray-700 mb-2">NT$ {item.price.toLocaleString()}</div>
