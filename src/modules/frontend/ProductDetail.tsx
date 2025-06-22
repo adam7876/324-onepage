@@ -13,14 +13,6 @@ interface Product {
   description?: string;
 }
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl?: string;
-  quantity: number;
-}
-
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
