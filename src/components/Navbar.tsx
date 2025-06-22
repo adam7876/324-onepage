@@ -1,4 +1,5 @@
 import { Button } from "../components/ui/button";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -27,8 +28,10 @@ export default function Navbar() {
           <span className="material-symbols-outlined">person</span>
         </Button>
         {/* 購物車 */}
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <span className="material-symbols-outlined">shopping_bag</span>
+        <Button variant="ghost" size="icon" className="rounded-full" asChild>
+          <Link href="/cart">
+            <span className="material-symbols-outlined">shopping_bag</span>
+          </Link>
         </Button>
       </div>
     </nav>
