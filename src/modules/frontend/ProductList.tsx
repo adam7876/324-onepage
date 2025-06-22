@@ -3,6 +3,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -36,23 +37,25 @@ export default function ProductList() {
       <h2 className="text-2xl font-bold mb-8 tracking-widest">IN STOCK</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((product) => (
-          <Card key={product.id} className="shadow-none border hover:shadow-lg transition-shadow duration-200 bg-white">
-            <CardContent className="flex flex-col items-center p-4">
-              {product.imageUrl ? (
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-72 object-cover rounded mb-4 bg-gray-100"
-                />
-              ) : (
-                <div className="w-full h-72 flex items-center justify-center bg-gray-100 rounded mb-4 text-gray-400">
-                  無圖片
-                </div>
-              )}
-              <div className="font-medium text-base text-center mb-1 line-clamp-2 min-h-[2.5em]">{product.name}</div>
-              <div className="text-lg font-bold text-gray-900">NT$ {product.price.toLocaleString()}</div>
-            </CardContent>
-          </Card>
+          <Link href={`/product/${product.id}`} className="block w-full h-full">
+            <Card key={product.id} className="shadow-none border hover:shadow-lg transition-shadow duration-200 bg-white cursor-pointer">
+              <CardContent className="flex flex-col items-center p-4">
+                {product.imageUrl ? (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-72 object-cover rounded mb-4 bg-gray-100"
+                  />
+                ) : (
+                  <div className="w-full h-72 flex items-center justify-center bg-gray-100 rounded mb-4 text-gray-400">
+                    無圖片
+                  </div>
+                )}
+                <div className="font-medium text-base text-center mb-1 line-clamp-2 min-h-[2.5em]">{product.name}</div>
+                <div className="text-lg font-bold text-gray-900">NT$ {product.price.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </section>
