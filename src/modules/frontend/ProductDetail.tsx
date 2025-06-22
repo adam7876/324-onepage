@@ -11,7 +11,12 @@ interface Product {
   price: number;
   imageUrl?: string;
   description?: string;
+  sizes?: string[];
+  colors?: string[];
 }
+
+const SIZE_OPTIONS = ["S", "M", "L", "XL"];
+const COLOR_OPTIONS = ["白色", "黑色", "灰色", "藍色"];
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +29,10 @@ export default function ProductDetail() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  // 商品選項
+  const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState(SIZE_OPTIONS[0]);
+  const [color, setColor] = useState(COLOR_OPTIONS[0]);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -53,8 +62,11 @@ export default function ProductDetail() {
         name: product.name,
         price: product.price,
         imageUrl: product.imageUrl,
+        size,
+        color,
       },
-      total: product.price,
+      quantity,
+      total: product.price * quantity,
       status: "待匯款",
       createdAt: Timestamp.now(),
     });
@@ -86,10 +98,52 @@ export default function ProductDetail() {
           <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
           <div className="text-xl font-bold text-gray-900 mb-4">NT$ {product.price.toLocaleString()}</div>
           <div className="text-gray-700 mb-6 min-h-[3em]">{product.description || "—"}</div>
+          {/* 商品選項 */}
+          <div className="flex gap-4 mb-4">
+            <div>
+              <label className="block text-sm mb-1">尺寸</label>
+              <select value={size} onChange={e => setSize(e.target.value)} className="border rounded px-2 py-1">
+                {SIZE_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm mb-1">顏色</label>
+              <select value={color} onChange={e => setColor(e.target.value)} className="border rounded px-2 py-1">
+                {COLOR_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm mb-1">數量</label>
+              <div className="flex items-center gap-1">
+                <Button type="button" size="sm" variant="outline" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</Button>
+                <span className="px-2 w-8 text-center">{quantity}</span>
+                <Button type="button" size="sm" variant="outline" onClick={() => setQuantity(q => q + 1)}>+</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* 已選購內容區塊 */}
+      <div className="my-8 bg-gray-100 rounded p-4">
+        <div className="font-bold mb-2">目前已經選購</div>
+        <div className="flex items-center gap-4">
+          {product.imageUrl && (
+            <img src={product.imageUrl} alt={product.name} className="w-16 h-16 object-cover rounded bg-gray-200" />
+          )}
+          <div className="flex-1">
+            <div>{product.name}</div>
+            <div className="text-sm text-gray-600">尺寸：{size}　顏色：{color}</div>
+            <div className="text-sm text-gray-600">數量：{quantity}</div>
+          </div>
+          <div className="font-bold text-lg">NT$ {(product.price * quantity).toLocaleString()}</div>
         </div>
       </div>
       {/* 結帳表單 */}
-      <form onSubmit={handleSubmit} className="mt-12 max-w-lg mx-auto bg-gray-50 p-6 rounded border space-y-4">
+      <form onSubmit={handleSubmit} className="mt-4 max-w-lg mx-auto bg-gray-50 p-6 rounded border space-y-4">
         <h2 className="text-lg font-bold mb-2">直接結帳</h2>
         <div>
           <label className="block mb-1">收件人姓名</label>
@@ -132,7 +186,7 @@ export default function ProductDetail() {
           />
         </div>
         <Button type="submit" className="w-full py-4 text-lg font-bold" disabled={submitting}>
-          {submitting ? "送出中..." : `購買 NT$ ${product.price.toLocaleString()}`}
+          {submitting ? "送出中..." : `購買 NT$ ${(product.price * quantity).toLocaleString()}`}
         </Button>
       </form>
       {/* 匯款資訊 Modal */}

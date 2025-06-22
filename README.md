@@ -48,6 +48,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - o Firebase 初始化（Auth、Firestore、Storage）
 - o 專案資料夾結構規劃（components、modules、admin、utils...）
 - o 商品列表（ProductList）
+- o 商品詳情（ProductDetail）
 - o Vercel 自動部署設定
 
 ## 建議的開發步驟（模組化流程）
@@ -63,7 +64,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ### 3. 前台功能模組
 - o 商品列表（ProductList）
-- [ ] 商品詳情（ProductDetail）
+- o 商品詳情（ProductDetail）
 - [ ] 購物車（Cart）
 - [ ] 結帳流程（Checkout）
 - [ ] 金流串接（如綠界、藍新、Line Pay）
@@ -95,11 +96,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ---
 
 ## 下一步建議
-1. 選定 UI 套件，設計 wireframe。
-2. 實作商品詳情（ProductDetail）元件與頁面。
-3. 實作購物車（Cart）與結帳流程（Checkout）。
-4. 後台管理模組與會員系統。
-5. 完成前台購物流程後，再進行金流、物流串接。
+1. 實作購物車（Cart）功能，讓使用者可將商品加入購物車。
+2. 設計結帳流程（Checkout），串接表單與 Firestore 訂單。
+3. 後台管理模組與會員系統。
+4. 完成前台購物流程後，再進行金流、物流串接。
 
 ---
 
