@@ -17,6 +17,8 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [shipping, setShipping] = useState("7-11 超商取貨");
+  const [payment, setPayment] = useState("銀行匯款");
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -34,9 +36,11 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         email,
         phone,
         address,
+        shipping,
+        payment,
         items: cart,
         total,
-        status: "待匯款",
+        status: payment === "銀行匯款" ? "待匯款" : "待付款",
         createdAt: Timestamp.now(),
       });
       setSuccess(true);
@@ -52,8 +56,24 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     return (
       <div className="bg-green-50 border border-green-300 rounded p-6 text-center my-6">
         <div className="text-2xl text-green-700 mb-2">✓ 訂單已送出！</div>
-        <div className="mb-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
-        <div className="text-sm text-gray-500">（如需匯款資訊請聯絡客服）</div>
+        <div className="mb-2">您選擇的物流方式：<span className="font-bold">{shipping}</span></div>
+        <div className="mb-2">您選擇的付款方式：<span className="font-bold">{payment}</span></div>
+        {payment === "銀行匯款" && (
+          <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-2">
+            <div className="font-bold mb-2">匯款資訊</div>
+            <div>銀行名稱：台灣銀行</div>
+            <div>分行：台北分行</div>
+            <div>戶名：王小明</div>
+            <div>帳號：123-456-789012</div>
+            <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
+          </div>
+        )}
+        {payment !== "銀行匯款" && (
+          <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-2">
+            <div className="font-bold mb-2">付款說明</div>
+            <div>此為模擬付款，請等待後台通知。</div>
+          </div>
+        )}
       </div>
     );
 
@@ -99,6 +119,30 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           className="w-full border rounded px-3 py-2"
           required
         />
+      </div>
+      <div>
+        <label className="block mb-1">物流方式</label>
+        <select
+          value={shipping}
+          onChange={e => setShipping(e.target.value)}
+          className="w-full border rounded px-3 py-2"
+        >
+          <option value="7-11 超商取貨">7-11 超商取貨</option>
+          <option value="全家超商取貨">全家超商取貨</option>
+          <option value="宅配到府">宅配到府</option>
+          <option value="店到店">店到店</option>
+        </select>
+      </div>
+      <div>
+        <label className="block mb-1">付款方式</label>
+        <select
+          value={payment}
+          onChange={e => setPayment(e.target.value)}
+          className="w-full border rounded px-3 py-2"
+        >
+          <option value="銀行匯款">銀行匯款</option>
+          <option value="模擬付款">模擬付款</option>
+        </select>
       </div>
       {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
       <Button type="submit" className="w-full py-3 text-lg font-bold" disabled={submitting}>
