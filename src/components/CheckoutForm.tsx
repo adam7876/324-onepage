@@ -19,6 +19,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [error, setError] = useState("");
   const [shipping, setShipping] = useState("7-11 超商取貨");
   const [payment, setPayment] = useState("銀行匯款");
+  const [orderId, setOrderId] = useState("");
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -31,7 +32,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     setSubmitting(true);
     setError("");
     try {
-      await addDoc(collection(db, "orders"), {
+      const orderRef = await addDoc(collection(db, "orders"), {
         name,
         email,
         phone,
@@ -43,6 +44,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         status: payment === "銀行匯款" ? "待匯款" : "待付款",
         createdAt: Timestamp.now(),
       });
+      setOrderId(orderRef.id);
       setSuccess(true);
       localStorage.removeItem("cart");
       if (onSuccess) onSuccess();
@@ -54,26 +56,31 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
 
   if (success)
     return (
-      <div className="bg-green-50 border border-green-300 rounded p-6 text-center my-6">
-        <div className="text-2xl text-green-700 mb-2">✓ 訂單已送出！</div>
-        <div className="mb-2">您選擇的物流方式：<span className="font-bold">{shipping}</span></div>
-        <div className="mb-2">您選擇的付款方式：<span className="font-bold">{payment}</span></div>
-        {payment === "銀行匯款" && (
-          <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-2">
-            <div className="font-bold mb-2">匯款資訊</div>
-            <div>銀行名稱：台灣銀行</div>
-            <div>分行：台北分行</div>
-            <div>戶名：王小明</div>
-            <div>帳號：123-456-789012</div>
-            <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
-          </div>
-        )}
-        {payment !== "銀行匯款" && (
-          <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-2">
-            <div className="font-bold mb-2">付款說明</div>
-            <div>此為模擬付款，請等待後台通知。</div>
-          </div>
-        )}
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-lg text-center relative border-2 border-green-400">
+          <div className="text-green-600 text-5xl mb-4">✓</div>
+          <div className="text-2xl font-bold mb-4 text-green-700">訂單成立</div>
+          <div className="mb-2 text-lg">感謝您的訂購！</div>
+          <div className="mb-2">訂單編號：<span className="font-mono text-pink-600">{orderId}</span></div>
+          <div className="mb-2">物流方式：<span className="font-bold">{shipping}</span></div>
+          <div className="mb-2">付款方式：<span className="font-bold">{payment}</span></div>
+          {payment === "銀行匯款" && (
+            <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
+              <div className="font-bold mb-2">匯款資訊</div>
+              <div>銀行名稱：台灣銀行</div>
+              <div>分行：台北分行</div>
+              <div>戶名：王小明</div>
+              <div>帳號：123-456-789012</div>
+              <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
+            </div>
+          )}
+          {payment !== "銀行匯款" && (
+            <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
+              <div className="font-bold mb-2">付款說明</div>
+              <div>此為模擬付款，請等待後台通知。</div>
+            </div>
+          )}
+        </div>
       </div>
     );
 
