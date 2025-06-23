@@ -48,7 +48,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - o Firebase 初始化（Auth、Firestore、Storage）
 - o 專案資料夾結構規劃（components、modules、admin、utils...）
 - o 商品列表（ProductList）
-- o 商品詳情（ProductDetail）
+- o 商品詳情（支援尺寸、顏色、數量選擇，x：Firestore 讀取規格不做，將改用自建後台管理商品規格）
 - o Vercel 自動部署設定
 
 ## 建議的開發步驟（模組化流程）
@@ -64,9 +64,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ### 3. 前台功能模組
 - o 商品列表（ProductList）
-- o 商品詳情（ProductDetail）
-- [ ] 購物車（Cart）
-- [ ] 結帳流程（Checkout）
+- o 商品詳情（支援尺寸、顏色、數量選擇，x：Firestore 讀取規格不做，將改用自建後台管理商品規格）
+- o 購物車（Cart）
+- o 結帳流程（Checkout）
 - [ ] 金流串接（如綠界、藍新、Line Pay）
 - [ ] 訂單查詢
 
