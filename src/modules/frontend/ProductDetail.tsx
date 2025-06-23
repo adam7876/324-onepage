@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
 import { Button } from "../../components/ui/button";
 import Image from "next/image";
+import CartInline from "../../components/CartInline";
 
 interface Product {
   id: string;
@@ -167,6 +168,8 @@ export default function ProductDetail() {
           加入購物車
         </Button>
       </div>
+      {/* 即時購物車內容 */}
+      <CartInline />
       {/* 已移除訂單 Modal，購物車式不再需要 */}
     </section>
   );
