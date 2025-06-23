@@ -59,11 +59,12 @@ export default function AdminProducts() {
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, files } = e.target as any;
-    if (name === "image") {
-      setForm(f => ({ ...f, image: files[0] }));
+    const target = e.target;
+    const name = target.name;
+    if (name === "image" && target instanceof HTMLInputElement && target.files) {
+      setForm(f => ({ ...f, image: target.files![0] }));
     } else {
-      setForm(f => ({ ...f, [name]: value }));
+      setForm(f => ({ ...f, [name]: target.value }));
     }
   };
 
