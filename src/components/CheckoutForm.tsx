@@ -80,6 +80,9 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
               <div>此為模擬付款，請等待後台通知。</div>
             </div>
           )}
+          <Button className="w-full mt-4" onClick={() => { setSuccess(false); if (onSuccess) onSuccess(); }}>
+            關閉
+          </Button>
         </div>
       </div>
     );
