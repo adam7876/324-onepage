@@ -6,6 +6,7 @@ import { db } from "../../firebase/firestore";
 import { Button } from "../../components/ui/button";
 import Image from "next/image";
 import CartInline from "../../components/CartInline";
+import { useCart } from "../../components/CartContext";
 
 interface Product {
   id: string;
@@ -25,6 +26,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
+
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function fetchProduct() {
@@ -54,32 +57,15 @@ export default function ProductDetail() {
   // 加入購物車
   const handleAddToCart = () => {
     if (!product) return;
-    const cartRaw = localStorage.getItem("cart");
-    const cart: Array<{
-      id: string;
-      name: string;
-      price: number;
-      imageUrl?: string;
-      size?: string;
-      color?: string;
-      quantity: number;
-    }> = cartRaw ? JSON.parse(cartRaw) : [];
-    // 判斷同商品同尺寸顏色是否已存在
-    const idx = cart.findIndex((item) => item.id === product.id && item.size === size && item.color === color);
-    if (idx > -1) {
-      cart[idx].quantity += quantity;
-    } else {
-      cart.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        size,
-        color,
-        quantity,
-      });
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      size,
+      color,
+      quantity,
+    });
     alert("已加入購物車！");
   };
 

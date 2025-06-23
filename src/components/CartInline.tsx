@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import CheckoutForm from "./CheckoutForm";
+import { useCart } from "./CartContext";
 
 export interface CartItem {
   id: string;
@@ -14,29 +15,7 @@ export interface CartItem {
 }
 
 export default function CartInline() {
-  const [cart, setCart] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("cart");
-    if (stored) setCart(JSON.parse(stored));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-
-  const updateQuantity = (idx: number, quantity: number) => {
-    setCart((prev) =>
-      prev.map((item, i) =>
-        i === idx ? { ...item, quantity: Math.max(1, quantity) } : item
-      )
-    );
-  };
-
-  const removeItem = (idx: number) => {
-    setCart((prev) => prev.filter((_, i) => i !== idx));
-  };
-
+  const { cart, updateQuantity, removeItem, clearCart } = useCart();
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   if (cart.length === 0)
@@ -85,7 +64,7 @@ export default function CartInline() {
       <div className="flex justify-between items-center mt-4">
         <div className="text-xl font-bold">總金額：NT$ {total.toLocaleString()}</div>
       </div>
-      <CheckoutForm cart={cart} onSuccess={() => setCart([])} />
+      <CheckoutForm cart={cart} onSuccess={clearCart} />
     </div>
   );
 } 
