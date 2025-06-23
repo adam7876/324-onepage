@@ -42,7 +42,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       setSuccess(true);
       localStorage.removeItem("cart");
       if (onSuccess) onSuccess();
-    } catch (err) {
+    } catch {
       setError("訂單送出失敗，請稍後再試");
     }
     setSubmitting(false);
