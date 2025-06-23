@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Product {
   id: string;
@@ -41,10 +42,13 @@ export default function ProductList() {
             <Card className="shadow-none border hover:shadow-lg transition-shadow duration-200 bg-white cursor-pointer">
               <CardContent className="flex flex-col items-center p-4">
                 {product.imageUrl ? (
-                  <img
+                  <Image
                     src={product.imageUrl}
                     alt={product.name}
+                    width={400}
+                    height={288}
                     className="w-full h-72 object-cover rounded mb-4 bg-gray-100"
+                    style={{ objectFit: "cover" }}
                   />
                 ) : (
                   <div className="w-full h-72 flex items-center justify-center bg-gray-100 rounded mb-4 text-gray-400">
