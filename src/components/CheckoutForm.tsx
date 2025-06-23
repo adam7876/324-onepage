@@ -6,7 +6,7 @@ import type { CartItem } from "./CartInline";
 
 interface CheckoutFormProps {
   cart: CartItem[];
-  onSuccess?: () => void;
+  onSuccess?: (info: { orderId: string; shipping: string; payment: string }) => void;
 }
 
 export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
@@ -47,7 +47,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       setOrderId(orderRef.id);
       setSuccess(true);
       localStorage.removeItem("cart");
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess({ orderId: orderRef.id, shipping, payment });
     } catch {
       setError("訂單送出失敗，請稍後再試");
     }
@@ -80,7 +80,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
               <div>此為模擬付款，請等待後台通知。</div>
             </div>
           )}
-          <Button className="w-full mt-4" onClick={() => { setSuccess(false); if (onSuccess) onSuccess(); }}>
+          <Button className="w-full mt-4" onClick={() => { setSuccess(false); if (onSuccess) onSuccess({ orderId, shipping, payment }); }}>
             關閉
           </Button>
         </div>

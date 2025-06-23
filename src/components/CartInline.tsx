@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import Image from "next/image";
 import CheckoutForm from "./CheckoutForm";
 import { useCart } from "./CartContext";
+import { useState } from "react";
 
 export interface CartItem {
   id: string;
@@ -17,6 +18,46 @@ export interface CartItem {
 export default function CartInline() {
   const { cart, updateQuantity, removeItem, clearCart } = useCart();
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const [orderInfo, setOrderInfo] = useState<null | {
+    orderId: string;
+    shipping: string;
+    payment: string;
+  }>(null);
+
+  if (orderInfo) {
+    // 訂單完成視窗
+    return (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-lg text-center relative border-2 border-green-400">
+          <div className="text-green-600 text-5xl mb-4">✓</div>
+          <div className="text-2xl font-bold mb-4 text-green-700">訂單成立</div>
+          <div className="mb-2 text-lg">感謝您的訂購！</div>
+          <div className="mb-2">訂單編號：<span className="font-mono text-pink-600">{orderInfo.orderId}</span></div>
+          <div className="mb-2">物流方式：<span className="font-bold">{orderInfo.shipping}</span></div>
+          <div className="mb-2">付款方式：<span className="font-bold">{orderInfo.payment}</span></div>
+          {orderInfo.payment === "銀行匯款" && (
+            <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
+              <div className="font-bold mb-2">匯款資訊</div>
+              <div>銀行名稱：台灣銀行</div>
+              <div>分行：台北分行</div>
+              <div>戶名：王小明</div>
+              <div>帳號：123-456-789012</div>
+              <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
+            </div>
+          )}
+          {orderInfo.payment !== "銀行匯款" && (
+            <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
+              <div className="font-bold mb-2">付款說明</div>
+              <div>此為模擬付款，請等待後台通知。</div>
+            </div>
+          )}
+          <Button className="w-full mt-4" onClick={() => { setOrderInfo(null); clearCart(); }}>
+            關閉
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.length === 0)
     return <div className="text-center py-6 text-gray-400">購物車目前沒有商品</div>;
@@ -64,7 +105,7 @@ export default function CartInline() {
       <div className="flex justify-between items-center mt-4">
         <div className="text-xl font-bold">總金額：NT$ {total.toLocaleString()}</div>
       </div>
-      <CheckoutForm cart={cart} onSuccess={clearCart} />
+      <CheckoutForm cart={cart} onSuccess={(info) => setOrderInfo(info)} />
     </div>
   );
 } 
