@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import Image from "next/image";
+import CheckoutForm from "./CheckoutForm";
 
 export interface CartItem {
   id: string;
@@ -83,10 +84,8 @@ export default function CartInline() {
       </div>
       <div className="flex justify-between items-center mt-4">
         <div className="text-xl font-bold">總金額：NT$ {total.toLocaleString()}</div>
-        <Button className="px-8 py-3 text-lg font-bold" asChild>
-          <a href="/checkout">前往結帳</a>
-        </Button>
       </div>
+      <CheckoutForm cart={cart} onSuccess={() => setCart([])} />
     </div>
   );
 } 
