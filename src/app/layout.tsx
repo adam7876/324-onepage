@@ -32,7 +32,7 @@ export default function RootLayout({
         <CartProvider>
           <Navbar />
           <nav className="absolute top-4 right-4">
-            <a href="/admin/products" className="text-sm text-blue-600 hover:underline font-bold">管理後台</a>
+            <a href="/admin/login" className="text-sm text-blue-600 hover:underline font-bold">管理後台</a>
           </nav>
           {children}
         </CartProvider>

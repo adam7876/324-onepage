@@ -7,6 +7,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProductForm, { ProductFormData } from "@/modules/admin/ProductForm";
 import Link from "next/link";
 import Image from "next/image";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app } from "@/firebase/firebaseConfig";
 
 interface Product {
   id: string;
@@ -28,9 +30,13 @@ export default function AdminProducts() {
 
   // 權限驗證
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("admin_login") !== "1") {
-      router.replace("/admin/login");
-    }
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.replace("/admin/login");
+      }
+    });
+    return () => unsubscribe();
   }, [router]);
 
   // 取得商品列表
