@@ -11,6 +11,7 @@ interface Product {
   name: string;
   price: number;
   imageUrl?: string;
+  images?: string[];
 }
 
 export default function ProductList() {
@@ -41,9 +42,9 @@ export default function ProductList() {
           <Link href={`/product/${product.id}`} className="block w-full h-full" key={product.id}>
             <Card className="shadow-none border hover:shadow-lg transition-shadow duration-200 bg-white cursor-pointer">
               <CardContent className="flex flex-col items-center p-4">
-                {product.imageUrl ? (
+                {product.imageUrl || (Array.isArray(product.images) && product.images[0]) ? (
                   <Image
-                    src={product.imageUrl}
+                    src={product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "/no-image.png"}
                     alt={product.name}
                     width={400}
                     height={288}
