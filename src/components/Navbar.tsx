@@ -33,6 +33,8 @@ export default function Navbar() {
             <span className="material-symbols-outlined">shopping_bag</span>
           </Link>
         </Button>
+        {/* 管理後台 */}
+        <Link href="/admin/login" className="ml-2 px-4 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition">管理後台</Link>
       </div>
     </nav>
   );
