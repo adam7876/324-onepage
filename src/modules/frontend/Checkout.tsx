@@ -20,6 +20,7 @@ export default function Checkout() {
   const [address, setAddress] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -32,20 +33,41 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !address || cart.length === 0) return;
+    
     setSubmitting(true);
-    await addDoc(collection(db, "orders"), {
-      name,
-      phone,
-      address,
-      cart,
-      total,
-      status: "待匯款",
-      createdAt: Timestamp.now(),
-    });
-    setSubmitting(false);
-    setSuccess(true);
-    localStorage.removeItem("cart");
-    setTimeout(() => router.push("/"), 3000);
+    setError("");
+    
+    try {
+      // 確保 Firebase 已初始化
+      if (!db) {
+        throw new Error("Firebase 連接失敗");
+      }
+
+      const orderData = {
+        name,
+        phone,
+        address,
+        cart,
+        total,
+        status: "待匯款",
+        createdAt: Timestamp.now(),
+      };
+
+      console.log("正在送出訂單:", orderData);
+      
+      const docRef = await addDoc(collection(db, "orders"), orderData);
+      console.log("訂單已建立，ID:", docRef.id);
+      
+      setSuccess(true);
+      localStorage.removeItem("cart");
+      setTimeout(() => router.push("/"), 3000);
+      
+    } catch (err) {
+      console.error("訂單送出失敗:", err);
+      setError(err instanceof Error ? err.message : "訂單送出失敗，請稍後再試");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (success)
@@ -73,6 +95,13 @@ export default function Checkout() {
         </ul>
         <div className="text-right font-bold">總金額：NT$ {total.toLocaleString()}</div>
       </div>
+      
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="mb-8 space-y-4">
         <div>
           <label className="block mb-1">收件人姓名</label>

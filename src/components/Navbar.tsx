@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "../components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,28 +20,13 @@ export default function Navbar() {
         <li className="hover:text-gray-500 cursor-pointer">ONE PIECES</li>
         <li className="hover:text-gray-500 cursor-pointer">ACCESSORIES</li>
         <li className="hover:text-gray-500 cursor-pointer">SALE</li>
-      </ul>
-      {/* 右側功能區 */}
-      <div className="flex gap-4 items-center">
-        {/* 搜尋 */}
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <span className="material-symbols-outlined">search</span>
-        </Button>
-        {/* 會員 */}
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <span className="material-symbols-outlined">person</span>
-        </Button>
-        {/* 購物車 */}
-        <Button variant="ghost" size="icon" className="rounded-full" asChild>
-          <Link href="/cart">
-            <span className="material-symbols-outlined">shopping_bag</span>
-          </Link>
-        </Button>
-        {/* 管理後台（只在非 /admin 路徑顯示，且為文字連結） */}
+        {/* 管理後台（只在非 /admin 路徑顯示，且符合目前風格） */}
         { !pathname.startsWith("/admin") && (
-          <Link href="/admin/login" className="ml-2 text-sm text-blue-600 hover:underline font-bold">管理後台</Link>
+          <li className="hover:text-gray-500 cursor-pointer">
+            <Link href="/admin/login">管理後台</Link>
+          </li>
         )}
-      </div>
+      </ul>
     </nav>
   );
 } 
