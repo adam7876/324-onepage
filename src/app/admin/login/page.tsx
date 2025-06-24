@@ -17,8 +17,8 @@ export default function AdminLogin() {
       // 登入成功，導向後台或顯示成功訊息
       alert("登入成功！");
       // 例如：window.location.href = "/admin/products";
-    } catch (err: any) {
-      setError("登入失敗：" + err.message);
+    } catch (err) {
+      setError("登入失敗：" + (err instanceof Error ? err.message : String(err)));
     }
   };
 
