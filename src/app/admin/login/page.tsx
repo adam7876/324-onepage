@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { app } from "@/src/firebase/firebaseConfig"; // 你的 firebase 初始化
+import { app } from "@/firebase/firebaseConfig"; // 你的 firebase 初始化
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
