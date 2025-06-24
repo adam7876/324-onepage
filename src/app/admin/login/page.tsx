@@ -1,33 +1,38 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { app } from "@/src/firebase/firebaseConfig"; // 你的 firebase 初始化
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === "admin" && password === "admin324") {
-      localStorage.setItem("admin_login", "1");
-      router.push("/admin/products");
-    } else {
-      setError("帳號或密碼錯誤");
+    setError("");
+    const auth = getAuth(app);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // 登入成功，導向後台或顯示成功訊息
+      alert("登入成功！");
+      // 例如：window.location.href = "/admin/products";
+    } catch (err: any) {
+      setError("登入失敗：" + err.message);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow max-w-xs w-full space-y-4 border">
+      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow max-w-xs w-full space-y-4 border">
         <h1 className="text-2xl font-bold mb-4 text-center">後台登入</h1>
         <div>
-          <label className="block mb-1">帳號</label>
+          <label className="block mb-1">Email</label>
           <input
-            type="text"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             className="w-full border rounded px-3 py-2"
             required
           />
@@ -36,6 +41,7 @@ export default function AdminLogin() {
           <label className="block mb-1">密碼</label>
           <input
             type="password"
+            placeholder="密碼"
             value={password}
             onChange={e => setPassword(e.target.value)}
             className="w-full border rounded px-3 py-2"
