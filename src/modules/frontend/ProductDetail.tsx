@@ -16,6 +16,7 @@ interface Product {
   description?: string;
   sizes?: string[];
   colors?: string[];
+  images?: string[];
 }
 
 export default function ProductDetail() {
@@ -76,9 +77,9 @@ export default function ProductDetail() {
     <section className="max-w-3xl mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 flex items-center justify-center">
-          {product.imageUrl ? (
+          {(product.imageUrl || (Array.isArray(product.images) && product.images[0])) ? (
             <Image
-              src={product.imageUrl}
+              src={product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "/no-image.png"}
               alt={product.name}
               width={320}
               height={384}
@@ -130,9 +131,9 @@ export default function ProductDetail() {
       <div className="my-8 bg-gray-100 rounded p-4">
         <div className="font-bold mb-2">目前已經選購</div>
         <div className="flex items-center gap-4">
-          {product.imageUrl && (
+          {(product.imageUrl || (Array.isArray(product.images) && product.images[0])) && (
             <Image
-              src={product.imageUrl}
+              src={product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "/no-image.png"}
               alt={product.name}
               width={64}
               height={64}

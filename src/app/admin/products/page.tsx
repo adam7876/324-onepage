@@ -177,7 +177,7 @@ export default function AdminProducts() {
                 <td className="border px-2 py-1">{(p.sizes ?? []).join(", ")}</td>
                 <td className="border px-2 py-1">{(p.colors ?? []).join(", ")}</td>
                 <td className="border px-2 py-1">
-                  <button className="text-blue-600 mr-2" disabled>編輯</button>
+                  <button className="text-blue-600 mr-2" onClick={() => router.push(`/admin/products/edit/${p.id}`)}>編輯</button>
                   <button className="text-red-600" onClick={() => handleDelete(p.id)}>刪除</button>
                 </td>
               </tr>
