@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { db } from "../firebase/firestore";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, getDocs, limit, query } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app } from "../firebase/firebaseConfig";
 import type { CartItem } from "./CartInline";
 
 interface CheckoutFormProps {
@@ -21,20 +23,43 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [shipping, setShipping] = useState("7-11 超商取貨");
   const [payment, setPayment] = useState("銀行匯款");
   const [orderId, setOrderId] = useState("");
-  const [initDelay, setInitDelay] = useState(true);
+  const [firebaseReady, setFirebaseReady] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
-    console.log("CheckoutForm 已載入，開始初始化延遲...");
-    // 簡單的延遲，給 Firebase 時間初始化
-    const timer = setTimeout(() => {
-      console.log("初始化延遲完成，表單可用");
-      setInitDelay(false);
-    }, 2000); // 2 秒延遲
+    console.log("CheckoutForm 已載入，檢查 Firebase 狀態...");
     
-    return () => clearTimeout(timer);
-  }, []);
+    // 監聽 Auth 狀態變化，這表示 Firebase 已初始化
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("Firebase Auth 狀態已確認，Firebase 已初始化");
+      // 無論是否登入，Auth 狀態的觸發都表示 Firebase 已準備好
+      setFirebaseReady(true);
+    });
+
+    // 備用檢查：如果 Auth 狀態沒有觸發，用測試查詢來確認
+    const fallbackCheck = setTimeout(async () => {
+      if (!firebaseReady) {
+        try {
+          console.log("執行備用檢查，測試 Firestore 連接...");
+          const testQuery = query(collection(db, "products"), limit(1));
+          await getDocs(testQuery);
+          console.log("Firestore 連接測試成功");
+          setFirebaseReady(true);
+        } catch (error) {
+          console.error("Firestore 連接測試失敗:", error);
+          // 如果還是失敗，3秒後再試一次
+          setTimeout(() => setFirebaseReady(true), 3000);
+        }
+      }
+    }, 1000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(fallbackCheck);
+    };
+  }, [firebaseReady]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +70,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       return;
     }
     
-    if (initDelay) {
+    if (!firebaseReady) {
       setError("系統正在初始化，請稍後再試");
       return;
     }
@@ -123,9 +148,9 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     <form onSubmit={handleSubmit} className="bg-white border rounded p-6 mt-6 max-w-lg mx-auto space-y-4 shadow">
       <h2 className="text-lg font-bold mb-2">結帳資訊</h2>
       
-      {initDelay && (
-        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
-          🔄 系統初始化中，請稍候... ({initDelay ? "初始化中" : "已完成"})
+      {!firebaseReady && (
+        <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+          🔄 系統初始化中，請稍候...
         </div>
       )}
       
@@ -201,10 +226,10 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       <Button 
         type="submit" 
         className="w-full py-3 text-lg font-bold" 
-        disabled={submitting || initDelay}
+        disabled={submitting || !firebaseReady}
       >
-        {submitting ? "🔄 送出中..." : initDelay ? "⏳ 系統初始化中..." : `送出訂單（NT$ ${total.toLocaleString()}）`}
+        {submitting ? "🔄 送出中..." : !firebaseReady ? "⏳ 系統初始化中..." : `送出訂單（NT$ ${total.toLocaleString()}）`}
       </Button>
     </form>
   );
-} 
+}
