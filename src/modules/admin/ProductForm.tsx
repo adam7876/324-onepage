@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export interface ProductFormData {
   name: string;
@@ -83,7 +84,7 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
             className="hidden"
           />
           {preview && (
-            <img src={preview} alt="預覽" className="w-20 h-20 object-cover rounded border" />
+            <Image src={preview} alt="預覽" width={80} height={80} className="w-20 h-20 object-cover rounded border" />
           )}
         </div>
       </div>

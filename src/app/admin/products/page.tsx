@@ -5,6 +5,8 @@ import { collection, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore"
 import { db } from "../../../firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProductForm, { ProductFormData } from "@/modules/admin/ProductForm";
+import Link from "next/link";
+import Image from "next/image";
 
 interface Product {
   id: string;
@@ -60,7 +62,7 @@ export default function AdminProducts() {
         <button className="bg-black text-white px-4 py-2 rounded font-bold" onClick={() => setShowForm(f => !f)}>
           {showForm ? "取消新增" : "＋新增商品"}
         </button>
-        <a href="/" className="text-sm text-blue-600 hover:underline font-bold">回到首頁</a>
+        <Link href="/" className="text-sm text-blue-600 hover:underline font-bold">回到首頁</Link>
       </div>
       {showForm && (
         <ProductForm
@@ -131,7 +133,7 @@ export default function AdminProducts() {
                 <td className="border px-2 py-1 max-w-xs truncate">{p.description}</td>
                 <td className="border px-2 py-1 text-center">
                   {p.images && p.images[0] ? (
-                    <img src={p.images[0]} alt={p.name} className="w-16 h-16 object-cover rounded mx-auto" />
+                    <Image src={p.images[0]} alt={p.name} width={64} height={64} className="w-16 h-16 object-cover rounded mx-auto" />
                   ) : (
                     <span className="text-gray-400">無圖片</span>
                   )}
