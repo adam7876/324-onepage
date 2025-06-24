@@ -21,14 +21,6 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    price: "",
-    description: "",
-    sizes: "",
-    colors: "",
-    image: null as File | null,
-  });
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState("");
 
