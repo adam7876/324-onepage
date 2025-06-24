@@ -2,11 +2,13 @@
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/firebase/firebaseConfig"; // 你的 firebase 初始化
+import { useRouter } from "next/navigation";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,9 +16,8 @@ export default function AdminLogin() {
     const auth = getAuth(app);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // 登入成功，導向後台或顯示成功訊息
       alert("登入成功！");
-      // 例如：window.location.href = "/admin/products";
+      router.push("/admin/products");
     } catch (err) {
       setError("登入失敗：" + (err instanceof Error ? err.message : String(err)));
     }
