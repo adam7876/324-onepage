@@ -56,10 +56,11 @@ export default function AdminProducts() {
   return (
     <section className="max-w-5xl mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold mb-8 tracking-widest">商品管理</h1>
-      <div className="mb-6 flex justify-end">
+      <div className="mb-6 flex justify-between items-center">
         <button className="bg-black text-white px-4 py-2 rounded font-bold" onClick={() => setShowForm(f => !f)}>
           {showForm ? "取消新增" : "＋新增商品"}
         </button>
+        <a href="/" className="text-sm text-blue-600 hover:underline font-bold">回到首頁</a>
       </div>
       {showForm && (
         <ProductForm
@@ -115,7 +116,7 @@ export default function AdminProducts() {
               <th className="border px-4 py-2">名稱</th>
               <th className="border px-4 py-2">價格</th>
               <th className="border px-4 py-2">描述</th>
-              <th className="border px-4 py-2">圖片數</th>
+              <th className="border px-4 py-2">主圖</th>
               <th className="border px-4 py-2">尺寸</th>
               <th className="border px-4 py-2">顏色</th>
               <th className="border px-4 py-2">操作</th>
@@ -128,7 +129,13 @@ export default function AdminProducts() {
                 <td className="border px-2 py-1">{p.name}</td>
                 <td className="border px-2 py-1">NT$ {p.price.toLocaleString()}</td>
                 <td className="border px-2 py-1 max-w-xs truncate">{p.description}</td>
-                <td className="border px-2 py-1 text-center">{p.images?.length ?? 0}</td>
+                <td className="border px-2 py-1 text-center">
+                  {p.images && p.images[0] ? (
+                    <img src={p.images[0]} alt={p.name} className="w-16 h-16 object-cover rounded mx-auto" />
+                  ) : (
+                    <span className="text-gray-400">無圖片</span>
+                  )}
+                </td>
                 <td className="border px-2 py-1">{(p.sizes ?? []).join(", ")}</td>
                 <td className="border px-2 py-1">{(p.colors ?? []).join(", ")}</td>
                 <td className="border px-2 py-1">

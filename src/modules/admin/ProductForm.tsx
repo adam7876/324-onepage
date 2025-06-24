@@ -28,10 +28,13 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
     image: null,
   });
 
+  const [preview, setPreview] = useState<string | null>(initialData?.image ? URL.createObjectURL(initialData.image) : null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === "image" && files) {
       setForm(f => ({ ...f, image: files[0] }));
+      setPreview(URL.createObjectURL(files[0]));
     } else {
       setForm(f => ({ ...f, [name]: value }));
     }
@@ -67,7 +70,22 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
       </div>
       <div>
         <label className="block mb-1">商品圖片</label>
-        <input type="file" name="image" accept="image/*" onChange={handleChange} className="w-full" />
+        <div className="flex items-center gap-4">
+          <button type="button" className="px-3 py-1 bg-gray-200 rounded font-bold" onClick={() => document.getElementById('product-image-input')?.click()}>
+            選擇圖片
+          </button>
+          <input
+            id="product-image-input"
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleChange}
+            className="hidden"
+          />
+          {preview && (
+            <img src={preview} alt="預覽" className="w-20 h-20 object-cover rounded border" />
+          )}
+        </div>
       </div>
       {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
       <button type="submit" className="w-full py-2 bg-black text-white rounded font-bold" disabled={loading}>
