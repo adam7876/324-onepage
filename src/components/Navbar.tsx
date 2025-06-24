@@ -1,7 +1,10 @@
 import { Button } from "../components/ui/button";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   return (
     <nav className="w-full flex items-center justify-between py-4 px-8 border-b bg-white">
       {/* LOGO */}
@@ -33,8 +36,10 @@ export default function Navbar() {
             <span className="material-symbols-outlined">shopping_bag</span>
           </Link>
         </Button>
-        {/* 管理後台 */}
-        <Link href="/admin/login" className="ml-2 px-4 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition">管理後台</Link>
+        {/* 管理後台（只在非 /admin 路徑顯示，且為文字連結） */}
+        { !pathname.startsWith("/admin") && (
+          <Link href="/admin/login" className="ml-2 text-sm text-blue-600 hover:underline font-bold">管理後台</Link>
+        )}
       </div>
     </nav>
   );
