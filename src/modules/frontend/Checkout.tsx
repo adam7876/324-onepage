@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
-import { db, firebaseReady } from "../../firebase/firestore";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { db } from "../../firebase/firestore";
+import { collection, addDoc, Timestamp, getDocs, limit, query } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 interface CartItem {
@@ -21,21 +21,31 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [firebaseInitialized, setFirebaseInitialized] = useState(false);
+  const [firebaseReady, setFirebaseReady] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
     if (stored) setCart(JSON.parse(stored));
     
-    // 等待 Firebase 初始化完成
-    firebaseReady.then(() => {
-      setFirebaseInitialized(true);
-      console.log("Firebase 初始化完成，可以送出訂單");
-    }).catch((error) => {
-      console.error("Firebase 初始化失敗:", error);
-      setError("系統初始化失敗，請重新整理頁面");
-    });
+    // 測試 Firebase 連接
+    const testFirebaseConnection = async () => {
+      try {
+        console.log("正在測試 Firebase 連接...");
+        // 嘗試讀取 products collection 來測試連接
+        const testQuery = query(collection(db, "products"), limit(1));
+        await getDocs(testQuery);
+        console.log("Firebase 連接測試成功");
+        setFirebaseReady(true);
+      } catch (error) {
+        console.error("Firebase 連接測試失敗:", error);
+        // 延遲重試
+        setTimeout(testFirebaseConnection, 2000);
+      }
+    };
+    
+    // 延遲一下再測試，確保 Firebase 有時間初始化
+    setTimeout(testFirebaseConnection, 500);
   }, []);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -44,7 +54,7 @@ export default function Checkout() {
     e.preventDefault();
     if (!name || !phone || !address || cart.length === 0) return;
     
-    if (!firebaseInitialized) {
+    if (!firebaseReady) {
       setError("系統正在初始化，請稍後再試");
       return;
     }
@@ -53,13 +63,6 @@ export default function Checkout() {
     setError("");
     
     try {
-      // 確保 Firebase 連接正常
-      await firebaseReady;
-      
-      if (!db) {
-        throw new Error("Firebase 連接失敗");
-      }
-
       const orderData = {
         name,
         phone,
@@ -113,7 +116,7 @@ export default function Checkout() {
         <div className="text-right font-bold">總金額：NT$ {total.toLocaleString()}</div>
       </div>
       
-      {!firebaseInitialized && (
+      {!firebaseReady && (
         <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
           系統初始化中，請稍候...
         </div>
@@ -159,9 +162,9 @@ export default function Checkout() {
         <Button 
           type="submit" 
           className="w-full py-4 text-lg font-bold" 
-          disabled={submitting || !firebaseInitialized}
+          disabled={submitting || !firebaseReady}
         >
-          {submitting ? "送出中..." : !firebaseInitialized ? "系統初始化中..." : "送出訂單"}
+          {submitting ? "送出中..." : !firebaseReady ? "系統初始化中..." : "送出訂單"}
         </Button>
       </form>
       <div className="bg-gray-50 p-4 rounded border">
