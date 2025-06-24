@@ -59,57 +59,6 @@ export default function AdminProducts() {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const target = e.target;
-    const name = target.name;
-    if (name === "image" && target instanceof HTMLInputElement && target.files) {
-      setForm(f => ({ ...f, image: target.files![0] }));
-    } else {
-      setForm(f => ({ ...f, [name]: target.value }));
-    }
-  };
-
-  const handleAddProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-    if (!form.name || !form.price) {
-      setFormError("請填寫商品名稱與價格");
-      return;
-    }
-    setFormLoading(true);
-    let imageUrl = "";
-    if (form.image) {
-      try {
-        const storage = getStorage();
-        const imgRef = ref(storage, `products/${Date.now()}_${form.image.name}`);
-        await uploadBytes(imgRef, form.image);
-        imageUrl = await getDownloadURL(imgRef);
-      } catch {
-        setFormError("圖片上傳失敗");
-        setFormLoading(false);
-        return;
-      }
-    }
-    const sizes = form.sizes.split(",").map(s => s.trim()).filter(Boolean);
-    const colors = form.colors.split(",").map(c => c.trim()).filter(Boolean);
-    const newProduct = {
-      name: form.name,
-      price: Number(form.price),
-      description: form.description,
-      images: imageUrl ? [imageUrl] : [],
-      sizes,
-      colors,
-    };
-    const docRef = await addDoc(collection(db, "products"), newProduct);
-    setProducts(prev => [
-      { id: docRef.id, ...newProduct },
-      ...prev,
-    ]);
-    setShowForm(false);
-    setForm({ name: "", price: "", description: "", sizes: "", colors: "", image: null });
-    setFormLoading(false);
-  };
-
   if (loading) return <div className="text-center py-12 text-lg">載入中...</div>;
 
   return (

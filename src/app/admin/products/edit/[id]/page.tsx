@@ -65,15 +65,15 @@ export default function EditProductPage() {
             }
             const sizes = (form.sizes || "").split(",").map(s => s.trim()).filter(Boolean);
             const colors = (form.colors || "").split(",").map(c => c.trim()).filter(Boolean);
-            const updateData: any = {
+            const updateData = {
               name: form.name,
               price: Number(form.price),
               description: form.description,
               sizes,
               colors,
             };
-            if (imageUrl) updateData.images = [imageUrl];
-            await updateDoc(doc(db, "products", id), updateData);
+            const finalUpdateData = imageUrl ? { ...updateData, images: [imageUrl] } : updateData;
+            await updateDoc(doc(db, "products", id), finalUpdateData);
             setFormLoading(false);
             alert("商品已更新！");
             router.push("/admin/products");
