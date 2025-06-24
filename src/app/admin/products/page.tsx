@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { collection, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
 import { db } from "../../../firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import ProductForm, { ProductFormData } from "@/modules/admin/ProductForm";
 
 interface Product {
   id: string;
@@ -120,37 +121,50 @@ export default function AdminProducts() {
         </button>
       </div>
       {showForm && (
-        <form onSubmit={handleAddProduct} className="bg-white border rounded p-6 mb-8 max-w-2xl mx-auto space-y-4 shadow">
-          <h2 className="text-lg font-bold mb-2">新增商品</h2>
-          <div>
-            <label className="block mb-1">商品名稱</label>
-            <input type="text" name="name" value={form.name} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required />
-          </div>
-          <div>
-            <label className="block mb-1">價格</label>
-            <input type="number" name="price" value={form.price} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required />
-          </div>
-          <div>
-            <label className="block mb-1">描述</label>
-            <textarea name="description" value={form.description} onChange={handleFormChange} className="w-full border rounded px-3 py-2" />
-          </div>
-          <div>
-            <label className="block mb-1">尺寸（逗號分隔）</label>
-            <input type="text" name="sizes" value={form.sizes} onChange={handleFormChange} className="w-full border rounded px-3 py-2" placeholder="如 S, M, L" />
-          </div>
-          <div>
-            <label className="block mb-1">顏色（逗號分隔）</label>
-            <input type="text" name="colors" value={form.colors} onChange={handleFormChange} className="w-full border rounded px-3 py-2" placeholder="如 白色, 黑色" />
-          </div>
-          <div>
-            <label className="block mb-1">商品圖片</label>
-            <input type="file" name="image" accept="image/*" onChange={handleFormChange} className="w-full" />
-          </div>
-          {formError && <div className="text-red-500 text-sm mb-2">{formError}</div>}
-          <button type="submit" className="w-full py-2 bg-black text-white rounded font-bold" disabled={formLoading}>
-            {formLoading ? "上傳中..." : "送出"}
-          </button>
-        </form>
+        <ProductForm
+          initialData={{ name: "", price: "", description: "", sizes: "", colors: "", image: null }}
+          loading={formLoading}
+          error={formError}
+          submitText="送出"
+          onSubmit={async (form: ProductFormData) => {
+            setFormError("");
+            if (!form.name || !form.price) {
+              setFormError("請填寫商品名稱與價格");
+              return;
+            }
+            setFormLoading(true);
+            let imageUrl = "";
+            if (form.image) {
+              try {
+                const storage = getStorage();
+                const imgRef = ref(storage, `products/${Date.now()}_${form.image.name}`);
+                await uploadBytes(imgRef, form.image);
+                imageUrl = await getDownloadURL(imgRef);
+              } catch {
+                setFormError("圖片上傳失敗");
+                setFormLoading(false);
+                return;
+              }
+            }
+            const sizes = (form.sizes || "").split(",").map(s => s.trim()).filter(Boolean);
+            const colors = (form.colors || "").split(",").map(c => c.trim()).filter(Boolean);
+            const newProduct = {
+              name: form.name,
+              price: Number(form.price),
+              description: form.description,
+              images: imageUrl ? [imageUrl] : [],
+              sizes,
+              colors,
+            };
+            const docRef = await addDoc(collection(db, "products"), newProduct);
+            setProducts(prev => [
+              { id: docRef.id, ...newProduct },
+              ...prev,
+            ]);
+            setShowForm(false);
+            setFormLoading(false);
+          }}
+        />
       )}
       <div className="overflow-x-auto">
         <table className="min-w-full border text-sm">
