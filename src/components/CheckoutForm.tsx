@@ -1,7 +1,8 @@
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { db } from "../firebase/firestore";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, getDocs, limit, query } from "firebase/firestore";
 import type { CartItem } from "./CartInline";
 
 interface CheckoutFormProps {
@@ -20,8 +21,30 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [shipping, setShipping] = useState("7-11 超商取貨");
   const [payment, setPayment] = useState("銀行匯款");
   const [orderId, setOrderId] = useState("");
+  const [firebaseReady, setFirebaseReady] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    // 測試 Firebase 連接
+    const testFirebaseConnection = async () => {
+      try {
+        console.log("正在測試 Firebase 連接...");
+        // 嘗試讀取 products collection 來測試連接
+        const testQuery = query(collection(db, "products"), limit(1));
+        await getDocs(testQuery);
+        console.log("Firebase 連接測試成功");
+        setFirebaseReady(true);
+      } catch (error) {
+        console.error("Firebase 連接測試失敗:", error);
+        // 延遲重試
+        setTimeout(testFirebaseConnection, 2000);
+      }
+    };
+    
+    // 延遲一下再測試，確保 Firebase 有時間初始化
+    setTimeout(testFirebaseConnection, 500);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +52,12 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       setError("請填寫完整資訊並確認購物車有商品");
       return;
     }
+    
+    if (!firebaseReady) {
+      setError("系統正在初始化，請稍後再試");
+      return;
+    }
+    
     setSubmitting(true);
     setError("");
     try {
@@ -44,11 +73,13 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         status: payment === "銀行匯款" ? "待匯款" : "待付款",
         createdAt: Timestamp.now(),
       });
+      console.log("訂單已建立，ID:", orderRef.id);
       setOrderId(orderRef.id);
       setSuccess(true);
       localStorage.removeItem("cart");
       if (onSuccess) onSuccess({ orderId: orderRef.id, shipping, payment });
-    } catch {
+    } catch (err) {
+      console.error("訂單送出失敗:", err);
       setError("訂單送出失敗，請稍後再試");
     }
     setSubmitting(false);
@@ -90,6 +121,13 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   return (
     <form onSubmit={handleSubmit} className="bg-white border rounded p-6 mt-6 max-w-lg mx-auto space-y-4 shadow">
       <h2 className="text-lg font-bold mb-2">結帳資訊</h2>
+      
+      {!firebaseReady && (
+        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+          系統初始化中，請稍候...
+        </div>
+      )}
+      
       <div>
         <label className="block mb-1">收件人姓名</label>
         <input
@@ -155,8 +193,12 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         </select>
       </div>
       {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-      <Button type="submit" className="w-full py-3 text-lg font-bold" disabled={submitting}>
-        {submitting ? "送出中..." : `送出訂單（NT$ ${total.toLocaleString()}）`}
+      <Button 
+        type="submit" 
+        className="w-full py-3 text-lg font-bold" 
+        disabled={submitting || !firebaseReady}
+      >
+        {submitting ? "送出中..." : !firebaseReady ? "系統初始化中..." : `送出訂單（NT$ ${total.toLocaleString()}）`}
       </Button>
     </form>
   );
