@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/firebase/firebaseConfig";
@@ -52,8 +52,7 @@ export default function AdminOrders() {
   // 取得訂單列表
   useEffect(() => {
     async function fetchOrders() {
-      let q = collection(db, "orders");
-      // 目前僅支援前端搜尋過濾
+      const q = collection(db, "orders");
       const querySnapshot = await getDocs(q);
       const items: Order[] = [];
       querySnapshot.forEach((doc) => {
