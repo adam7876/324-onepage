@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { app } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
+import type { User } from "firebase/auth";
 
 export default function AdminDashboard() {
   const [authChecked, setAuthChecked] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
