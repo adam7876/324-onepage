@@ -50,7 +50,7 @@ export default function EditProductPage() {
           onSubmit={async (form: ProductFormData) => {
             setFormError("");
             setFormLoading(true);
-            let imageUrls: string[] = Array.isArray(form.images) ? form.images.filter(i => typeof i === 'string') : [];
+            const imageUrls: string[] = Array.isArray(form.images) ? form.images.filter(i => typeof i === 'string') : [];
             if (form.images && form.images.length > 0) {
               try {
                 const storage = getStorage();

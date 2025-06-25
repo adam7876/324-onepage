@@ -86,7 +86,7 @@ export default function AdminProducts() {
               return;
             }
             setFormLoading(true);
-            let imageUrls: string[] = [];
+            const imageUrls: string[] = [];
             if (form.images && form.images.length > 0) {
               try {
                 const storage = getStorage();
