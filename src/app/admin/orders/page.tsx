@@ -253,7 +253,7 @@ export default function AdminOrders() {
                             setOrders((prev) => prev.map((ord) => ord.id === o.id ? { ...ord, status: newStatus } : ord));
                             setStatusSuccess(o.id);
                             setTimeout(() => setStatusSuccess(null), 1200);
-                          } catch (err) {
+                          } catch {
                             setStatusError(o.id);
                             setTimeout(() => setStatusError(null), 2000);
                           } finally {
