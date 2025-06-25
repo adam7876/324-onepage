@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ONE PAGE",
-  description: "一頁式時尚銷售網站",
+  title: "324.SAMiSA",
+  description: "324 一頁式",
 };
 
 export default function RootLayout({
