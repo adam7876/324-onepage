@@ -49,7 +49,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - o 專案資料夾結構規劃（components、modules、admin、utils...）
 - o 商品列表（ProductList）
 - o 商品詳情（支援尺寸、顏色、數量選擇，x：Firestore 讀取規格不做，將改用自建後台管理商品規格）
+- o 購物車（Cart）
+- o 結帳流程（Checkout，含訂單送出，已修正首次載入無法送出訂單的 bug）
+- o 後台登入/權限管理（Firebase Auth）
+- o 後台商品管理（CRUD）
 - o Vercel 自動部署設定
+- [ ] 金流串接（如綠界、藍新、Line Pay）
+- [ ] 訂單查詢
+- [ ] 物流串接（如黑貓、7-11、全家）
 
 ## 建議的開發步驟（模組化流程）
 
@@ -66,13 +73,13 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - o 商品列表（ProductList）
 - o 商品詳情（支援尺寸、顏色、數量選擇，x：Firestore 讀取規格不做，將改用自建後台管理商品規格）
 - o 購物車（Cart）
-- o 結帳流程（Checkout）
+- o 結帳流程（Checkout，含訂單送出，已修正首次載入無法送出訂單的 bug）
 - [ ] 金流串接（如綠界、藍新、Line Pay）
 - [ ] 訂單查詢
 
 ### 4. 後台管理模組
-- [ ] 登入/權限管理（Firebase Auth）
-- [ ] 商品管理（CRUD）
+- o 登入/權限管理（Firebase Auth）
+- o 商品管理（CRUD）
 - [ ] 訂單管理
 - [ ] 會員管理
 - [ ] 內容管理（Banner、FAQ...）
@@ -83,6 +90,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ### 6. 部署與測試
 - o 設定自動部署（Vercel）
 - o 每次功能完成自動部署，直接雲端測試
+
+---
+
+## 重要修正紀錄
+- 2024/07/07：修正首次載入無法送出訂單的問題，原因為 Firebase 初始化與資料驗證時序，現已徹底解決。
 
 ---
 
