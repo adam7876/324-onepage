@@ -38,6 +38,7 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
 
   // 權限驗證
@@ -45,6 +46,7 @@ export default function AdminOrders() {
     const auth = getAuth(app);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) router.replace("/admin/login");
+      setAuthChecked(true);
     });
     return () => unsubscribe();
   }, [router]);
@@ -74,6 +76,10 @@ export default function AdminOrders() {
       o.phone?.toLowerCase().includes(keyword)
     );
   });
+
+  if (!authChecked) {
+    return <div className="text-center py-24 text-lg">權限驗證中...</div>;
+  }
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-12">
