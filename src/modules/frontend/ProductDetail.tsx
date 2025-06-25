@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
-import { Button } from "../../components/ui/button";
 import Image from "next/image";
-import CartInline from "../../components/CartInline";
 import { useCart } from "../../components/CartContext";
 
 interface Product {
@@ -24,7 +22,6 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   // 商品選項
-  const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   // 多圖主圖 index
@@ -57,21 +54,6 @@ export default function ProductDetail() {
     }
     fetchProduct();
   }, [id]);
-
-  // 加入購物車
-  const handleAddToCart = () => {
-    if (!product) return;
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      size,
-      color,
-      quantity,
-    });
-    alert("已加入購物車！");
-  };
 
   if (loading) return <div className="text-center py-12 text-lg">載入中...</div>;
   if (!product) return <div className="text-center py-12 text-gray-400">找不到商品</div>;
