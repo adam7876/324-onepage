@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/firebase/firebaseConfig"; // 你的 firebase 初始化
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -51,6 +52,7 @@ export default function AdminLogin() {
         </div>
         {error && <div className="text-red-500 text-sm mb-2 text-center">{error}</div>}
         <button type="submit" className="w-full py-2 bg-black text-white rounded font-bold">登入</button>
+        <Link href="/" className="block w-full mt-2 py-2 text-center rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回首頁</Link>
       </form>
     </div>
   );

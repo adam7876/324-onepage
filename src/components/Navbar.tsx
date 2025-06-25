@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation";
 export default function Navbar() {
   const pathname = usePathname();
 
+  // 判斷是否為商品詳情頁
+  const isProductDetail = /^\/product\//.test(pathname);
+
   return (
     <nav className="w-full flex items-center justify-between py-4 px-8 border-b bg-white">
       {/* LOGO */}
@@ -20,8 +23,8 @@ export default function Navbar() {
         <li className="hover:text-gray-500 cursor-pointer">ONE PIECES</li>
         <li className="hover:text-gray-500 cursor-pointer">ACCESSORIES</li>
         <li className="hover:text-gray-500 cursor-pointer">SALE</li>
-        {/* 管理後台（只在非 /admin 路徑顯示，且符合目前風格） */}
-        { !pathname.startsWith("/admin") && (
+        {/* 管理後台（只在非 /admin 路徑且非商品詳情頁顯示） */}
+        { !pathname.startsWith("/admin") && !isProductDetail && (
           <li className="hover:text-gray-500 cursor-pointer">
             <Link href="/admin/login">管理後台</Link>
           </li>
