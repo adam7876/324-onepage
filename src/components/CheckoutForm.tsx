@@ -32,7 +32,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     
     // 監聽 Auth 狀態變化，這表示 Firebase 已初始化
     const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, (_) => {
+    const unsubscribe = onAuthStateChanged(auth, () => {
       console.log("Firebase Auth 狀態已確認，Firebase 已初始化");
       // 無論是否登入，Auth 狀態的觸發都表示 Firebase 已準備好
       setFirebaseReady(true);
