@@ -64,11 +64,14 @@ export default function AdminProducts() {
   return (
     <section className="max-w-5xl mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold mb-8 tracking-widest">商品管理</h1>
+      <div className="flex gap-2 mb-4">
+        <Link href="/admin" className="px-4 py-2 rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回主控台</Link>
+        <Link href="/" className="px-4 py-2 rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回首頁</Link>
+      </div>
       <div className="mb-6 flex justify-between items-center">
         <button className="bg-black text-white px-4 py-2 rounded font-bold" onClick={() => setShowForm(f => !f)}>
           {showForm ? "取消新增" : "＋新增商品"}
         </button>
-        <Link href="/" className="text-sm text-blue-600 hover:underline font-bold">回到首頁</Link>
       </div>
       {showForm && (
         <ProductForm

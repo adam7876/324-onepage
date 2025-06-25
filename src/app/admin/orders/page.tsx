@@ -6,6 +6,7 @@ import { db } from "@/firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface OrderItem {
   id: string;
@@ -83,6 +84,10 @@ export default function AdminOrders() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-12">
+      <div className="flex gap-2 mb-4">
+        <Link href="/admin" className="px-4 py-2 rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回主控台</Link>
+        <Link href="/" className="px-4 py-2 rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回首頁</Link>
+      </div>
       <h1 className="text-2xl font-bold mb-8 tracking-widest">訂單管理</h1>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <input

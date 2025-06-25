@@ -17,7 +17,7 @@ export default function AdminLogin() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert("登入成功！");
-      router.push("/admin/products");
+      router.push("/admin");
     } catch (err) {
       setError("登入失敗：" + (err instanceof Error ? err.message : String(err)));
     }
