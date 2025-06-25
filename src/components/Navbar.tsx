@@ -23,7 +23,7 @@ export default function Navbar() {
         {/* 管理後台（只在非 /admin 路徑顯示，且符合目前風格） */}
         { !pathname.startsWith("/admin") && (
           <li className="hover:text-gray-500 cursor-pointer">
-            <Link href="/admin/login">管理後台</Link>
+            <Link href="/admin">管理後台</Link>
           </li>
         )}
       </ul>
