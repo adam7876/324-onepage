@@ -33,7 +33,9 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
   // 預覽初始化（編輯時）
   useEffect(() => {
     if (initialData && Array.isArray(initialData.images)) {
-      setPreviews(initialData.images.map(f => URL.createObjectURL(f)));
+      setPreviews(initialData.images.map(f =>
+        typeof f === 'string' ? f : URL.createObjectURL(f)
+      ));
     }
   }, [initialData]);
 
