@@ -78,7 +78,7 @@ export default function ProductDetail() {
                   aria-label="上一張"
                   style={{ outline: 'none' }}
                 >
-                  <span className="text-3xl font-extrabold text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-blue-600 drop-shadow-lg transition select-none">{'<'}</span>
+                  <span className="text-3xl font-extrabold text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-[#880000] drop-shadow-lg transition select-none">{'<'}</span>
                 </button>
               )}
               <Image
@@ -97,7 +97,7 @@ export default function ProductDetail() {
                   aria-label="下一張"
                   style={{ outline: 'none' }}
                 >
-                  <span className="text-3xl font-extrabold text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-blue-600 drop-shadow-lg transition select-none">{'>'}</span>
+                  <span className="text-3xl font-extrabold text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-[#880000] drop-shadow-lg transition select-none">{'>'}</span>
                 </button>
               )}
             </div>
@@ -127,9 +127,9 @@ export default function ProductDetail() {
             href="https://www.shop2000.com.tw/324"
             target="_blank"
             rel="noopener noreferrer"
-            className="block mt-8 px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-lg font-bold shadow-lg hover:from-blue-600 hover:to-indigo-700 hover:scale-105 transition-all text-center tracking-widest"
+            className="block mt-8 px-8 py-3 rounded-full bg-[#880000] text-white text-lg font-bold shadow-lg hover:scale-105 transition-all text-center tracking-widest"
           >
-            324官網
+            編號官網下單
           </a>
         </div>
         {/*
