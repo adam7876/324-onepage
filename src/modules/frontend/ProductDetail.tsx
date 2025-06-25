@@ -27,6 +27,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
+  // 多圖主圖 index
+  const [mainImgIdx, setMainImgIdx] = useState(0);
 
   const { addToCart } = useCart();
 
@@ -49,6 +51,7 @@ export default function ProductDetail() {
         } else {
           setColor("");
         }
+        setMainImgIdx(0); // 切換商品時重設主圖
       }
       setLoading(false);
     }
@@ -76,19 +79,58 @@ export default function ProductDetail() {
   return (
     <section className="max-w-3xl mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-1 flex items-center justify-center">
-          {(product.imageUrl || (Array.isArray(product.images) && product.images[0])) ? (
-            <Image
-              src={product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "/no-image.png"}
-              alt={product.name}
-              width={320}
-              height={384}
-              className="w-full max-w-xs h-96 object-cover rounded bg-gray-100"
-              style={{ objectFit: "cover" }}
-            />
+        <div className="flex-1 flex flex-col items-center justify-center">
+          {/* 主圖區 */}
+          {Array.isArray(product?.images) && product.images.length > 0 ? (
+            <div className="relative w-full max-w-xs h-96 flex items-center justify-center">
+              {/* 左箭頭 */}
+              {product.images.length > 1 && (
+                <button
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-100 z-10"
+                  onClick={() => setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length)}
+                  aria-label="上一張"
+                >
+                  <span className="text-2xl">&#8592;</span>
+                </button>
+              )}
+              <Image
+                src={product.images[mainImgIdx]}
+                alt={product.name}
+                width={320}
+                height={384}
+                className="w-full max-w-xs h-96 object-cover rounded bg-gray-100"
+                style={{ objectFit: "cover" }}
+              />
+              {/* 右箭頭 */}
+              {product.images.length > 1 && (
+                <button
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-100 z-10"
+                  onClick={() => setMainImgIdx(i => (i + 1) % product.images!.length)}
+                  aria-label="下一張"
+                >
+                  <span className="text-2xl">&#8594;</span>
+                </button>
+              )}
+            </div>
           ) : (
             <div className="w-full max-w-xs h-96 flex items-center justify-center bg-gray-100 rounded text-gray-400">
               無圖片
+            </div>
+          )}
+          {/* 小圖預覽區 */}
+          {Array.isArray(product?.images) && product.images.length > 1 && (
+            <div className="flex gap-2 mt-2 overflow-x-auto max-w-xs">
+              {product.images.map((img, idx) => (
+                <button
+                  key={img}
+                  className={`border rounded ${mainImgIdx === idx ? 'border-black' : 'border-gray-200'} p-0.5 bg-white`}
+                  style={{ minWidth: 48 }}
+                  onClick={() => setMainImgIdx(idx)}
+                  aria-label={`預覽圖${idx+1}`}
+                >
+                  <Image src={img} alt={`預覽${idx+1}`} width={48} height={48} className="w-12 h-12 object-cover rounded" />
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -131,9 +173,9 @@ export default function ProductDetail() {
       <div className="my-8 bg-gray-100 rounded p-4">
         <div className="font-bold mb-2">目前已經選購</div>
         <div className="flex items-center gap-4">
-          {(product.imageUrl || (Array.isArray(product.images) && product.images[0])) && (
+          {Array.isArray(product?.images) && product.images.length > 0 && product.images[mainImgIdx] && (
             <Image
-              src={product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "/no-image.png"}
+              src={product.images[mainImgIdx]}
               alt={product.name}
               width={64}
               height={64}

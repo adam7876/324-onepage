@@ -75,7 +75,7 @@ export default function AdminProducts() {
       </div>
       {showForm && (
         <ProductForm
-          initialData={{ name: "", price: "", description: "", sizes: "", colors: "", image: null }}
+          initialData={{ name: "", price: "", description: "", sizes: "", colors: "", images: [] }}
           loading={formLoading}
           error={formError}
           submitText="送出"
@@ -86,13 +86,16 @@ export default function AdminProducts() {
               return;
             }
             setFormLoading(true);
-            let imageUrl = "";
-            if (form.image) {
+            let imageUrls: string[] = [];
+            if (form.images && form.images.length > 0) {
               try {
                 const storage = getStorage();
-                const imgRef = ref(storage, `products/${Date.now()}_${form.image.name}`);
-                await uploadBytes(imgRef, form.image);
-                imageUrl = await getDownloadURL(imgRef);
+                for (const file of form.images) {
+                  const imgRef = ref(storage, `products/${Date.now()}_${file.name}`);
+                  await uploadBytes(imgRef, file);
+                  const url = await getDownloadURL(imgRef);
+                  imageUrls.push(url);
+                }
               } catch {
                 setFormError("圖片上傳失敗");
                 setFormLoading(false);
@@ -105,7 +108,7 @@ export default function AdminProducts() {
               name: form.name,
               price: Number(form.price),
               description: form.description,
-              images: imageUrl ? [imageUrl] : [],
+              images: imageUrls,
               sizes,
               colors,
             };

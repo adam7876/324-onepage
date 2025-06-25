@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export interface ProductFormData {
@@ -8,7 +8,7 @@ export interface ProductFormData {
   description?: string;
   sizes?: string;
   colors?: string;
-  image?: File | null;
+  images?: File[];
 }
 
 interface ProductFormProps {
@@ -26,19 +26,36 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
     description: "",
     sizes: "",
     colors: "",
-    image: null,
+    images: [],
   });
+  const [previews, setPreviews] = useState<string[]>([]);
 
-  const [preview, setPreview] = useState<string | null>(initialData?.image ? URL.createObjectURL(initialData.image) : null);
+  // 預覽初始化（編輯時）
+  useEffect(() => {
+    if (initialData && Array.isArray(initialData.images)) {
+      setPreviews(initialData.images.map(f => URL.createObjectURL(f)));
+    }
+  }, [initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
-    if (name === "image" && files) {
-      setForm(f => ({ ...f, image: files[0] }));
-      setPreview(URL.createObjectURL(files[0]));
+    if (name === "images" && files) {
+      let newFiles = Array.from(files);
+      if ((form.images?.length || 0) + newFiles.length > 20) {
+        alert("最多只能上傳20張圖片");
+        newFiles = newFiles.slice(0, 20 - (form.images?.length || 0));
+      }
+      setForm(f => ({ ...f, images: [...(f.images || []), ...newFiles] }));
+      setPreviews(p => [...p, ...newFiles.map(f => URL.createObjectURL(f))]);
     } else {
       setForm(f => ({ ...f, [name]: value }));
     }
+  };
+
+  // 刪除單張圖片
+  const handleRemoveImage = (idx: number) => {
+    setForm(f => ({ ...f, images: (f.images || []).filter((_, i) => i !== idx) }));
+    setPreviews(p => p.filter((_, i) => i !== idx));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,21 +88,27 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
       </div>
       <div>
         <label className="block mb-1">商品圖片</label>
-        <div className="flex items-center gap-4">
-          <button type="button" className="px-3 py-1 bg-gray-200 rounded font-bold" onClick={() => document.getElementById('product-image-input')?.click()}>
-            選擇圖片
+        <div>
+          <button type="button" className="px-3 py-1 bg-gray-200 rounded font-bold" onClick={() => document.getElementById('product-images-input')?.click()}>
+            選擇圖片（可多選，最多20張）
           </button>
           <input
-            id="product-image-input"
+            id="product-images-input"
             type="file"
-            name="image"
+            name="images"
             accept="image/*"
+            multiple
             onChange={handleChange}
             className="hidden"
           />
-          {preview && (
-            <Image src={preview} alt="預覽" width={80} height={80} className="w-20 h-20 object-cover rounded border" />
-          )}
+          <div className="flex flex-wrap gap-2 mt-2">
+            {previews.map((src, idx) => (
+              <div key={idx} className="relative group">
+                <Image src={src} alt={`預覽${idx+1}`} width={80} height={80} className="w-20 h-20 object-cover rounded border" />
+                <button type="button" className="absolute top-0 right-0 bg-black bg-opacity-60 text-white text-xs rounded px-1 py-0.5 opacity-80 group-hover:opacity-100" onClick={() => handleRemoveImage(idx)}>✕</button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       {error && <div className="text-red-500 text-sm mb-2">{error}</div>}

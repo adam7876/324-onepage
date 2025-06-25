@@ -27,7 +27,7 @@ export default function EditProductPage() {
           description: data.description || "",
           sizes: (data.sizes || []).join(", "),
           colors: (data.colors || []).join(", "),
-          image: null,
+          images: Array.isArray(data.images) ? data.images : [],
         });
       }
       setLoading(false);
@@ -50,13 +50,17 @@ export default function EditProductPage() {
           onSubmit={async (form: ProductFormData) => {
             setFormError("");
             setFormLoading(true);
-            let imageUrl = null;
-            if (form.image) {
+            let imageUrls: string[] = Array.isArray(form.images) ? form.images.filter(i => typeof i === 'string') : [];
+            if (form.images && form.images.length > 0) {
               try {
                 const storage = getStorage();
-                const imgRef = ref(storage, `products/${Date.now()}_${form.image.name}`);
-                await uploadBytes(imgRef, form.image);
-                imageUrl = await getDownloadURL(imgRef);
+                for (const file of form.images) {
+                  if (typeof file === 'string') continue; // 已有網址
+                  const imgRef = ref(storage, `products/${Date.now()}_${file.name}`);
+                  await uploadBytes(imgRef, file);
+                  const url = await getDownloadURL(imgRef);
+                  imageUrls.push(url);
+                }
               } catch {
                 setFormError("圖片上傳失敗");
                 setFormLoading(false);
@@ -71,9 +75,9 @@ export default function EditProductPage() {
               description: form.description,
               sizes,
               colors,
+              images: imageUrls,
             };
-            const finalUpdateData = imageUrl ? { ...updateData, images: [imageUrl] } : updateData;
-            await updateDoc(doc(db, "products", id), finalUpdateData);
+            await updateDoc(doc(db, "products", id), updateData);
             setFormLoading(false);
             alert("商品已更新！");
             router.push("/admin/products");
