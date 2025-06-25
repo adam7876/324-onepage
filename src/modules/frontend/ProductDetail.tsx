@@ -4,7 +4,9 @@ import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
 import Image from "next/image";
-import { useCart } from "../../components/CartContext";
+// ===== 以下為購物功能相關 import，暫時隱藏，日後可直接解除註解恢復 =====
+// import { Button } from "../../components/ui/button";
+// import CartInline from "../../components/CartInline";
 
 interface Product {
   id: string;
@@ -21,13 +23,16 @@ export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  // ===== 以下為購物功能相關 useState，暫時隱藏，日後可直接解除註解恢復 =====
+  // const [quantity, setQuantity] = useState(1);
   // 商品選項
-  const [size, setSize] = useState("");
-  const [color, setColor] = useState("");
+  // const [size, setSize] = useState("");
+  // const [color, setColor] = useState("");
   // 多圖主圖 index
   const [mainImgIdx, setMainImgIdx] = useState(0);
 
-  const { addToCart } = useCart();
+  // ===== 以下為購物功能相關 hook，暫時隱藏，日後可直接解除註解恢復 =====
+  // const { addToCart } = useCart();
 
   useEffect(() => {
     async function fetchProduct() {
@@ -39,14 +44,14 @@ export default function ProductDetail() {
         // 預設選第一個尺寸/顏色
         const data = docSnap.data();
         if (data.sizes && Array.isArray(data.sizes) && data.sizes.length > 0) {
-          setSize(data.sizes[0]);
+          // const [size, setSize] = useState(data.sizes[0]);
         } else {
-          setSize("");
+          // const [size, setSize] = useState("");
         }
         if (data.colors && Array.isArray(data.colors) && data.colors.length > 0) {
-          setColor(data.colors[0]);
+          // const [color, setColor] = useState(data.colors[0]);
         } else {
-          setColor("");
+          // const [color, setColor] = useState("");
         }
         setMainImgIdx(0); // 切換商品時重設主圖
       }
