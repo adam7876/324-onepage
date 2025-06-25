@@ -86,12 +86,11 @@ export default function ProductDetail() {
               {/* 左箭頭 */}
               {product.images.length > 1 && (
                 <button
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-40 border border-gray-300 rounded-full p-1.5 z-10 transition hover:bg-opacity-90 hover:border-black"
-                  style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 group"
                   onClick={() => setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length)}
                   aria-label="上一張"
                 >
-                  <span className="text-xl text-gray-700">&#8592;</span>
+                  <span className="text-2xl text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-black transition select-none">&#8592;</span>
                 </button>
               )}
               <Image
@@ -105,12 +104,11 @@ export default function ProductDetail() {
               {/* 右箭頭 */}
               {product.images.length > 1 && (
                 <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-40 border border-gray-300 rounded-full p-1.5 z-10 transition hover:bg-opacity-90 hover:border-black"
-                  style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 group"
                   onClick={() => setMainImgIdx(i => (i + 1) % product.images!.length)}
                   aria-label="下一張"
                 >
-                  <span className="text-xl text-gray-700">&#8594;</span>
+                  <span className="text-2xl text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-black transition select-none">&#8594;</span>
                 </button>
               )}
             </div>
