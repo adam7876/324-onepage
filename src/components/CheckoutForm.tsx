@@ -80,15 +80,23 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     
     try {
       console.log("準備建立訂單...");
+      // 將 cart 內每個商品的 undefined 欄位補成空字串或預設值
+      const cleanCart = cart.map(item => ({
+        ...item,
+        name: item.name ?? "",
+        price: item.price ?? 0,
+        quantity: item.quantity ?? 1,
+        imageUrl: item.imageUrl ?? "",
+      }));
       const orderData = {
-        name,
-        email,
-        phone,
-        address,
-        shipping,
-        payment,
-        items: cart,
-        total,
+        name: name ?? "",
+        email: email ?? "",
+        phone: phone ?? "",
+        address: address ?? "",
+        shipping: shipping ?? "",
+        payment: payment ?? "",
+        items: cleanCart,
+        total: total ?? 0,
         status: payment === "銀行匯款" ? "待匯款" : "待付款",
         createdAt: Timestamp.now(),
       };
