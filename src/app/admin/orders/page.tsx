@@ -164,14 +164,23 @@ export default function AdminOrders() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 bg-gray-50 p-4 rounded border mb-2">
             <div>
               <label className="block text-xs mb-1">狀態</label>
-              <select
-                multiple
-                className="border rounded px-2 py-1 w-full"
-                value={filterStatus}
-                onChange={e => setFilterStatus(Array.from(e.target.selectedOptions, o => o.value))}
-              >
-                {ORDER_STATUS.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              <div className="flex gap-2 items-center">
+                <select
+                  multiple
+                  className="border rounded px-2 py-1 w-full"
+                  value={filterStatus}
+                  onChange={e => setFilterStatus(Array.from(e.target.selectedOptions, o => o.value))}
+                >
+                  {ORDER_STATUS.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+                {filterStatus.length > 0 && (
+                  <button
+                    type="button"
+                    className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    onClick={() => setFilterStatus([])}
+                  >清除</button>
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-xs mb-1">訂單編號</label>
