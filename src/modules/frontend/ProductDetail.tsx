@@ -126,13 +126,13 @@ export default function ProductDetail() {
               {/* 小圖列表 */}
               <div
                 id="thumbs-scroll"
-                className="flex gap-2 overflow-x-auto px-8 py-2 border-2 border-[#880000] rounded-xl bg-white shadow relative"
+                className="flex gap-2 overflow-x-auto px-8 py-2 rounded-xl bg-white shadow relative"
                 style={{ scrollBehavior: 'smooth', minWidth: 320, maxWidth: 360 }}
               >
                 {product.images.map((img, idx) => (
                   <button
                     key={img}
-                    className={`border-2 rounded-lg ${mainImgIdx === idx ? 'border-blue-600' : 'border-gray-200'} p-1 bg-white transition hover:border-blue-400`}
+                    className={`border-2 rounded-lg ${mainImgIdx === idx ? 'border-gray-500' : 'border-gray-200'} p-1 bg-white transition`}
                     style={{ minWidth: 72, minHeight: 72, width: 72, height: 72 }}
                     onClick={() => setMainImgIdx(idx)}
                     aria-label={`預覽圖${idx+1}`}
