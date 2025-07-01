@@ -9,6 +9,7 @@ export interface ProductFormData {
   sizes?: string;
   colors?: string;
   images?: File[];
+  externalOrderUrl?: string;
 }
 
 interface ProductFormProps {
@@ -27,6 +28,7 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
     sizes: "",
     colors: "",
     images: [],
+    externalOrderUrl: "",
   });
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -112,6 +114,10 @@ export default function ProductForm({ initialData, loading, error, onSubmit, sub
             ))}
           </div>
         </div>
+      </div>
+      <div>
+        <label className="block mb-1">官網下單連結（選填）</label>
+        <input type="text" name="externalOrderUrl" value={form.externalOrderUrl || ""} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="https://www.shop2000.com.tw/324/product/xxxxxx" />
       </div>
       {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
       <button type="submit" className="w-full py-2 bg-black text-white rounded font-bold" disabled={loading}>

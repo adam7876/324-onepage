@@ -28,6 +28,7 @@ export default function EditProductPage() {
           sizes: (data.sizes || []).join(", "),
           colors: (data.colors || []).join(", "),
           images: Array.isArray(data.images) ? data.images : [],
+          externalOrderUrl: data.externalOrderUrl || "",
         });
       }
       setLoading(false);
@@ -76,6 +77,7 @@ export default function EditProductPage() {
               sizes,
               colors,
               images: imageUrls,
+              externalOrderUrl: form.externalOrderUrl || "",
             };
             await updateDoc(doc(db, "products", id), updateData);
             setFormLoading(false);

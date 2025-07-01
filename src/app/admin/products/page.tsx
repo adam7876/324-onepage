@@ -75,7 +75,7 @@ export default function AdminProducts() {
       </div>
       {showForm && (
         <ProductForm
-          initialData={{ name: "", price: "", description: "", sizes: "", colors: "", images: [] }}
+          initialData={{ name: "", price: "", description: "", sizes: "", colors: "", images: [], externalOrderUrl: "" }}
           loading={formLoading}
           error={formError}
           submitText="送出"
@@ -111,6 +111,7 @@ export default function AdminProducts() {
               images: imageUrls,
               sizes,
               colors,
+              externalOrderUrl: form.externalOrderUrl || "",
             };
             const docRef = await addDoc(collection(db, "products"), newProduct);
             setProducts(prev => [

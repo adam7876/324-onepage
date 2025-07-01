@@ -17,6 +17,7 @@ interface Product {
   sizes?: string[];
   colors?: string[];
   images?: string[];
+  externalOrderUrl?: string;
 }
 
 export default function ProductDetail() {
@@ -164,14 +165,16 @@ export default function ProductDetail() {
             </div>
           )}
           {/* 324官網按鈕 */}
-          <a
-            href="https://www.shop2000.com.tw/324/product/p56305550"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mt-8 px-8 py-3 rounded-full bg-[#880000] text-white text-lg font-bold shadow-lg hover:scale-105 transition-all text-center tracking-widest"
-          >
-            編號官網下單
-          </a>
+          {product.externalOrderUrl && (
+            <a
+              href={product.externalOrderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block mt-8 px-8 py-3 rounded-full bg-[#880000] text-white text-lg font-bold shadow-lg hover:scale-105 transition-all text-center tracking-widest"
+            >
+              編號官網下單
+            </a>
+          )}
         </div>
         {/*
         <div className="flex-1 flex flex-col justify-center">
