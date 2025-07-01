@@ -3,6 +3,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase/firestore";
 import type { Metadata } from "next";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateMetadata(props: any): Promise<Metadata> {
   const { params } = props;
   // 伺服器端抓取商品名稱
