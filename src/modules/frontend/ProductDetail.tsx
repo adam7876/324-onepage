@@ -126,8 +126,8 @@ export default function ProductDetail() {
               {/* 小圖列表 */}
               <div
                 id="thumbs-scroll"
-                className="flex gap-2 overflow-x-auto px-8 py-2 rounded-xl bg-white shadow relative"
-                style={{ scrollBehavior: 'smooth', minWidth: 320, maxWidth: 360 }}
+                className="flex gap-2 overflow-x-auto px-8 py-2 rounded-xl bg-white relative"
+                style={{ scrollBehavior: 'smooth', minWidth: 320, maxWidth: 360, boxShadow: 'none', border: 'none' }}
               >
                 {product.images.map((img, idx) => (
                   <button
