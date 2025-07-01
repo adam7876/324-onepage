@@ -108,18 +108,59 @@ export default function ProductDetail() {
           )}
           {/* 小圖預覽區 */}
           {Array.isArray(product?.images) && product.images.length > 1 && (
-            <div className="flex gap-2 mt-2 overflow-x-auto max-w-xs">
-              {product.images.map((img, idx) => (
-                <button
-                  key={img}
-                  className={`border rounded ${mainImgIdx === idx ? 'border-blue-600' : 'border-gray-200'} p-0.5 bg-white transition hover:border-blue-400`}
-                  style={{ minWidth: 48 }}
-                  onClick={() => setMainImgIdx(idx)}
-                  aria-label={`預覽圖${idx+1}`}
-                >
-                  <Image src={img} alt={`預覽${idx+1}`} width={48} height={48} className="w-12 h-12 object-cover rounded" />
-                </button>
-              ))}
+            <div className="relative flex items-center justify-center mt-4 mb-2" style={{ maxWidth: 440 }}>
+              {/* 左箭頭（小圖區） */}
+              <button
+                className="absolute left-0 z-10 h-full flex items-center px-2 group"
+                style={{ top: 0, bottom: 0 }}
+                onClick={() => {
+                  if (!product.images) return;
+                  const newIdx = (mainImgIdx - 1 + product.images.length) % product.images.length;
+                  setMainImgIdx(newIdx);
+                  document.getElementById('thumbs-scroll')?.scrollBy({ left: -80, behavior: 'smooth' });
+                }}
+                aria-label="上一張預覽"
+              >
+                <span className="text-2xl font-extrabold text-gray-400 opacity-70 group-hover:text-[#880000] group-hover:opacity-100 transition select-none">{'<'}</span>
+              </button>
+              {/* 小圖列表 */}
+              <div
+                id="thumbs-scroll"
+                className="flex gap-2 overflow-x-auto px-8 py-2 border-2 border-[#880000] rounded-xl bg-white shadow relative"
+                style={{ scrollBehavior: 'smooth', minWidth: 320, maxWidth: 360 }}
+              >
+                {product.images.map((img, idx) => (
+                  <button
+                    key={img}
+                    className={`border-2 rounded-lg ${mainImgIdx === idx ? 'border-blue-600' : 'border-gray-200'} p-1 bg-white transition hover:border-blue-400`}
+                    style={{ minWidth: 72, minHeight: 72, width: 72, height: 72 }}
+                    onClick={() => setMainImgIdx(idx)}
+                    aria-label={`預覽圖${idx+1}`}
+                  >
+                    <Image src={img} alt={`預覽${idx+1}`} width={72} height={72} className="w-16 h-16 object-cover rounded-lg" />
+                  </button>
+                ))}
+              </div>
+              {/* 右箭頭（小圖區） */}
+              <button
+                className="absolute right-0 z-10 h-full flex items-center px-2 group"
+                style={{ top: 0, bottom: 0 }}
+                onClick={() => {
+                  if (!product.images) return;
+                  const newIdx = (mainImgIdx + 1) % product.images.length;
+                  setMainImgIdx(newIdx);
+                  document.getElementById('thumbs-scroll')?.scrollBy({ left: 80, behavior: 'smooth' });
+                }}
+                aria-label="下一張預覽"
+              >
+                <span className="text-2xl font-extrabold text-gray-400 opacity-70 group-hover:text-[#880000] group-hover:opacity-100 transition select-none">{'>'}</span>
+              </button>
+              {/* 右下角數字顯示 */}
+              {product.images && (
+                <div className="absolute right-2 bottom-2 bg-gray-700/80 text-white text-xs px-3 py-1 rounded-full font-bold tracking-widest shadow-lg select-none" style={{ letterSpacing: 1 }}>
+                  {mainImgIdx + 1} / {product.images.length}
+                </div>
+              )}
             </div>
           )}
           {/* 324官網按鈕 */}
