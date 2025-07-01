@@ -3,7 +3,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase/firestore";
 import type { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const { params } = props;
   // 伺服器端抓取商品名稱
   let title = "324.SAMiSA | 324 一頁式";
   let description = "324.SAMiSA 商品詳情頁";
