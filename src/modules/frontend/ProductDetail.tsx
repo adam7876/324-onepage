@@ -132,12 +132,12 @@ export default function ProductDetail() {
                 {product.images.map((img, idx) => (
                   <button
                     key={img}
-                    className={`border-2 rounded-lg ${mainImgIdx === idx ? 'border-gray-500' : 'border-gray-200'} p-1 bg-white transition`}
-                    style={{ minWidth: 72, minHeight: 72, width: 72, height: 72 }}
+                    className={`rounded-lg transition ${mainImgIdx === idx ? 'border-2 border-[#880000]' : 'border-none'}`}
+                    style={{ minWidth: 72, minHeight: 72, width: 72, height: 72, padding: 4, boxSizing: 'border-box' }}
                     onClick={() => setMainImgIdx(idx)}
                     aria-label={`預覽圖${idx+1}`}
                   >
-                    <Image src={img} alt={`預覽${idx+1}`} width={72} height={72} className="w-16 h-16 object-cover rounded-lg" />
+                    <Image src={img} alt={`預覽${idx+1}`} width={64} height={64} className="w-14 h-14 object-cover rounded-lg" style={{ display: 'block', margin: '0 auto' }} />
                   </button>
                 ))}
               </div>
