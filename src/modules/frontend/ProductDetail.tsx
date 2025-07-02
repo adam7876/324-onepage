@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
@@ -35,6 +35,7 @@ export default function ProductDetail() {
   // const [color, setColor] = useState("");
   // 多圖主圖 index
   const [mainImgIdx, setMainImgIdx] = useState(0);
+  const swiperRef = useRef<any>(null);
 
   // ===== 以下為購物功能相關 hook，暫時隱藏，日後可直接解除註解恢復 =====
   // const { addToCart } = useCart();
@@ -80,11 +81,13 @@ export default function ProductDetail() {
             <div className="w-full flex justify-center items-center">
               <Swiper
                 modules={[Navigation]}
-                navigation={hasMultiImages}
                 spaceBetween={16}
                 slidesPerView={1}
                 className="w-full max-w-xl"
                 style={{ minHeight: '200px' }}
+                onSlideChange={swiper => setMainImgIdx(swiper.activeIndex)}
+                onSwiper={swiper => (swiperRef.current = swiper)}
+                navigation={false}
               >
                 {product.images!.map((img, idx) => (
                   <SwiperSlide key={img}>
@@ -108,8 +111,29 @@ export default function ProductDetail() {
           )}
           {/* 圖片索引顯示 */}
           {hasMultiImages && (
-            <div className="w-full text-center mt-4 text-base font-bold tracking-widest text-gray-700 select-none">
-              {String(mainImgIdx + 1).padStart(2, '0')} / {String(product.images!.length).padStart(2, '0')}
+            <div className="w-full flex items-center justify-center gap-4 mt-4 text-base font-bold tracking-widest text-gray-700 select-none">
+              {/* 左箭頭 */}
+              <button
+                type="button"
+                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 transition disabled:opacity-30"
+                onClick={() => swiperRef.current?.slidePrev()}
+                disabled={mainImgIdx === 0}
+                aria-label="上一張"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              {/* 數字顯示 */}
+              <span>{String(mainImgIdx + 1).padStart(2, '0')} / {String(product.images!.length).padStart(2, '0')}</span>
+              {/* 右箭頭 */}
+              <button
+                type="button"
+                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 transition disabled:opacity-30"
+                onClick={() => swiperRef.current?.slideNext()}
+                disabled={mainImgIdx === product.images!.length - 1}
+                aria-label="下一張"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
             </div>
           )}
           {/* 324官網按鈕 */}
