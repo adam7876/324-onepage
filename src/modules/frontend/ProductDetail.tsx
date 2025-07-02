@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
 // ===== 以下為購物功能相關 import，暫時隱藏，日後可直接解除註解恢復 =====
 // import { Button } from "../../components/ui/button";
 // import CartInline from "../../components/CartInline";
@@ -35,7 +36,7 @@ export default function ProductDetail() {
   // const [color, setColor] = useState("");
   // 多圖主圖 index
   const [mainImgIdx, setMainImgIdx] = useState(0);
-  const swiperRef = useRef<any>(null);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   // ===== 以下為購物功能相關 hook，暫時隱藏，日後可直接解除註解恢復 =====
   // const { addToCart } = useCart();
