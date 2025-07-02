@@ -77,7 +77,7 @@ export default function ProductDetail() {
           {/* 主圖區（滿版，支援滑動） */}
           {hasImages ? (
             <div
-              className="relative w-full h-[60vw] md:h-[500px] max-w-full flex items-center justify-center bg-black"
+              className="relative w-full h-[60vw] md:h-[500px] lg:h-[600px] max-w-full flex items-center justify-center"
               style={{ touchAction: 'pan-y', overflow: 'hidden' }}
               onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
               onTouchMove={e => setTouchEndX(e.touches[0].clientX)}
@@ -121,8 +121,8 @@ export default function ProductDetail() {
                 src={product.images![mainImgIdx]}
                 alt={product.name}
                 fill
-                className="object-contain w-full h-full bg-black"
-                style={{ objectFit: "contain" }}
+                className="object-cover w-full h-full"
+                style={{ objectFit: "cover" }}
               />
             </div>
           ) : (
