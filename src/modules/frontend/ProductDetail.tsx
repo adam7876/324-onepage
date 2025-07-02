@@ -4,6 +4,10 @@ import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
 import Image from "next/image";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Navigation } from 'swiper/modules';
 // ===== 以下為購物功能相關 import，暫時隱藏，日後可直接解除註解恢復 =====
 // import { Button } from "../../components/ui/button";
 // import CartInline from "../../components/CartInline";
@@ -74,64 +78,37 @@ export default function ProductDetail() {
     <section className="max-w-3xl mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 flex flex-col items-center justify-center">
-          {/* 主圖區（滿版，支援滑動） */}
+          {/* 主圖區（使用 Swiper 輪播） */}
           {hasImages ? (
-            <div
-              className="w-full flex justify-center items-center"
-              style={{ touchAction: 'pan-y', overflow: 'hidden', minHeight: '200px' }}
-              onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
-              onTouchMove={e => setTouchEndX(e.touches[0].clientX)}
-              onTouchEnd={() => {
-                if (touchStartX !== null && touchEndX !== null) {
-                  const delta = touchEndX - touchStartX;
-                  if (Math.abs(delta) > 40) {
-                    if (delta < 0) {
-                      setMainImgIdx(i => (i + 1) % product.images!.length);
-                    } else {
-                      setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length);
-                    }
-                  }
-                }
-                setTouchStartX(null);
-                setTouchEndX(null);
-              }}
-            >
-              {/* 左右箭頭（僅桌機顯示） */}
-              {hasMultiImages && (
-                <>
-                  <button
-                    type="button"
-                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-red-600 hover:text-white border-2 border-gray-300 hover:border-red-600 rounded-full w-14 h-14 items-center justify-center text-3xl font-bold shadow-lg transition-all duration-200"
-                    onClick={() => setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length)}
-                    aria-label="上一張"
-                  >
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                  </button>
-                  <button
-                    type="button"
-                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-red-600 hover:text-white border-2 border-gray-300 hover:border-red-600 rounded-full w-14 h-14 items-center justify-center text-3xl font-bold shadow-lg transition-all duration-200"
-                    onClick={() => setMainImgIdx(i => (i + 1) % product.images!.length)}
-                    aria-label="下一張"
-                  >
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                  </button>
-                </>
-              )}
-              <Image
-                src={product.images![mainImgIdx]}
-                alt={product.name}
-                width={800}
-                height={800}
-                className="object-contain max-w-full max-h-[500px]"
-                style={{ objectFit: "contain" }}
-              />
+            <div className="w-full flex justify-center items-center">
+              <Swiper
+                modules={[Navigation]}
+                navigation={hasMultiImages}
+                spaceBetween={16}
+                slidesPerView={1}
+                className="w-full max-w-xl"
+                style={{ minHeight: '200px' }}
+              >
+                {product.images!.map((img, idx) => (
+                  <SwiperSlide key={img}>
+                    <Image
+                      src={img}
+                      alt={product.name}
+                      width={800}
+                      height={800}
+                      className="object-contain max-w-full max-h-[500px] mx-auto"
+                      style={{ objectFit: "contain" }}
+                      priority={idx === mainImgIdx}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           ) : (
             <div className="w-full max-w-xs h-96 flex items-center justify-center bg-gray-100 rounded text-gray-400">
               無圖片
             </div>
           )}
-          {/* 小圖預覽區（已隱藏，日後可恢復） */}
           {/* 圖片索引顯示 */}
           {hasMultiImages && (
             <div className="w-full text-center mt-4 text-base font-bold tracking-widest text-gray-700 select-none">
