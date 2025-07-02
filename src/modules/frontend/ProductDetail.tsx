@@ -35,9 +35,6 @@ export default function ProductDetail() {
   // const [color, setColor] = useState("");
   // 多圖主圖 index
   const [mainImgIdx, setMainImgIdx] = useState(0);
-  // 滑動手勢狀態
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
   // ===== 以下為購物功能相關 hook，暫時隱藏，日後可直接解除註解恢復 =====
   // const { addToCart } = useCart();
