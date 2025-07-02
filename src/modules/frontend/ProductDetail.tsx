@@ -112,64 +112,6 @@ export default function ProductDetail() {
             </div>
           )}
           {/* 小圖預覽區（已隱藏，日後可恢復） */}
-          {/*
-          {hasMultiImages && (
-            <div className="relative flex items-center justify-center mt-4 mb-2" style={{ maxWidth: 440 }}>
-              {/* 左箭頭（小圖區） */}
-              <button
-                className="absolute left-0 z-10 h-full flex items-center px-2 group"
-                style={{ top: 0, bottom: 0 }}
-                onClick={() => {
-                  if (!product.images) return;
-                  const newIdx = (mainImgIdx - 1 + product.images!.length) % product.images!.length;
-                  setMainImgIdx(newIdx);
-                  document.getElementById('thumbs-scroll')?.scrollBy({ left: -80, behavior: 'smooth' });
-                }}
-                aria-label="上一張預覽"
-              >
-                <span className="text-2xl font-extrabold text-gray-400 opacity-70 group-hover:text-[#880000] group-hover:opacity-100 transition select-none">{'<'}</span>
-              </button>
-              {/* 小圖列表 */}
-              <div
-                id="thumbs-scroll"
-                className="flex gap-2 overflow-x-auto px-8 py-2 rounded-xl bg-white relative"
-                style={{ scrollBehavior: 'smooth', minWidth: 320, maxWidth: 360, boxShadow: 'none', border: 'none' }}
-              >
-                {product.images!.map((img, idx) => (
-                  <button
-                    key={img}
-                    className={`rounded-lg transition ${mainImgIdx === idx ? 'border-2 border-[#880000]' : 'border-none'}`}
-                    style={{ minWidth: 72, minHeight: 72, width: 72, height: 72, padding: 4, boxSizing: 'border-box' }}
-                    onClick={() => setMainImgIdx(idx)}
-                    aria-label={`預覽圖${idx+1}`}
-                  >
-                    <Image src={img} alt={`預覽${idx+1}`} width={64} height={64} className="w-14 h-14 object-cover rounded-lg" style={{ display: 'block', margin: '0 auto' }} />
-                  </button>
-                ))}
-              </div>
-              {/* 右箭頭（小圖區） */}
-              <button
-                className="absolute right-0 z-10 h-full flex items-center px-2 group"
-                style={{ top: 0, bottom: 0 }}
-                onClick={() => {
-                  if (!product.images) return;
-                  const newIdx = (mainImgIdx + 1) % product.images!.length;
-                  setMainImgIdx(newIdx);
-                  document.getElementById('thumbs-scroll')?.scrollBy({ left: 80, behavior: 'smooth' });
-                }}
-                aria-label="下一張預覽"
-              >
-                <span className="text-2xl font-extrabold text-gray-400 opacity-70 group-hover:text-[#880000] group-hover:opacity-100 transition select-none">{'>'}</span>
-              </button>
-              {/* 右下角數字顯示 */}
-              {product.images && (
-                <div className="absolute right-2 bottom-2 bg-gray-700/80 text-white text-xs px-3 py-1 rounded-full font-bold tracking-widest shadow-lg select-none" style={{ letterSpacing: 1 }}>
-                  {mainImgIdx + 1} / {product.images!.length}
-                </div>
-              )}
-            </div>
-          )}
-          */}
           {/* 圖片索引顯示 */}
           {hasMultiImages && (
             <div className="w-full text-center mt-4 text-base font-bold tracking-widest text-gray-700 select-none">
