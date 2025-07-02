@@ -112,7 +112,8 @@ export default function ProductDetail() {
             </div>
           )}
           {/* 小圖預覽區（已隱藏，日後可恢復） */}
-          {false && hasMultiImages && (
+          {/*
+          {hasMultiImages && (
             <div className="relative flex items-center justify-center mt-4 mb-2" style={{ maxWidth: 440 }}>
               {/* 左箭頭（小圖區） */}
               <button
@@ -168,6 +169,7 @@ export default function ProductDetail() {
               )}
             </div>
           )}
+          */}
           {/* 圖片索引顯示 */}
           {hasMultiImages && (
             <div className="w-full text-center mt-4 text-base font-bold tracking-widest text-gray-700 select-none">
