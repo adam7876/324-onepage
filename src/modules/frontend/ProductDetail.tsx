@@ -77,7 +77,7 @@ export default function ProductDetail() {
           {/* 主圖區（滿版，支援滑動） */}
           {hasImages ? (
             <div
-              className="relative w-full h-[60vw] max-w-full flex items-center justify-center bg-black"
+              className="relative w-full h-[60vw] md:h-[500px] max-w-full flex items-center justify-center bg-black"
               style={{ touchAction: 'pan-y', overflow: 'hidden' }}
               onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
               onTouchMove={e => setTouchEndX(e.touches[0].clientX)}
@@ -86,10 +86,8 @@ export default function ProductDetail() {
                   const delta = touchEndX - touchStartX;
                   if (Math.abs(delta) > 40) {
                     if (delta < 0) {
-                      // 下一張
                       setMainImgIdx(i => (i + 1) % product.images!.length);
                     } else {
-                      // 上一張
                       setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length);
                     }
                   }
@@ -98,6 +96,27 @@ export default function ProductDetail() {
                 setTouchEndX(null);
               }}
             >
+              {/* 左右箭頭（僅桌機顯示） */}
+              {hasMultiImages && (
+                <>
+                  <button
+                    type="button"
+                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white rounded-full w-10 h-10 items-center justify-center text-2xl font-bold shadow"
+                    onClick={() => setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length)}
+                    aria-label="上一張"
+                  >
+                    &#8592;
+                  </button>
+                  <button
+                    type="button"
+                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white rounded-full w-10 h-10 items-center justify-center text-2xl font-bold shadow"
+                    onClick={() => setMainImgIdx(i => (i + 1) % product.images!.length)}
+                    aria-label="下一張"
+                  >
+                    &#8594;
+                  </button>
+                </>
+              )}
               <Image
                 src={product.images![mainImgIdx]}
                 alt={product.name}
