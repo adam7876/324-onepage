@@ -101,19 +101,19 @@ export default function ProductDetail() {
                 <>
                   <button
                     type="button"
-                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white rounded-full w-10 h-10 items-center justify-center text-2xl font-bold shadow"
+                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-red-600 hover:text-white border-2 border-gray-300 hover:border-red-600 rounded-full w-14 h-14 items-center justify-center text-3xl font-bold shadow-lg transition-all duration-200"
                     onClick={() => setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length)}
                     aria-label="上一張"
                   >
-                    &#8592;
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   </button>
                   <button
                     type="button"
-                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white rounded-full w-10 h-10 items-center justify-center text-2xl font-bold shadow"
+                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-red-600 hover:text-white border-2 border-gray-300 hover:border-red-600 rounded-full w-14 h-14 items-center justify-center text-3xl font-bold shadow-lg transition-all duration-200"
                     onClick={() => setMainImgIdx(i => (i + 1) % product.images!.length)}
                     aria-label="下一張"
                   >
-                    &#8594;
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </button>
                 </>
               )}
@@ -121,8 +121,8 @@ export default function ProductDetail() {
                 src={product.images![mainImgIdx]}
                 alt={product.name}
                 fill
-                className="object-cover w-full h-full"
-                style={{ objectFit: "cover" }}
+                className="object-contain w-full h-full bg-black"
+                style={{ objectFit: "contain" }}
               />
             </div>
           ) : (
