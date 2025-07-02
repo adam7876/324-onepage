@@ -31,6 +31,9 @@ export default function ProductDetail() {
   // const [color, setColor] = useState("");
   // 多圖主圖 index
   const [mainImgIdx, setMainImgIdx] = useState(0);
+  // 滑動手勢狀態
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
   // ===== 以下為購物功能相關 hook，暫時隱藏，日後可直接解除註解恢復 =====
   // const { addToCart } = useCart();
@@ -64,51 +67,52 @@ export default function ProductDetail() {
   if (loading) return <div className="text-center py-12 text-lg">載入中...</div>;
   if (!product) return <div className="text-center py-12 text-gray-400">找不到商品</div>;
 
+  const hasImages = Array.isArray(product.images) && product.images && product.images.length > 0;
+  const hasMultiImages = Array.isArray(product.images) && product.images && product.images.length > 1;
+
   return (
     <section className="max-w-3xl mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 flex flex-col items-center justify-center">
-          {/* 主圖區 */}
-          {Array.isArray(product?.images) && product.images.length > 0 ? (
-            <div className="relative w-full max-w-xs h-96 flex items-center justify-center">
-              {/* 左箭頭 */}
-              {product.images.length > 1 && (
-                <button
-                  className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 group select-none"
-                  onClick={() => setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length)}
-                  aria-label="上一張"
-                  style={{ outline: 'none' }}
-                >
-                  <span className="text-3xl font-extrabold text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-[#880000] drop-shadow-lg transition select-none">{'<'}</span>
-                </button>
-              )}
+          {/* 主圖區（滿版，支援滑動） */}
+          {hasImages ? (
+            <div
+              className="relative w-full h-[60vw] max-w-full flex items-center justify-center bg-black"
+              style={{ touchAction: 'pan-y', overflow: 'hidden' }}
+              onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
+              onTouchMove={e => setTouchEndX(e.touches[0].clientX)}
+              onTouchEnd={() => {
+                if (touchStartX !== null && touchEndX !== null) {
+                  const delta = touchEndX - touchStartX;
+                  if (Math.abs(delta) > 40) {
+                    if (delta < 0) {
+                      // 下一張
+                      setMainImgIdx(i => (i + 1) % product.images!.length);
+                    } else {
+                      // 上一張
+                      setMainImgIdx(i => (i - 1 + product.images!.length) % product.images!.length);
+                    }
+                  }
+                }
+                setTouchStartX(null);
+                setTouchEndX(null);
+              }}
+            >
               <Image
-                src={product.images[mainImgIdx]}
+                src={product.images![mainImgIdx]}
                 alt={product.name}
-                width={320}
-                height={384}
-                className="w-full max-w-xs h-96 object-cover rounded bg-gray-100"
+                fill
+                className="object-cover w-full h-full"
                 style={{ objectFit: "cover" }}
               />
-              {/* 右箭頭 */}
-              {product.images.length > 1 && (
-                <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 group select-none"
-                  onClick={() => setMainImgIdx(i => (i + 1) % product.images!.length)}
-                  aria-label="下一張"
-                  style={{ outline: 'none' }}
-                >
-                  <span className="text-3xl font-extrabold text-gray-500 opacity-60 group-hover:opacity-100 group-hover:text-[#880000] drop-shadow-lg transition select-none">{'>'}</span>
-                </button>
-              )}
             </div>
           ) : (
             <div className="w-full max-w-xs h-96 flex items-center justify-center bg-gray-100 rounded text-gray-400">
               無圖片
             </div>
           )}
-          {/* 小圖預覽區 */}
-          {Array.isArray(product?.images) && product.images.length > 1 && (
+          {/* 小圖預覽區（已隱藏，日後可恢復） */}
+          {false && hasMultiImages && (
             <div className="relative flex items-center justify-center mt-4 mb-2" style={{ maxWidth: 440 }}>
               {/* 左箭頭（小圖區） */}
               <button
@@ -116,7 +120,7 @@ export default function ProductDetail() {
                 style={{ top: 0, bottom: 0 }}
                 onClick={() => {
                   if (!product.images) return;
-                  const newIdx = (mainImgIdx - 1 + product.images.length) % product.images.length;
+                  const newIdx = (mainImgIdx - 1 + product.images!.length) % product.images!.length;
                   setMainImgIdx(newIdx);
                   document.getElementById('thumbs-scroll')?.scrollBy({ left: -80, behavior: 'smooth' });
                 }}
@@ -130,7 +134,7 @@ export default function ProductDetail() {
                 className="flex gap-2 overflow-x-auto px-8 py-2 rounded-xl bg-white relative"
                 style={{ scrollBehavior: 'smooth', minWidth: 320, maxWidth: 360, boxShadow: 'none', border: 'none' }}
               >
-                {product.images.map((img, idx) => (
+                {product.images!.map((img, idx) => (
                   <button
                     key={img}
                     className={`rounded-lg transition ${mainImgIdx === idx ? 'border-2 border-[#880000]' : 'border-none'}`}
@@ -148,7 +152,7 @@ export default function ProductDetail() {
                 style={{ top: 0, bottom: 0 }}
                 onClick={() => {
                   if (!product.images) return;
-                  const newIdx = (mainImgIdx + 1) % product.images.length;
+                  const newIdx = (mainImgIdx + 1) % product.images!.length;
                   setMainImgIdx(newIdx);
                   document.getElementById('thumbs-scroll')?.scrollBy({ left: 80, behavior: 'smooth' });
                 }}
@@ -159,9 +163,15 @@ export default function ProductDetail() {
               {/* 右下角數字顯示 */}
               {product.images && (
                 <div className="absolute right-2 bottom-2 bg-gray-700/80 text-white text-xs px-3 py-1 rounded-full font-bold tracking-widest shadow-lg select-none" style={{ letterSpacing: 1 }}>
-                  {mainImgIdx + 1} / {product.images.length}
+                  {mainImgIdx + 1} / {product.images!.length}
                 </div>
               )}
+            </div>
+          )}
+          {/* 圖片索引顯示 */}
+          {hasMultiImages && (
+            <div className="w-full text-center mt-4 text-base font-bold tracking-widest text-gray-700 select-none">
+              {String(mainImgIdx + 1).padStart(2, '0')} / {String(product.images!.length).padStart(2, '0')}
             </div>
           )}
           {/* 324官網按鈕 */}
