@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
-import { generateVerificationCode, isValidEmail, getTodayStart } from '../../../../lib/game-utils';
+import { generateVerificationCode, isValidEmail } from '../../../../lib/game-utils';
 import type { EmailVerification } from '../../../../lib/game-types';
 
 export async function POST(request: NextRequest) {
