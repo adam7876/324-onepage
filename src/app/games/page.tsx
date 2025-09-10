@@ -1,0 +1,309 @@
+"use client";
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { GAME_CONFIG } from '../../lib/game-config';
+import { isValidEmail } from '../../lib/game-utils';
+
+export default function GamesPage() {
+  const [email, setEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [selectedGame, setSelectedGame] = useState<string>('');
+  const [step, setStep] = useState<'select' | 'email' | 'verify' | 'play'>('select');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  // 選擇遊戲
+  const handleGameSelect = (gameId: string) => {
+    setSelectedGame(gameId);
+    setStep('email');
+  };
+
+  // 發送驗證碼
+  const handleSendVerification = async () => {
+    if (!isValidEmail(email)) {
+      setError('請輸入有效的Email地址');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/games/send-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('驗證碼已發送到您的Email，請查收');
+        setStep('verify');
+      } else {
+        setError(data.message || '發送失敗，請稍後再試');
+      }
+    } catch {
+      setError('發送失敗，請稍後再試');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 驗證碼確認
+  const handleVerifyCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      setError('請輸入6位數驗證碼');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/games/verify-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          code: verificationCode,
+          gameType: selectedGame,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // 跳轉到獨立遊戲頁面
+        const gameUrl = `/play/${selectedGame}?token=${data.data.token}`;
+        window.open(gameUrl, '_blank', 'noopener,noreferrer');
+        
+        // 重置狀態
+        setStep('select');
+        setEmail('');
+        setVerificationCode('');
+        setSelectedGame('');
+        setMessage('遊戲視窗已開啟，請前往遊戲視窗進行遊戲！');
+      } else {
+        setError(data.message || '驗證失敗，請重試');
+      }
+    } catch {
+      setError('驗證失敗，請稍後再試');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-100 py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* 頁面標題 */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            🎮 遊戲中心 🎮
+          </h1>
+          <p className="text-lg text-gray-600">
+            每天一次機會，玩遊戲領折價券！
+          </p>
+        </div>
+
+        {/* 遊戲規則說明 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">📋 遊戲規則</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-semibold text-purple-600 mb-2">參與方式</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✅</span>
+                  每天限玩一次
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✅</span>
+                  需要Email驗證
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✅</span>
+                  獲得折價券可用於購物
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-purple-600 mb-2">獎品機率</h3>
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex justify-between">
+                  <span>🎁 50元折價券</span>
+                  <span className="font-medium">8%</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>🎀 30元折價券</span>
+                  <span className="font-medium">12%</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>💝 20元折價券</span>
+                  <span className="font-medium">15%</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>🎫 10元折價券</span>
+                  <span className="font-medium">25%</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* 訊息顯示 */}
+        {message && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            ✅ {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            ❌ {error}
+          </div>
+        )}
+
+        {/* 遊戲選擇 */}
+        {step === 'select' && (
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+              選擇您想玩的遊戲
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {GAME_CONFIG.games.filter(game => game.enabled).map((game) => (
+                <div
+                  key={game.id}
+                  onClick={() => handleGameSelect(game.id)}
+                  className="bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl p-6 text-white cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all"
+                >
+                  <div className="text-4xl mb-4 text-center">{game.emoji}</div>
+                  <h3 className="text-xl font-bold mb-2 text-center">{game.name}</h3>
+                  <p className="text-center opacity-90">{game.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Email輸入 */}
+        {step === 'email' && selectedGameInfo && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-2">{selectedGameInfo.emoji}</div>
+              <h2 className="text-2xl font-bold text-gray-800">{selectedGameInfo.name}</h2>
+              <p className="text-gray-600 mt-2">請輸入您的Email以獲取驗證碼</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email地址
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="請輸入您的Email"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setStep('select')}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  返回選擇
+                </button>
+                <button
+                  onClick={handleSendVerification}
+                  disabled={loading || !email}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? '發送中...' : '發送驗證碼'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 驗證碼輸入 */}
+        {step === 'verify' && selectedGameInfo && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-2">{selectedGameInfo.emoji}</div>
+              <h2 className="text-2xl font-bold text-gray-800">輸入驗證碼</h2>
+              <p className="text-gray-600 mt-2">
+                驗證碼已發送至 <span className="font-medium">{email}</span>
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  6位數驗證碼
+                </label>
+                <input
+                  type="text"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="請輸入6位數驗證碼"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-center text-lg tracking-widest"
+                  disabled={loading}
+                  maxLength={6}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setStep('email')}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  返回修改
+                </button>
+                <button
+                  onClick={handleVerifyCode}
+                  disabled={loading || verificationCode.length !== 6}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? '驗證中...' : '開始遊戲'}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 text-center">
+              <button
+                onClick={handleSendVerification}
+                disabled={loading}
+                className="text-sm text-purple-600 hover:text-purple-700 disabled:opacity-50"
+              >
+                重新發送驗證碼
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 返回首頁 */}
+        <div className="text-center mt-8">
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            返回首頁
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

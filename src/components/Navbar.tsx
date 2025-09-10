@@ -15,18 +15,29 @@ export default function Navbar() {
       <div className="font-bold text-xl tracking-widest">324.SAMiSA</div>
       {/* 分類選單 */}
       <ul className="hidden md:flex gap-8 text-base font-medium text-black">
-        {/*
-        <li className="hover:text-gray-500 cursor-pointer">IN STOCK</li>
-        <li className="hover:text-gray-500 cursor-pointer">BEAUTY</li>
-        <li className="hover:text-gray-500 cursor-pointer">KOREA</li>
-        <li className="hover:text-gray-500 cursor-pointer">TOPS</li>
-        <li className="hover:text-gray-500 cursor-pointer">BOTTOMS</li>
-        <li className="hover:text-gray-500 cursor-pointer">ONE PIECES</li>
-        <li className="hover:text-gray-500 cursor-pointer">ACCESSORIES</li>
-        <li className="hover:text-gray-500 cursor-pointer">SALE</li>
-        */}
-        {/* 只保留管理後台（只在非 /admin 路徑且非商品詳情頁顯示） */}
-        { !pathname.startsWith("/admin") && !isProductDetail && (
+        {/* 主要導航 */}
+        {!pathname.startsWith("/admin") && !pathname.startsWith("/play") && !isProductDetail && (
+          <>
+            <li className="hover:text-gray-500 cursor-pointer">
+              <Link href="/" className={pathname === "/" ? "text-purple-600 font-semibold" : ""}>
+                商品列表
+              </Link>
+            </li>
+            <li className="hover:text-gray-500 cursor-pointer">
+              <Link href="/games" className={`flex items-center gap-1 ${pathname === "/games" ? "text-purple-600 font-semibold" : ""}`}>
+                🎮 遊戲
+              </Link>
+            </li>
+            <li className="hover:text-gray-500 cursor-pointer">
+              <Link href="/cart" className={pathname === "/cart" ? "text-purple-600 font-semibold" : ""}>
+                購物車
+              </Link>
+            </li>
+          </>
+        )}
+        
+        {/* 管理後台連結（只在非 /admin 路徑且非商品詳情頁顯示） */}
+        { !pathname.startsWith("/admin") && !pathname.startsWith("/play") && !isProductDetail && (
           <li className="hover:text-gray-500 cursor-pointer">
             <Link href="/admin/login">管理後台</Link>
           </li>

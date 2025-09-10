@@ -49,14 +49,23 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - o 專案資料夾結構規劃（components、modules、admin、utils...）
 - o 商品列表（ProductList）
 - o 商品詳情（支援尺寸、顏色、數量選擇，x：Firestore 讀取規格不做，將改用自建後台管理商品規格）
+- o 商品詳情多圖輪播（支援滑動/箭頭切換，Swiper 導入，數字同步，UI/UX 完善）
+- o 商品詳情「編號官網下單」連結（後台可設定，前台自動顯示/隱藏）
+- o 商品詳情 SEO 標題、Open Graph 標題/描述動態化
 - o 購物車（Cart）
 - o 結帳流程（Checkout，含訂單送出，已修正首次載入無法送出訂單的 bug）
 - o 後台登入/權限管理（Firebase Auth）
 - o 後台商品管理（CRUD）
 - o Vercel 自動部署設定
+- o 程式碼型別安全、linter error 排查與修正
+- o 商品詳情頁 linter error 全數消除
 - [ ] 金流串接（如綠界、藍新、Line Pay）
 - [ ] 訂單查詢
 - [ ] 物流串接（如黑貓、7-11、全家）
+- [ ] 後台訂單管理/多條件搜尋/細分
+- [ ] 會員管理
+- [ ] 內容管理（Banner、FAQ...）
+- [ ] UI/UX 設計細節優化（如分頁點、動畫速度、RWD 微調等）
 
 ## 建議的開發步驟（模組化流程）
 
@@ -94,7 +103,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ---
 
 ## 重要修正紀錄
-- 2024/07/07：修正首次載入無法送出訂單的問題，原因為 Firebase 初始化與資料驗證時序，現已徹底解決。
+- 2025/07/07：修正首次載入無法送出訂單的問題，原因為 Firebase 初始化與資料驗證時序，現已徹底解決。
+- 2025/07/08：商品詳情頁多圖輪播改用 Swiper，支援滑動/箭頭切換，數字同步，UI/UX 完善。
+- 2025/07/08：商品詳情頁「官網下單」連結模組化，後台可設定，前台自動顯示。
+- 2025/07/08：SEO/OG 標題描述動態化，社群分享預覽優化。
+- 2025/07/08：linter error 全數修正，程式碼型別安全。
 
 ---
 
