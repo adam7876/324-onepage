@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 檢查今天是否已經玩過
+    // 暫時移除每日限制檢查，避免複合索引問題
+    // TODO: 建立Firebase索引後可以重新啟用
+    /*
     const todayStart = getTodayStart();
     const gameHistoryQuery = query(
       collection(db, 'gameHistory'),
@@ -31,6 +33,7 @@ export async function POST(request: NextRequest) {
         message: '您今天已經玩過遊戲了，明天再來吧！'
       }, { status: 400 });
     }
+    */
 
     // 檢查是否已有未使用的驗證碼（10分鐘內）
     const now = new Date();
