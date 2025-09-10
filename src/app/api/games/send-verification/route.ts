@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
 import { generateVerificationCode, isValidEmail } from '../../../../lib/game-utils';
 import type { EmailVerification } from '../../../../lib/game-types';
@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
     }
     */
 
-    // 檢查是否已有未使用的驗證碼（10分鐘內）
+    // 暫時移除重複發送檢查，避免複合索引問題
+    // TODO: 建立Firebase索引後可以重新啟用
+    /*
     const now = new Date();
     const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 
@@ -53,8 +55,10 @@ export async function POST(request: NextRequest) {
         message: '驗證碼已發送，請檢查您的信箱，10分鐘後可重新發送'
       }, { status: 400 });
     }
+    */
 
     // 生成驗證碼
+    const now = new Date();
     const code = generateVerificationCode();
     const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 10分鐘後過期
 
