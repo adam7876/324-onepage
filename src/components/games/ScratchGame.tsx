@@ -54,7 +54,7 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
   }, []);
 
   // 處理刮擦
-  const handleScratch = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleScratch = (x: number, y: number) => {
     if (hasPlayed) return;
 
     const canvas = canvasRef.current;
@@ -63,14 +63,10 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
     // 設定橡皮擦效果
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 20, 0, 2 * Math.PI);
+    ctx.arc(x, y, 25, 0, 2 * Math.PI);
     ctx.fill();
 
     // 計算刮開的百分比
@@ -115,65 +111,45 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
     }
   };
 
-  // 處理觸控設備
-  const handleTouchScratch = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    if (hasPlayed) return;
-
+  // 滑鼠事件處理
+  const handleMouseScratch = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isScratching) return;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    handleScratch(x, y);
+  };
+
+  // 點擊刮擦
+  const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    handleScratch(x, y);
+  };
+
+  // 觸控事件處理
+  const handleTouchScratch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-
-    // 設定橡皮擦效果
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // 與滑鼠事件相同的百分比計算邏輯
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let transparent = 0;
-
-    for (let i = 3; i < pixels.length; i += 4) {
-      if (pixels[i] === 0) transparent++;
-    }
-
-    const percent = (transparent / (pixels.length / 4)) * 100;
-    setScratchedPercent(percent);
-
-    if (percent > 30 && !showResult) {
-      setShowResult(true);
-      setHasPlayed(true);
-
-      if (!reward) return;
-
-      const result: GameResult = {
-        success: true,
-        result: reward.type === 'coupon' ? 'win' : 'lose',
-        message: reward.type === 'coupon' ? '恭喜中獎！' : '謝謝參與！',
-      };
-
-      if (reward.type === 'coupon') {
-        result.reward = {
-          type: 'coupon',
-          name: reward.name,
-          value: reward.value || 0,
-          code: '',
-        };
-      }
-
-      setTimeout(() => {
-        onComplete(result);
-      }, 2000);
-    }
+    
+    handleScratch(x, y);
   };
 
   return (
@@ -208,10 +184,12 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
         {/* 刮刮層 */}
         <canvas
           ref={canvasRef}
-          className="rounded-2xl shadow-2xl cursor-pointer"
+          className="rounded-2xl shadow-2xl cursor-pointer touch-none"
+          style={{ width: '300px', height: '200px' }}
+          onClick={handleClick}
           onMouseDown={() => setIsScratching(true)}
           onMouseUp={() => setIsScratching(false)}
-          onMouseMove={(e) => isScratching && handleScratch(e)}
+          onMouseMove={handleMouseScratch}
           onMouseLeave={() => setIsScratching(false)}
           onTouchStart={() => setIsScratching(true)}
           onTouchEnd={() => setIsScratching(false)}
