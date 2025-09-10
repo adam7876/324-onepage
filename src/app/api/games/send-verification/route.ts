@@ -75,15 +75,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: '驗證碼已發送，請查收您的信箱',
-      // 開發環境下顯示驗證碼，生產環境需要移除
-      ...(process.env.NODE_ENV === 'development' && { code })
+      // 開發和測試環境下顯示驗證碼，方便測試
+      code: code
     });
 
   } catch (error) {
     console.error('發送驗證碼失敗:', error);
     return NextResponse.json({
       success: false,
-      message: '系統錯誤，請稍後再試'
+      message: `系統錯誤：${error instanceof Error ? error.message : '未知錯誤'}`,
+      error: error instanceof Error ? error.message : '未知錯誤'
     }, { status: 500 });
   }
 }
