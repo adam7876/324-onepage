@@ -108,7 +108,7 @@ export default function GamesPage() {
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
 
   return (
-    <div className="min-h-screen relative py-12 pb-24">
+    <div className="min-h-screen relative py-12 pb-32">
       {/* 背景圖片 */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -339,11 +339,11 @@ export default function GamesPage() {
           </div>
         )}
 
-        {/* 返回首頁 */}
-        <div className="text-center mt-8">
+        {/* 返回首頁 - 移到較高位置避免遮擋324字樣 */}
+        <div className="text-center mt-8 mb-16">
           <Link
             href="/"
-            className="inline-block px-6 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors"
+            className="inline-block px-6 py-3 bg-gray-600/80 text-white font-bold rounded-lg hover:bg-gray-700/90 transition-colors backdrop-blur-sm"
           >
             返回首頁
           </Link>
