@@ -13,7 +13,7 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
   const [isScratching, setIsScratching] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [scratchedPercent, setScratchedPercent] = useState(0);
-  const [reward, setReward] = useState<{type: string; name: string; value?: number} | null>(null);
+  const [reward, setReward] = useState<{type: string; description: string; value?: number} | null>(null);
   const [showResult, setShowResult] = useState(false);
 
   // 初始化刮刮樂
@@ -50,7 +50,11 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
 
     // 抽獎決定結果
     const drawnReward = drawReward();
-    setReward(drawnReward);
+    setReward({
+      type: drawnReward.type,
+      description: drawnReward.description,
+      value: drawnReward.value
+    });
   }, []);
 
   // 處理刮擦
@@ -98,7 +102,7 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
       if (reward.type === 'coupon') {
         result.reward = {
           type: 'coupon',
-          name: reward.name,
+          name: reward.description || '獎品',
           value: reward.value || 0,
           code: '', // 將在後端生成
         };
@@ -170,7 +174,7 @@ export default function ScratchGame({ onComplete }: ScratchGameProps) {
                 {reward.type === 'coupon' ? '🎁' : '😔'}
               </div>
               <div className="text-2xl font-bold text-gray-800">
-                {reward.name}
+                {reward.description || '獎品'}
               </div>
               {reward.type === 'coupon' && (
                 <div className="text-lg text-purple-600 mt-2">

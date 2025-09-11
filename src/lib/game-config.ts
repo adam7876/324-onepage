@@ -13,6 +13,7 @@ export const GAME_CONFIG = {
 
   // 遊戲列表
   games: [
+    // 舊遊戲暫時停用但保留程式碼
     {
       id: 'wheel',
       name: '幸運轉盤',
@@ -20,7 +21,7 @@ export const GAME_CONFIG = {
       emoji: '🎯',
       icon: '/images/games/wheel-icon.png',
       background: '/images/backgrounds/wheel-bg.jpg',
-      enabled: true,
+      enabled: false, // 暫時停用
     },
     {
       id: 'dice',
@@ -29,7 +30,7 @@ export const GAME_CONFIG = {
       emoji: '🎲',
       icon: '/images/games/dice-icon.png',
       background: '/images/backgrounds/dice-bg.jpg',
-      enabled: true,
+      enabled: false, // 暫時停用
     },
     {
       id: 'scratch',
@@ -38,19 +39,40 @@ export const GAME_CONFIG = {
       emoji: '🎪',
       icon: '/images/games/scratch-icon.png',
       background: '/images/backgrounds/scratch-bg.jpg',
+      enabled: false, // 暫時停用
+    },
+    // 新遊戲
+    {
+      id: 'rock-paper-scissors',
+      name: '猜拳遊戲',
+      description: '與電腦猜拳，贏了拿獎品！',
+      emoji: '✂️',
+      icon: '/images/games/rps-icon.png',
+      background: '/images/backgrounds/rps-bg.jpg',
+      enabled: true,
+    },
+    {
+      id: 'dice-battle',
+      name: '骰子比大小',
+      description: '擲骰子比大小，點數大就贏！',
+      emoji: '🎰',
+      icon: '/images/games/dice-battle-icon.png',
+      background: '/images/backgrounds/dice-battle-bg.jpg',
       enabled: true,
     },
   ],
 
-  // 獎品配置
-  rewards: [
-    { name: '50元折價券', value: 50, probability: 0.08, type: 'coupon' },   // 8%
-    { name: '30元折價券', value: 30, probability: 0.12, type: 'coupon' },   // 12%
-    { name: '20元折價券', value: 20, probability: 0.15, type: 'coupon' },   // 15%
-    { name: '10元折價券', value: 10, probability: 0.25, type: 'coupon' },   // 25%
-    { name: '謝謝參與', value: 0, probability: 0.40, type: 'none' },        // 40%
-  ],
+  // 獎品配置 - 簡化為管理者可設定的單一獎品
+  reward: {
+    type: 'coupon' as 'coupon' | 'discount', // 'coupon' 或 'discount'
+    value: 30, // 折價券金額或折扣百分比
+    description: '30元折價券', // 獎品描述
+  },
 } as const;
 
 export type GameType = typeof GAME_CONFIG.games[number]['id'];
-export type RewardType = typeof GAME_CONFIG.rewards[number];
+export type RewardType = typeof GAME_CONFIG.reward | {
+  type: 'none';
+  value: 0;
+  description: string;
+};

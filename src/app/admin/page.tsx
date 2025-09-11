@@ -33,6 +33,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-4 mb-8">
           <Button className="w-full" onClick={() => router.push("/admin/products")}>商品管理</Button>
           <Button className="w-full" onClick={() => router.push("/admin/orders")}>訂單管理</Button>
+          <Button className="w-full" onClick={() => router.push("/admin/games")}>遊戲管理</Button>
         </div>
         <Button variant="outline" className="w-full" onClick={async () => { await signOut(getAuth(app)); router.replace("/admin/login"); }}>登出</Button>
       </div>

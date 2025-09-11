@@ -67,7 +67,7 @@ export default function DiceGame({ onComplete }: DiceGameProps) {
       if (reward.type === 'coupon') {
         result.reward = {
           type: 'coupon',
-          name: reward.name,
+          name: reward.description || '獎品',
           value: reward.value,
           code: '', // 將在後端生成
         };

@@ -22,10 +22,10 @@ export default function WheelGame({ onComplete }: WheelGameProps) {
     // 抽獎決定結果
     const reward = drawReward();
     
-    // 計算轉盤應該停在的位置
-    const segments = GAME_CONFIG.rewards.length;
+    // 由於已簡化為單一獎品，直接設定結果
+    const segments = 6; // 固定6個區域
     const segmentAngle = 360 / segments;
-    const rewardIndex = GAME_CONFIG.rewards.findIndex(r => r.name === reward.name);
+    const rewardIndex = reward.type === 'coupon' ? 0 : 1; // 獎品在第一個位置
     
     // 計算目標角度（多轉幾圈增加視覺效果）
     const extraSpins = 5; // 額外轉5圈
@@ -48,7 +48,7 @@ export default function WheelGame({ onComplete }: WheelGameProps) {
       if (reward.type === 'coupon') {
         result.reward = {
           type: 'coupon',
-          name: reward.name,
+          name: reward.description || '獎品',
           value: reward.value,
           code: '', // 將在後端生成
         };
@@ -81,8 +81,15 @@ export default function WheelGame({ onComplete }: WheelGameProps) {
           }}
         >
           {/* 轉盤區域 */}
-          {GAME_CONFIG.rewards.map((reward, index) => {
-            const segmentAngle = 360 / GAME_CONFIG.rewards.length;
+          {[
+            { type: 'coupon', description: GAME_CONFIG.reward.description, value: GAME_CONFIG.reward.value, probability: 0.5 },
+            { type: 'none', description: '謝謝參與', value: 0, probability: 0.5 },
+            { type: 'coupon', description: GAME_CONFIG.reward.description, value: GAME_CONFIG.reward.value, probability: 0.5 },
+            { type: 'none', description: '謝謝參與', value: 0, probability: 0.5 },
+            { type: 'coupon', description: GAME_CONFIG.reward.description, value: GAME_CONFIG.reward.value, probability: 0.5 },
+            { type: 'none', description: '謝謝參與', value: 0, probability: 0.5 },
+          ].map((reward, index) => {
+            const segmentAngle = 360 / 6;
             const startAngle = index * segmentAngle;
             
             // 顏色配置
@@ -123,7 +130,7 @@ export default function WheelGame({ onComplete }: WheelGameProps) {
                       {reward.type === 'coupon' ? '🎁' : '😔'}
                     </div>
                     <div className="text-xs leading-tight">
-                      {reward.name}
+                      {reward.description || '獎品'}
                     </div>
                     {reward.type === 'coupon' && (
                       <div className="text-xs opacity-90">

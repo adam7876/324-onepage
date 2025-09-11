@@ -6,6 +6,8 @@ import { GAME_CONFIG } from '../../../lib/game-config';
 import WheelGame from '../../../components/games/WheelGame';
 import DiceGame from '../../../components/games/DiceGame';
 import ScratchGame from '../../../components/games/ScratchGame';
+import RockPaperScissorsGame from '../../../components/games/RockPaperScissorsGame';
+import DiceBattleGame from '../../../components/games/DiceBattleGame';
 import type { GameResult } from '../../../lib/game-types';
 
 export default function PlayGamePage() {
@@ -98,6 +100,42 @@ export default function PlayGamePage() {
         return <DiceGame onComplete={handleGameComplete} />;
       case 'scratch':
         return <ScratchGame onComplete={handleGameComplete} />;
+      case 'rock-paper-scissors':
+        return <RockPaperScissorsGame 
+          token={token || ''} 
+          onComplete={(result, reward) => {
+            const gameResult = {
+              success: true,
+              result,
+              reward: reward ? {
+                type: 'coupon' as const,
+                name: reward.name,
+                value: reward.value,
+                code: `GAME${Date.now()}`
+              } : undefined,
+              message: result === 'win' ? '恭喜獲獎！' : '感謝參與！'
+            };
+            handleGameComplete(gameResult);
+          }} 
+        />;
+      case 'dice-battle':
+        return <DiceBattleGame 
+          token={token || ''} 
+          onComplete={(result, reward) => {
+            const gameResult = {
+              success: true,
+              result,
+              reward: reward ? {
+                type: 'coupon' as const,
+                name: reward.name,
+                value: reward.value,
+                code: `GAME${Date.now()}`
+              } : undefined,
+              message: result === 'win' ? '恭喜獲獎！' : '感謝參與！'
+            };
+            handleGameComplete(gameResult);
+          }}
+        />;
       default:
         return <div>未知的遊戲類型</div>;
     }
