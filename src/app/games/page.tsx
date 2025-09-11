@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { GAME_CONFIG } from '../../lib/game-config';
 import { isValidEmail } from '../../lib/game-utils';
 
@@ -107,8 +108,21 @@ export default function GamesPage() {
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-100 py-12">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen relative py-12">
+      {/* 背景圖片 */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/backgrounds/games-bg.jpg"
+          alt="遊戲背景"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* 背景遮罩 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/70 via-pink-900/60 to-yellow-900/50"></div>
+      </div>
+      
+      <div className="relative z-10 max-w-4xl mx-auto px-4">
         {/* 頁面標題 */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -188,11 +202,39 @@ export default function GamesPage() {
                 <div
                   key={game.id}
                   onClick={() => handleGameSelect(game.id)}
-                  className="bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl p-6 text-white cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all"
+                  className="relative bg-white/95 backdrop-blur-sm rounded-xl p-6 cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all overflow-hidden group"
                 >
-                  <div className="text-4xl mb-4 text-center">{game.emoji}</div>
-                  <h3 className="text-xl font-bold mb-2 text-center">{game.name}</h3>
-                  <p className="text-center opacity-90">{game.description}</p>
+                  {/* 遊戲圖標 */}
+                  <div className="flex justify-center mb-4">
+                    <div className="relative w-16 h-16">
+                      <Image
+                        src={game.icon}
+                        alt={game.name}
+                        fill
+                        className="object-contain"
+                        onError={(e) => {
+                          // 如果圖片載入失敗，顯示emoji
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (fallback) {
+                            fallback.style.display = 'block';
+                          }
+                        }}
+                      />
+                      <div 
+                        className="text-4xl text-center w-full h-full flex items-center justify-center hidden"
+                        style={{ display: 'none' }}
+                      >
+                        {game.emoji}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold mb-2 text-center text-gray-800">{game.name}</h3>
+                  <p className="text-center text-gray-600">{game.description}</p>
+                  
+                  {/* 裝飾效果 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
                 </div>
               ))}
             </div>

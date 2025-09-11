@@ -18,6 +18,8 @@ export const GAME_CONFIG = {
       name: '幸運轉盤',
       description: '轉動轉盤，看看你的運氣如何！',
       emoji: '🎯',
+      icon: '/images/games/wheel-icon.png',
+      background: '/images/backgrounds/wheel-bg.jpg',
       enabled: true,
     },
     {
@@ -25,6 +27,8 @@ export const GAME_CONFIG = {
       name: '幸運骰子',
       description: '擲出雙6獲得大獎！',
       emoji: '🎲',
+      icon: '/images/games/dice-icon.png',
+      background: '/images/backgrounds/dice-bg.jpg',
       enabled: true,
     },
     {
@@ -32,6 +36,8 @@ export const GAME_CONFIG = {
       name: '刮刮樂',
       description: '刮開卡片，發現驚喜！',
       emoji: '🎪',
+      icon: '/images/games/scratch-icon.png',
+      background: '/images/backgrounds/scratch-bg.jpg',
       enabled: true,
     },
   ],
