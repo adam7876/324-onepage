@@ -108,7 +108,7 @@ export default function GamesPage() {
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
 
   return (
-    <div className="min-h-screen relative py-12">
+    <div className="min-h-screen relative py-12 pb-24">
       {/* 背景圖片 */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -118,17 +118,16 @@ export default function GamesPage() {
           className="object-cover"
           priority
         />
-        {/* 背景遮罩 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/70 via-pink-900/60 to-yellow-900/50"></div>
+        {/* 移除背景遮罩，保持原圖色彩 */}
       </div>
       
-      <div className="relative z-10 max-w-4xl mx-auto px-4">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
         {/* 頁面標題 */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 drop-shadow-sm">
             🎮 遊戲中心 🎮
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-800 drop-shadow-sm">
             每天一次機會，玩遊戲領折價券！
           </p>
         </div>
