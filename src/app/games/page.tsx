@@ -32,9 +32,10 @@ export default function GamesPage() {
         
         if (docSnap.exists()) {
           const data = docSnap.data() as GameRewardConfig;
+          console.log('🎁 從 Firestore 載入獎品配置:', data);
           setRewardConfig(data);
         } else {
-          // 如果沒有設定，使用預設值
+          console.log('❌ Firestore 中沒有獎品配置，使用預設值');
           setRewardConfig(GAME_CONFIG.reward);
         }
       } catch (error) {

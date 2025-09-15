@@ -72,13 +72,16 @@ export async function getRewardConfig(): Promise<RewardType> {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return docSnap.data() as RewardType;
+      const data = docSnap.data() as RewardType;
+      console.log('🎮 遊戲組件從 Firestore 載入獎品配置:', data);
+      return data;
     }
     
+    console.log('🎮 遊戲組件：Firestore 中沒有獎品配置，使用預設值');
     // 如果資料庫中沒有配置，返回預設配置
     return GAME_CONFIG.reward;
   } catch (error) {
-    console.error('獲取獎品配置失敗:', error);
+    console.error('🎮 遊戲組件獲取獎品配置失敗:', error);
     // 出錯時返回預設配置
     return GAME_CONFIG.reward;
   }
