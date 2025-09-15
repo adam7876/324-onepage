@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { getRewardConfig } from '../../lib/game-utils';
 import type { RewardType } from '../../lib/game-config';
 
@@ -117,9 +118,18 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          ✊🏻 猜拳遊戲 🖐🏻
-        </h1>
+        <div className="flex flex-col items-center mb-8">
+          <Image
+            src="/images/games/rps-icon.png"
+            alt="猜拳遊戲"
+            width={64}
+            height={64}
+            className="mb-4"
+          />
+          <h1 className="text-3xl font-bold text-gray-800">
+            猜拳遊戲
+          </h1>
+        </div>
 
         {!hasPlayed && !isPlaying && (
           <>

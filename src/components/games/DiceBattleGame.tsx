@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { getRewardConfig } from '../../lib/game-utils';
 import type { RewardType } from '../../lib/game-config';
 
@@ -112,9 +113,18 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-50 to-purple-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          🎰 骰子比大小 🎲
-        </h1>
+        <div className="flex flex-col items-center mb-8">
+          <Image
+            src="/images/games/dice-battle-icon.png"
+            alt="骰子比大小"
+            width={64}
+            height={64}
+            className="mb-4"
+          />
+          <h1 className="text-3xl font-bold text-gray-800">
+            骰子比大小
+          </h1>
+        </div>
 
         {!hasPlayed && !isRolling && result !== 'draw' && (
           <>
