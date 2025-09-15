@@ -185,26 +185,15 @@ export default function GamesPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-purple-600 mb-2">獎品規則</h3>
-              <div className="space-y-3 text-gray-700">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">🎯 獲勝獎品</span>
-                    <span className="text-green-600 font-bold">50%機率</span>
+              <h3 className="font-semibold text-purple-600 mb-2">獎品內容</h3>
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-orange-200 rounded-lg p-4">
+                <div className="text-center">
+                  <div className="text-2xl mb-2">🎁</div>
+                  <div className="font-bold text-lg text-orange-800">
+                    {rewardConfig ? rewardConfig.description : '30元折價券'}
                   </div>
-                  <div className="mt-2 text-sm">
-                    <span className="font-medium">
-                      🎁 {rewardConfig ? rewardConfig.description : '30元折價券'}
-                    </span>
-                  </div>
-                </div>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">😢 未獲勝</span>
-                    <span className="text-gray-600 font-bold">50%機率</span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600">
-                    沒有獎品，下次再試試運氣！
+                  <div className="text-sm text-orange-600 mt-1">
+                    獲勝即可獲得
                   </div>
                 </div>
               </div>
