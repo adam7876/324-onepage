@@ -120,6 +120,8 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             width={64}
             height={64}
             className="mb-4"
+            priority
+            unoptimized
           />
           <h1 className="text-3xl font-bold text-gray-800">
             骰子比大小

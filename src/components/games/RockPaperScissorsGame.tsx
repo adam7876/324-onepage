@@ -125,6 +125,8 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
             width={64}
             height={64}
             className="mb-4"
+            priority
+            unoptimized
           />
           <h1 className="text-3xl font-bold text-gray-800">
             猜拳遊戲
