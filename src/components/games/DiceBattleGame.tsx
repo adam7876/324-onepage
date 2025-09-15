@@ -30,8 +30,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
   const getDiceEmoji = (value: number | null): string => {
     if (value === null) return '🎲';
-    // 使用立體圓圈數字，更清晰美觀
-    const diceEmojis = ['①', '②', '③', '④', '⑤', '⑥'];
+    const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
     return diceEmojis[value - 1] || '🎲';
   };
 

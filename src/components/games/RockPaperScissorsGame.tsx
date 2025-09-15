@@ -118,7 +118,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          ✂️ 猜拳遊戲 🪨
+          ✊🏻 猜拳遊戲 🖐🏻
         </h1>
 
         {!hasPlayed && !isPlaying && (
