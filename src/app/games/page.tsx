@@ -1,9 +1,17 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase/firestore';
 import { GAME_CONFIG } from '../../lib/game-config';
 import { isValidEmail } from '../../lib/game-utils';
+
+interface GameRewardConfig {
+  type: 'coupon' | 'discount';
+  value: number;
+  description: string;
+}
 
 export default function GamesPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +21,30 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [rewardConfig, setRewardConfig] = useState<GameRewardConfig | null>(null);
+
+  // 載入獎品配置
+  useEffect(() => {
+    const loadRewardConfig = async () => {
+      try {
+        const docRef = doc(db, 'gameConfig', 'reward');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data() as GameRewardConfig;
+          setRewardConfig(data);
+        } else {
+          // 如果沒有設定，使用預設值
+          setRewardConfig(GAME_CONFIG.reward);
+        }
+      } catch (error) {
+        console.error('載入獎品配置失敗:', error);
+        setRewardConfig(GAME_CONFIG.reward);
+      }
+    };
+    
+    loadRewardConfig();
+  }, []);
 
   // 選擇遊戲
   const handleGameSelect = (gameId: string) => {
@@ -153,25 +185,29 @@ export default function GamesPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-purple-600 mb-2">獎品機率</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex justify-between">
-                  <span>🎁 50元折價券</span>
-                  <span className="font-medium">8%</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>🎀 30元折價券</span>
-                  <span className="font-medium">12%</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>💝 20元折價券</span>
-                  <span className="font-medium">15%</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>🎫 10元折價券</span>
-                  <span className="font-medium">25%</span>
-                </li>
-              </ul>
+              <h3 className="font-semibold text-purple-600 mb-2">獎品規則</h3>
+              <div className="space-y-3 text-gray-700">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">🎯 獲勝獎品</span>
+                    <span className="text-green-600 font-bold">50%機率</span>
+                  </div>
+                  <div className="mt-2 text-sm">
+                    <span className="font-medium">
+                      🎁 {rewardConfig ? rewardConfig.description : '30元折價券'}
+                    </span>
+                  </div>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">😢 未獲勝</span>
+                    <span className="text-gray-600 font-bold">50%機率</span>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600">
+                    沒有獎品，下次再試試運氣！
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
