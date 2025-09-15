@@ -244,7 +244,14 @@ export default function GamesPage() {
         {step === 'email' && selectedGameInfo && (
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
             <div className="text-center mb-6">
-              <div className="text-4xl mb-2">{selectedGameInfo.emoji}</div>
+              <div className="flex justify-center mb-4">
+                <Image
+                  src={selectedGameInfo.icon}
+                  alt={selectedGameInfo.name}
+                  width={64}
+                  height={64}
+                />
+              </div>
               <h2 className="text-2xl font-bold text-gray-800">{selectedGameInfo.name}</h2>
               <p className="text-gray-600 mt-2">請輸入您的Email以獲取驗證碼</p>
             </div>
@@ -287,7 +294,14 @@ export default function GamesPage() {
         {step === 'verify' && selectedGameInfo && (
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
             <div className="text-center mb-6">
-              <div className="text-4xl mb-2">{selectedGameInfo.emoji}</div>
+              <div className="flex justify-center mb-4">
+                <Image
+                  src={selectedGameInfo.icon}
+                  alt={selectedGameInfo.name}
+                  width={64}
+                  height={64}
+                />
+              </div>
               <h2 className="text-2xl font-bold text-gray-800">輸入驗證碼</h2>
               <p className="text-gray-600 mt-2">
                 驗證碼已發送至 <span className="font-medium">{email}</span>
