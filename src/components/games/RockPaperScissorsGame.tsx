@@ -12,9 +12,9 @@ interface RockPaperScissorsGameProps {
 type Choice = 'rock' | 'paper' | 'scissors';
 
 const choices: { id: Choice; name: string; emoji: string }[] = [
-  { id: 'rock', name: '石頭', emoji: '🪨' },
-  { id: 'paper', name: '布', emoji: '📄' },
-  { id: 'scissors', name: '剪刀', emoji: '✂️' }
+  { id: 'rock', name: '石頭', emoji: '✊🏻' },
+  { id: 'paper', name: '布', emoji: '🖐🏻' },
+  { id: 'scissors', name: '剪刀', emoji: '✌🏻' }
 ];
 
 export default function RockPaperScissorsGame({ token, onComplete }: RockPaperScissorsGameProps) {
