@@ -64,7 +64,6 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
       
       const gameResult = determineWinner(choice, computer);
       setResult(gameResult);
-      setHasPlayed(true);
 
       // 如果是平手，允許再玩一次
       if (gameResult === 'draw') {
@@ -73,9 +72,13 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           setComputerChoice(null);
           setResult(null);
           setIsPlaying(false);
-        }, 2000);
+          // 平手不設定hasPlayed，讓用戶可以繼續
+        }, 3000); // 增加顯示時間
         return;
       }
+
+      // 只有分出勝負才設定hasPlayed
+      setHasPlayed(true);
 
       // 提交結果
       const reward = gameResult === 'win' && rewardConfig ? {
@@ -86,7 +89,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
 
       setTimeout(() => {
         onComplete(gameResult, reward);
-      }, 2000);
+      }, 4000); // 增加延遲讓用戶看清結果
     }, 1500);
   };
 
