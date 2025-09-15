@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { GAME_CONFIG } from '../../lib/game-config';
 import { isValidEmail } from '../../lib/game-utils';
@@ -353,15 +352,6 @@ export default function GamesPage() {
           </div>
         )}
 
-        {/* 返回首頁 - 移到較高位置避免遮擋324字樣 */}
-        <div className="text-center mt-8 mb-16">
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 bg-gray-600/80 text-white font-bold rounded-lg hover:bg-gray-700/90 transition-colors backdrop-blur-sm"
-          >
-            返回首頁
-          </Link>
-        </div>
       </div>
     </div>
   );

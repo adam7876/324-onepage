@@ -16,7 +16,7 @@ export default function Navbar() {
       {/* 分類選單 */}
       <ul className="hidden md:flex gap-8 text-base font-medium text-black">
         {/* 主要導航 */}
-        {!pathname.startsWith("/admin") && !pathname.startsWith("/play") && !isProductDetail && (
+        {!pathname.startsWith("/admin") && !pathname.startsWith("/play") && !pathname.startsWith("/games") && !isProductDetail && (
           <>
             <li className="hover:text-gray-500 cursor-pointer">
               <Link href="/" className={pathname === "/" ? "text-purple-600 font-semibold" : ""}>
@@ -37,7 +37,7 @@ export default function Navbar() {
         )}
         
         {/* 管理後台連結（只在非 /admin 路徑且非商品詳情頁顯示） */}
-        { !pathname.startsWith("/admin") && !pathname.startsWith("/play") && !isProductDetail && (
+        { !pathname.startsWith("/admin") && !pathname.startsWith("/play") && !pathname.startsWith("/games") && !isProductDetail && (
           <li className="hover:text-gray-500 cursor-pointer">
             <Link href="/admin/login">管理後台</Link>
           </li>
