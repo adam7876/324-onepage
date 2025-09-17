@@ -119,12 +119,22 @@ export default function GamesPage() {
       if (data.success) {
         // 跳轉到獨立遊戲頁面
         const gameUrl = `/play/${selectedGame}?token=${data.data.token}`;
-        window.open(gameUrl, '_blank', 'noopener,noreferrer');
         
-        // 重置狀態
-        setStep('select');
-        setEmail('');
-        setVerificationCode('');
+        // 檢測是否為移動設備
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+          // 移動設備直接在當前頁面跳轉
+          window.location.href = gameUrl;
+        } else {
+          // 桌面設備開新視窗
+          window.open(gameUrl, '_blank', 'noopener,noreferrer');
+          
+          // 重置狀態
+          setStep('select');
+          setEmail('');
+          setVerificationCode('');
+        }
         setSelectedGame('');
         setMessage('遊戲視窗已開啟，請前往遊戲視窗進行遊戲！');
       } else {
