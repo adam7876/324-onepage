@@ -14,7 +14,7 @@ interface EmailConfig {
 
 // 預設使用 console 輸出（開發/測試環境）
 const EMAIL_CONFIG: EmailConfig = {
-  provider: process.env.EMAIL_PROVIDER as any || 'console',
+  provider: (process.env.EMAIL_PROVIDER as 'console' | 'smtp' | 'sendgrid' | 'resend') || 'console',
   settings: {
     apiKey: process.env.EMAIL_API_KEY,
     smtpHost: process.env.SMTP_HOST,
@@ -224,10 +224,10 @@ async function sendSendGridEmail(
 
 // SMTP Email Service
 async function sendSMTPEmail(
-  toEmail: string, 
-  subject: string, 
-  htmlContent: string, 
-  textContent: string
+  _toEmail: string, 
+  _subject: string, 
+  _htmlContent: string, 
+  _textContent: string
 ): Promise<EmailSendResult> {
   
   // 這裡需要 nodemailer 或類似的 SMTP 客戶端

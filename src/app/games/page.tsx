@@ -6,7 +6,7 @@ import Head from 'next/head';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firestore';
 import { GAME_CONFIG } from '../../lib/game-config';
-import { isValidEmail, isCommonEmailProvider } from '../../lib/game-utils';
+import { isValidEmail } from '../../lib/game-utils';
 
 interface GameRewardConfig {
   type: 'coupon' | 'discount';
