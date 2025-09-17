@@ -101,7 +101,7 @@ export async function sendVerificationEmail(
         return await sendSendGridEmail(toEmail, subject, htmlContent, textContent);
       
       case 'smtp':
-        return await sendSMTPEmail(toEmail, subject, htmlContent, textContent);
+        return await sendSMTPEmail();
       
       default:
         return sendConsoleEmail(toEmail, subject, verificationCode);
@@ -223,13 +223,7 @@ async function sendSendGridEmail(
 }
 
 // SMTP Email Service
-async function sendSMTPEmail(
-  _toEmail: string, 
-  _subject: string, 
-  _htmlContent: string, 
-  _textContent: string
-): Promise<EmailSendResult> {
-  
+async function sendSMTPEmail(): Promise<EmailSendResult> {
   // 這裡需要 nodemailer 或類似的 SMTP 客戶端
   // 由於是 Next.js edge runtime，建議使用 API-based 解決方案
   throw new Error('SMTP 功能需要額外配置 nodemailer');
