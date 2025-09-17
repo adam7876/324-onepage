@@ -78,7 +78,7 @@ export default function GameManagement() {
       ...prev,
       type,
       description: type === 'coupon' 
-        ? `${prev.value}元折價券` 
+        ? `回饋金 ${prev.value} 元` 
         : `${prev.value}折優惠`
     }));
   };
@@ -88,7 +88,7 @@ export default function GameManagement() {
       ...prev,
       value,
       description: prev.type === 'coupon' 
-        ? `${value}元折價券` 
+        ? `回饋金 ${value} 元` 
         : `${value}折優惠`
     }));
   };
@@ -127,7 +127,7 @@ export default function GameManagement() {
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
-                    💰 現金折價券
+                    💰 回饋金
                   </button>
                   <button
                     onClick={() => handleTypeChange('discount')}

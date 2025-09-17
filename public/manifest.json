@@ -1,7 +1,7 @@
 {
-  "name": "324.SAMiSA 遊戲中心",
-  "short_name": "324遊戲",
-  "description": "每天一次機會，玩遊戲領折價券！",
+  "name": "324遊樂園🎠",
+  "short_name": "324遊樂園🎠",
+  "description": "每天一次機會，玩遊戲領回饋金！",
   "start_url": "/games",
   "display": "standalone",
   "background_color": "#ffffff",

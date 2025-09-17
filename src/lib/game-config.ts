@@ -65,8 +65,8 @@ export const GAME_CONFIG = {
   // 獎品配置 - 簡化為管理者可設定的單一獎品
   reward: {
     type: 'coupon' as 'coupon' | 'discount', // 'coupon' 或 'discount'
-    value: 30, // 折價券金額或折扣百分比
-    description: '30元折價券', // 獎品描述
+    value: 30, // 回饋金金額或折扣百分比
+    description: '回饋金 30 元', // 獎品描述
   },
 } as const;
 

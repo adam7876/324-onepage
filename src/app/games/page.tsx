@@ -167,10 +167,10 @@ export default function GamesPage() {
         {/* 頁面標題 */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4 drop-shadow-sm">
-            🎮 遊戲中心 🎮
+            324遊樂園🎠
           </h1>
           <p className="text-lg text-gray-800 drop-shadow-sm">
-            每天一次機會，玩遊戲領折價券！
+            每天一次機會，玩遊戲領回饋金！
           </p>
         </div>
 
