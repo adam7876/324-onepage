@@ -294,7 +294,7 @@ export default function AdminOrders() {
                         <ul className="mb-2">
                           {o.items?.map((item, idx) => (
                             <li key={idx} className="flex items-center gap-2 py-1">
-                              {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-10 h-10 object-cover rounded" />}
+                              {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-10 h-10 object-cover rounded" />} {/* eslint-disable-line @next/next/no-img-element */}
                               <span>{item.name}</span>
                               <span className="text-gray-400">x{item.quantity}</span>
                               <span className="ml-auto">NT$ {item.price?.toLocaleString()}</span>
