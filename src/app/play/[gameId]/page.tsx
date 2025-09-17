@@ -143,8 +143,8 @@ export default function PlayGamePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400">
-        <div className="text-center text-white">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-900 drop-shadow-lg">
           <div className="text-4xl mb-4">🎮</div>
           <div className="text-xl">載入遊戲中...</div>
         </div>
@@ -154,11 +154,11 @@ export default function PlayGamePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-400 to-pink-400">
-        <div className="text-center text-white">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-900 drop-shadow-lg">
           <div className="text-4xl mb-4">❌</div>
           <div className="text-xl mb-4">{error}</div>
-          <div className="text-sm opacity-75">
+          <div className="text-sm">
             請返回遊戲中心重新開始
           </div>
         </div>
@@ -168,8 +168,8 @@ export default function PlayGamePage() {
 
   if (gameResult) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-400 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="p-8 max-w-md w-full text-center">
           {gameResult.result === 'win' ? (
             <div>
               <div className="text-6xl mb-4">🎉</div>
@@ -222,13 +222,8 @@ export default function PlayGamePage() {
   const gameInfo = GAME_CONFIG.games.find(g => g.id === gameId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 to-pink-400">
-      {/* 遊戲標題 */}
-      <div className="text-center py-8 text-white">
-        <div className="text-4xl mb-2">{gameInfo?.emoji}</div>
-        <h1 className="text-2xl font-bold">{gameInfo?.name}</h1>
-        <p className="opacity-90">{gameInfo?.description}</p>
-      </div>
+    <div className="min-h-screen">
+      {/* 遊戲標題 - 已移除，讓遊戲組件自己處理 */}
 
       {/* 遊戲內容 */}
       <div className="container mx-auto px-4">

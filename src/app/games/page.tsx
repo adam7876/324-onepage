@@ -214,13 +214,13 @@ export default function GamesPage() {
 
         {/* 訊息顯示 */}
         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+          <div className="text-green-800 px-4 py-3 mb-6 drop-shadow-lg">
             ✅ {message}
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="text-red-800 px-4 py-3 mb-6 drop-shadow-lg">
             ❌ {error}
           </div>
         )}
