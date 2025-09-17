@@ -57,16 +57,8 @@ export default function GamesPage() {
   // 發送驗證碼
   const handleSendVerification = async () => {
     if (!isValidEmail(email)) {
-      setError('請輸入有效的Email地址，不支援臨時或測試信箱');
+      setError('請輸入有效的Email地址');
       return;
-    }
-
-    // 提示非常見 email 提供商
-    if (!isCommonEmailProvider(email)) {
-      const confirmUse = confirm(`您使用的是 ${email.split('@')[1]} 信箱，請確認能正常收取郵件。是否繼續？`);
-      if (!confirmUse) {
-        return;
-      }
     }
 
     setLoading(true);

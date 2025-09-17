@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
 import { generateVerificationCode, isValidEmail, isCommonEmailProvider } from '../../../../lib/game-utils';
+import { sendVerificationEmail } from '../../../../lib/email-service';
 import type { EmailVerification } from '../../../../lib/game-types';
 
 export async function POST(request: NextRequest) {
@@ -92,17 +93,27 @@ export async function POST(request: NextRequest) {
 
     await addDoc(collection(db, 'emailVerifications'), verificationData);
 
-    // 這裡應該發送email，暫時先在console顯示
-    console.log(`驗證碼發送給 ${email}: ${code}`);
+    // 發送真實的 email
+    const emailResult = await sendVerificationEmail(email, code);
+    
+    if (!emailResult.success) {
+      console.error(`Email 發送失敗 ${email}:`, emailResult.error);
+      // 即使 email 發送失敗，我們也先返回成功，避免暴露系統內部狀態
+      // 但會在伺服器端記錄錯誤
+    }
 
-    // TODO: 實際部署時需要整合真實的郵件服務
-    // 例如：SendGrid, AWS SES, 或其他郵件服務
+    console.log(`驗證碼處理完成 ${email}:`, {
+      emailSent: emailResult.success,
+      messageId: emailResult.messageId
+    });
 
     return NextResponse.json({
       success: true,
-      message: '驗證碼已發送，請查收您的信箱',
-      // 開發和測試環境下顯示驗證碼，方便測試
-      code: code
+      message: emailResult.success 
+        ? '驗證碼已發送到您的信箱，請查收' 
+        : '驗證碼已發送，若未收到請檢查垃圾信件夾',
+      // 只在開發環境顯示驗證碼
+      ...(process.env.NODE_ENV === 'development' && { code: code })
     });
 
   } catch (error) {

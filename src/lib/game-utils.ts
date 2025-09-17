@@ -37,7 +37,7 @@ export function drawReward(): RewardType {
   }
 }
 
-// 驗證email格式和真實性
+// 驗證email格式（基本檢查，真實性由 email 發送驗證）
 export function isValidEmail(email: string): boolean {
   // 基本格式檢查
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,41 +45,23 @@ export function isValidEmail(email: string): boolean {
     return false;
   }
 
-  // 檢查是否為常見的垃圾 email 模式
-  const suspiciousPatterns = [
-    /^[a-z0-9]{20,}@/i,  // 超長隨機字符
-    /^[0-9]{10,}@/,      // 純數字超長
-    /test.*test/i,       // 包含 test...test
-    /temp.*temp/i,       // 包含 temp...temp
-    /fake.*fake/i,       // 包含 fake...fake
-    /spam.*spam/i,       // 包含 spam...spam
-    /^(qwe|asd|zxc|123|abc)/i, // 常見鍵盤序列開頭
-  ];
-
-  for (const pattern of suspiciousPatterns) {
-    if (pattern.test(email)) {
-      return false;
-    }
-  }
-
-  // 檢查域名是否合理
+  // 只檢查明顯不合理的格式
   const domain = email.split('@')[1]?.toLowerCase();
   if (!domain) return false;
 
-  // 拒絕明顯假的域名
-  const fakeDomainPatterns = [
-    /^[a-z]{1,3}\.com$/,     // 太短的域名如 ab.com
-    /test\.com$/,            // test.com
-    /temp\.com$/,            // temp.com
-    /fake\.com$/,            // fake.com
-    /example\.com$/,         // example.com
-    /localhost$/,            // localhost
+  // 拒絕明顯假的測試域名
+  const obviousFakeDomains = [
+    'test.com', 'temp.com', 'fake.com', 'example.com', 
+    'localhost', 'test.test', 'fake.fake'
   ];
 
-  for (const pattern of fakeDomainPatterns) {
-    if (pattern.test(domain)) {
-      return false;
-    }
+  if (obviousFakeDomains.includes(domain)) {
+    return false;
+  }
+
+  // 拒絕太短的域名（可能打錯）
+  if (domain.length < 4) {
+    return false;
   }
 
   return true;
