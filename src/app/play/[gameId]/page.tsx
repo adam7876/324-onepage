@@ -219,8 +219,6 @@ export default function PlayGamePage() {
     );
   }
 
-  const gameInfo = GAME_CONFIG.games.find(g => g.id === gameId);
-
   return (
     <div className="min-h-screen">
       {/* 遊戲標題 - 已移除，讓遊戲組件自己處理 */}
