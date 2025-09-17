@@ -6,7 +6,7 @@ import Head from 'next/head';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firestore';
 import { GAME_CONFIG } from '../../lib/game-config';
-import { isValidEmail } from '../../lib/game-utils';
+import { isValidEmail, isCommonEmailProvider } from '../../lib/game-utils';
 
 interface GameRewardConfig {
   type: 'coupon' | 'discount';
@@ -57,8 +57,16 @@ export default function GamesPage() {
   // 發送驗證碼
   const handleSendVerification = async () => {
     if (!isValidEmail(email)) {
-      setError('請輸入有效的Email地址');
+      setError('請輸入有效的Email地址，不支援臨時或測試信箱');
       return;
+    }
+
+    // 提示非常見 email 提供商
+    if (!isCommonEmailProvider(email)) {
+      const confirmUse = confirm(`您使用的是 ${email.split('@')[1]} 信箱，請確認能正常收取郵件。是否繼續？`);
+      if (!confirmUse) {
+        return;
+      }
     }
 
     setLoading(true);

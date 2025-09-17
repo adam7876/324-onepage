@@ -37,10 +37,65 @@ export function drawReward(): RewardType {
   }
 }
 
-// 驗證email格式
+// 驗證email格式和真實性
 export function isValidEmail(email: string): boolean {
+  // 基本格式檢查
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  if (!emailRegex.test(email)) {
+    return false;
+  }
+
+  // 檢查是否為常見的垃圾 email 模式
+  const suspiciousPatterns = [
+    /^[a-z0-9]{20,}@/i,  // 超長隨機字符
+    /^[0-9]{10,}@/,      // 純數字超長
+    /test.*test/i,       // 包含 test...test
+    /temp.*temp/i,       // 包含 temp...temp
+    /fake.*fake/i,       // 包含 fake...fake
+    /spam.*spam/i,       // 包含 spam...spam
+    /^(qwe|asd|zxc|123|abc)/i, // 常見鍵盤序列開頭
+  ];
+
+  for (const pattern of suspiciousPatterns) {
+    if (pattern.test(email)) {
+      return false;
+    }
+  }
+
+  // 檢查域名是否合理
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (!domain) return false;
+
+  // 拒絕明顯假的域名
+  const fakeDomainPatterns = [
+    /^[a-z]{1,3}\.com$/,     // 太短的域名如 ab.com
+    /test\.com$/,            // test.com
+    /temp\.com$/,            // temp.com
+    /fake\.com$/,            // fake.com
+    /example\.com$/,         // example.com
+    /localhost$/,            // localhost
+  ];
+
+  for (const pattern of fakeDomainPatterns) {
+    if (pattern.test(domain)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// 檢查是否為常見 email 提供商
+export function isCommonEmailProvider(email: string): boolean {
+  const commonProviders = [
+    'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 
+    'icloud.com', 'live.com', 'msn.com', 'aol.com',
+    'protonmail.com', 'tutanota.com', 'me.com',
+    'ymail.com', 'rocketmail.com', 'mail.com'
+  ];
+  
+  const domain = email.split('@')[1]?.toLowerCase();
+  return commonProviders.includes(domain || '');
 }
 
 // 檢查是否為今天

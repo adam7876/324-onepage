@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
-import { generateVerificationCode, isValidEmail } from '../../../../lib/game-utils';
+import { generateVerificationCode, isValidEmail, isCommonEmailProvider } from '../../../../lib/game-utils';
 import type { EmailVerification } from '../../../../lib/game-types';
 
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
 
-    // 驗證email格式
+    // 驗證email格式和真實性
     if (!isValidEmail(email)) {
       return NextResponse.json({
         success: false,
-        message: '請輸入有效的Email地址'
+        message: '請輸入有效的Email地址，不支援臨時或測試信箱'
       }, { status: 400 });
+    }
+
+    // 檢查是否為常見的 email 提供商（可選的額外保護）
+    if (!isCommonEmailProvider(email)) {
+      console.log(`⚠️ 非常見 email 提供商: ${email}`);
+      // 暫時只記錄，不阻擋（您可以根據需要調整）
     }
 
     // 檢查該email今天是否已經玩過遊戲
