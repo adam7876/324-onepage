@@ -175,7 +175,7 @@ export default function GamesPage() {
         </div>
 
         {/* 遊戲規則說明 */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">📋 遊戲規則</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -197,7 +197,7 @@ export default function GamesPage() {
             </div>
             <div>
               <h3 className="font-semibold text-purple-600 mb-2">獎品內容</h3>
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-orange-200 rounded-lg p-4">
+              <div className="bg-orange-100/80 backdrop-blur-sm border border-orange-300/60 rounded-lg p-4">
                 <div className="text-center">
                   <div className="text-2xl mb-2">🎁</div>
                   <div className="font-bold text-lg text-orange-800">
@@ -227,7 +227,7 @@ export default function GamesPage() {
 
         {/* 遊戲選擇 */}
         {step === 'select' && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
               選擇您想玩的遊戲
             </h2>
@@ -277,7 +277,7 @@ export default function GamesPage() {
 
         {/* Email輸入 */}
         {step === 'email' && selectedGameInfo && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
                 <Image
@@ -327,7 +327,7 @@ export default function GamesPage() {
 
         {/* 驗證碼輸入 */}
         {step === 'verify' && selectedGameInfo && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
                 <Image

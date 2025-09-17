@@ -116,8 +116,8 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center p-4" style={{backgroundImage: 'url(/images/backgrounds/rps-bg.jpg)'}}>
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
         <div className="flex flex-col items-center mb-8">
           <Image
             src="/images/games/rps-icon.png"

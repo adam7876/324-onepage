@@ -111,8 +111,8 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-50 to-purple-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center p-4" style={{backgroundImage: 'url(/images/backgrounds/dice-battle-bg.jpg)'}}>
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
         <div className="flex flex-col items-center mb-8">
           <Image
             src="/images/games/dice-battle-icon.png"
