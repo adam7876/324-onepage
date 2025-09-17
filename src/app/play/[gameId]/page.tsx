@@ -167,53 +167,70 @@ export default function PlayGamePage() {
   }
 
   if (gameResult) {
+    const currentDateTime = new Date().toLocaleString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="p-8 max-w-md w-full text-center">
           {gameResult.result === 'win' ? (
             <div>
               <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-2xl font-bold text-green-600 mb-4">
+              <h2 className="text-2xl font-bold text-green-700 mb-4 drop-shadow-md">
                 恭喜中獎！
               </h2>
-              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6">
-                <p className="text-green-800 font-semibold text-lg">
-                  {gameResult.reward?.name}
-                </p>
-                {gameResult.reward?.code && (
-                  <div className="mt-3">
-                    <p className="text-sm text-green-700 mb-2">優惠券代碼：</p>
-                    <div className="bg-white border border-green-300 rounded px-3 py-2 font-mono text-lg">
-                      {gameResult.reward.code}
-                    </div>
-                    <button
-                      onClick={() => navigator.clipboard.writeText(gameResult.reward!.code)}
-                      className="mt-2 text-sm text-green-600 hover:text-green-700"
-                    >
-                      點擊複製代碼
-                    </button>
+              
+              {/* 獎品顯示區域 - 供截圖使用 */}
+              <div className="bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-orange-300 rounded-xl p-6 mb-6 shadow-lg">
+                <div className="text-orange-600 text-sm font-medium mb-2">
+                  324遊樂園🎠 中獎證明
+                </div>
+                <div className="text-orange-900 font-bold text-xl mb-3">
+                  {gameResult.reward?.name || '回饋金'}
+                </div>
+                <div className="text-orange-700 text-lg font-semibold mb-3">
+                  恭喜獲得獎品！
+                </div>
+                <div className="border-t border-orange-300 pt-3">
+                  <div className="text-orange-600 text-sm">
+                    中獎時間：{currentDateTime}
                   </div>
-                )}
+                </div>
               </div>
-              <p className="text-gray-600 text-sm">
-                請保存好您的優惠券代碼，可在購物時使用！
-              </p>
+
+              {/* 截圖提示 */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="text-blue-800 font-semibold mb-2">
+                  📸 請截圖保存此頁面
+                </div>
+                <div className="text-blue-700 text-sm">
+                  請對此頁面進行截圖並保存<br/>
+                  購物時出示截圖即可享有優惠<br/>
+                  ※ 每張截圖僅限使用一次
+                </div>
+              </div>
             </div>
           ) : (
             <div>
-              <div className="text-6xl mb-4">😔</div>
-              <h2 className="text-2xl font-bold text-gray-600 mb-4">
-                很可惜，沒有中獎
+              <div className="text-6xl mb-4">😢</div>
+              <h2 className="text-2xl font-bold text-gray-700 mb-4 drop-shadow-md">
+                很遺憾！
               </h2>
-              <p className="text-gray-600">
-                謝謝您的參與，明天再來試試運氣吧！
+              <p className="text-gray-600 mb-6">
+                這次沒有中獎，明天再來試試運氣吧！
               </p>
             </div>
           )}
           
-          <div className="mt-6 pt-6 border-t border-gray-200 text-sm text-gray-500">
+          <p className="text-xs text-gray-500 mt-4">
             遊戲結束，可以關閉此視窗了
-          </div>
+          </p>
         </div>
       </div>
     );
