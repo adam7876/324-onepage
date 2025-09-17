@@ -1,0 +1,32 @@
+{
+  "name": "324.SAMiSA 遊戲中心",
+  "short_name": "324遊戲",
+  "description": "每天一次機會，玩遊戲領折價券！",
+  "start_url": "/games",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "zh-TW",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
