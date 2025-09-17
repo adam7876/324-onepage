@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
-import { generateVerificationCode, isValidEmail } from '../../../../lib/game-utils';
+import { generateVerificationCode, isValidEmail, getTodayStart } from '../../../../lib/game-utils';
 import type { EmailVerification } from '../../../../lib/game-types';
 
 export async function POST(request: NextRequest) {
@@ -16,49 +16,63 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 暫時移除每日限制檢查，避免複合索引問題
-    // TODO: 建立Firebase索引後可以重新啟用
-    /*
+    // 檢查該email今天是否已經玩過遊戲
     const todayStart = getTodayStart();
     const gameHistoryQuery = query(
       collection(db, 'gameHistory'),
-      where('email', '==', email),
-      where('playedAt', '>=', Timestamp.fromDate(todayStart))
+      where('email', '==', email)
     );
 
     const gameHistorySnapshot = await getDocs(gameHistoryQuery);
-    if (!gameHistorySnapshot.empty) {
+    
+    // 檢查是否有今天的記錄
+    const todayPlayRecord = gameHistorySnapshot.docs.find(doc => {
+      const playedAt = doc.data().playedAt?.toDate();
+      if (!playedAt) return false;
+      
+      // 檢查是否為今天
+      const playedDate = new Date(playedAt);
+      const today = new Date();
+      return playedDate.getDate() === today.getDate() &&
+             playedDate.getMonth() === today.getMonth() &&
+             playedDate.getFullYear() === today.getFullYear();
+    });
+
+    if (todayPlayRecord) {
       return NextResponse.json({
         success: false,
-        message: '您今天已經玩過遊戲了，明天再來吧！'
+        message: '您今天已經玩過遊戲了，明天再來試試吧！🎮'
       }, { status: 400 });
     }
-    */
 
-    // 暫時移除重複發送檢查，避免複合索引問題
-    // TODO: 建立Firebase索引後可以重新啟用
-    /*
+    // 檢查是否在短時間內重複發送驗證碼
     const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
 
     const verificationQuery = query(
       collection(db, 'emailVerifications'),
-      where('email', '==', email),
-      where('used', '==', false),
-      where('createdAt', '>=', Timestamp.fromDate(tenMinutesAgo))
+      where('email', '==', email)
     );
 
     const verificationSnapshot = await getDocs(verificationQuery);
-    if (!verificationSnapshot.empty) {
+    
+    // 檢查是否有5分鐘內的未使用驗證碼
+    const recentVerification = verificationSnapshot.docs.find(doc => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate();
+      return createdAt && 
+             createdAt > fiveMinutesAgo && 
+             !data.used;
+    });
+
+    if (recentVerification) {
       return NextResponse.json({
         success: false,
-        message: '驗證碼已發送，請檢查您的信箱，10分鐘後可重新發送'
+        message: '驗證碼已發送，請檢查您的信箱。5分鐘後可重新發送 📧'
       }, { status: 400 });
     }
-    */
 
     // 生成驗證碼
-    const now = new Date();
     const code = generateVerificationCode();
     const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 10分鐘後過期
 

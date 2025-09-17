@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firestore";
 import { app } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,21 @@ interface GameRewardConfig {
   description: string;
 }
 
+interface GameStats {
+  todayTotal: number;
+  todayWins: number;
+  todayEmails: string[];
+}
+
 export default function GameManagement() {
   const [authChecked, setAuthChecked] = useState(false);
   const [, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [gameStats, setGameStats] = useState<GameStats>({
+    todayTotal: 0,
+    todayWins: 0,
+    todayEmails: []
+  });
   const [saving, setSaving] = useState(false);
   const [rewardConfig, setRewardConfig] = useState<GameRewardConfig>({
     type: 'coupon',
@@ -39,6 +50,7 @@ export default function GameManagement() {
       setUser(user);
       setAuthChecked(true);
       loadRewardConfig();
+      loadGameStats();
     });
     return () => unsubscribe();
   }, [router]);
@@ -56,6 +68,35 @@ export default function GameManagement() {
       console.error('載入獎品配置失敗:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadGameStats = async () => {
+    try {
+      const gameHistoryQuery = query(collection(db, 'gameHistory'));
+      const snapshot = await getDocs(gameHistoryQuery);
+      
+      const today = new Date();
+      const todayRecords = snapshot.docs.filter(doc => {
+        const data = doc.data();
+        const playedAt = data.playedAt?.toDate();
+        if (!playedAt) return false;
+        
+        return playedAt.getDate() === today.getDate() &&
+               playedAt.getMonth() === today.getMonth() &&
+               playedAt.getFullYear() === today.getFullYear();
+      });
+
+      const todayEmails = [...new Set(todayRecords.map(doc => doc.data().email))];
+      const todayWins = todayRecords.filter(doc => doc.data().result === 'win').length;
+
+      setGameStats({
+        todayTotal: todayRecords.length,
+        todayWins,
+        todayEmails
+      });
+    } catch (error) {
+      console.error('載入遊戲統計失敗:', error);
     }
   };
 
@@ -105,6 +146,40 @@ export default function GameManagement() {
           <Button variant="outline" onClick={() => router.back()}>
             返回
           </Button>
+        </div>
+
+        {/* 今日統計 */}
+        <div className="mb-8">
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-6 text-gray-800">📊 今日遊戲統計</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">{gameStats.todayTotal}</div>
+                <div className="text-sm text-gray-600">總遊戲次數</div>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-600">{gameStats.todayWins}</div>
+                <div className="text-sm text-gray-600">中獎次數</div>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">{gameStats.todayEmails.length}</div>
+                <div className="text-sm text-gray-600">參與用戶</div>
+              </div>
+            </div>
+            <div className="mt-4 text-center">
+              <div className="text-sm text-gray-500">
+                中獎率：{gameStats.todayTotal > 0 ? ((gameStats.todayWins / gameStats.todayTotal) * 100).toFixed(1) : 0}%
+              </div>
+              <Button 
+                onClick={loadGameStats} 
+                variant="outline" 
+                size="sm" 
+                className="mt-2"
+              >
+                🔄 重新整理
+              </Button>
+            </div>
+          </Card>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
