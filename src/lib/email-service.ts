@@ -21,7 +21,7 @@ const EMAIL_CONFIG: EmailConfig = {
     smtpPort: parseInt(process.env.SMTP_PORT || '587'),
     smtpUser: process.env.SMTP_USER,
     smtpPass: process.env.SMTP_PASS,
-    fromEmail: process.env.FROM_EMAIL || 'noreply@324game.com',
+    fromEmail: process.env.FROM_EMAIL || 'onboarding@resend.dev',
     fromName: process.env.FROM_NAME || '324遊樂園🎠',
   }
 };
