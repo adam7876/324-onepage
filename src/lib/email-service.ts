@@ -144,8 +144,16 @@ async function sendResendEmail(
 ): Promise<EmailSendResult> {
   
   if (!EMAIL_CONFIG.settings.apiKey) {
+    console.error('❌ Resend API key 未設定，檢查環境變數 EMAIL_API_KEY');
     throw new Error('Resend API key 未設定');
   }
+
+  console.log('📧 準備發送 Resend email:', {
+    to: toEmail,
+    from: `${EMAIL_CONFIG.settings.fromName} <${EMAIL_CONFIG.settings.fromEmail}>`,
+    hasApiKey: !!EMAIL_CONFIG.settings.apiKey,
+    apiKeyPrefix: EMAIL_CONFIG.settings.apiKey?.substring(0, 8) + '...'
+  });
 
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -164,6 +172,11 @@ async function sendResendEmail(
 
   if (!response.ok) {
     const error = await response.text();
+    console.error('❌ Resend API 發送失敗:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: error
+    });
     throw new Error(`Resend API 錯誤: ${error}`);
   }
 
