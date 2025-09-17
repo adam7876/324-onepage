@@ -36,12 +36,28 @@ export async function POST(request: NextRequest) {
       const playedAt = doc.data().playedAt?.toDate();
       if (!playedAt) return false;
       
-      // 檢查是否為今天
+      // 使用台灣時區檢查是否為今天
       const playedDate = new Date(playedAt);
       const today = new Date();
-      return playedDate.getDate() === today.getDate() &&
-             playedDate.getMonth() === today.getMonth() &&
-             playedDate.getFullYear() === today.getFullYear();
+      
+      // 轉換為台灣時間 (UTC+8)
+      const taiwanOffset = 8 * 60; // 台灣時區偏移（分鐘）
+      const playedTaiwanTime = new Date(playedDate.getTime() + taiwanOffset * 60 * 1000);
+      const todayTaiwanTime = new Date(today.getTime() + taiwanOffset * 60 * 1000);
+      
+      const isSameDay = playedTaiwanTime.getUTCDate() === todayTaiwanTime.getUTCDate() &&
+                        playedTaiwanTime.getUTCMonth() === todayTaiwanTime.getUTCMonth() &&
+                        playedTaiwanTime.getUTCFullYear() === todayTaiwanTime.getUTCFullYear();
+      
+      // 詳細日誌，幫助除錯
+      console.log(`🕰️ 檢查 ${email} 的遊戲記錄:`, {
+        playedAt: playedDate.toISOString(),
+        playedTaiwanTime: playedTaiwanTime.toISOString(),
+        todayTaiwanTime: todayTaiwanTime.toISOString(),
+        isSameDay
+      });
+      
+      return isSameDay;
     });
 
     if (todayPlayRecord) {
