@@ -179,12 +179,16 @@ export default function MaintenancePage() {
             
             <Button 
               onClick={performCleanup} 
-              disabled={loading || !cleanupStats || (cleanupStats.totalToClean || 0) === 0}
+              disabled={loading}
               variant="destructive"
               className="w-full mb-4"
             >
               {loading ? '清理中...' : '🧹 執行清理'}
             </Button>
+
+            <div className="text-sm text-gray-600 mb-4">
+              💡 可以直接執行清理，系統會自動檢查並清理需要的資料
+            </div>
 
             {cleanupStats && (cleanupStats.totalToClean || 0) === 0 && (
               <div className="text-center text-green-600 font-semibold">

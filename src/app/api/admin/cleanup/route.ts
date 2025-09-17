@@ -38,71 +38,65 @@ export async function POST(request: NextRequest) {
 
     const now = new Date();
 
-    // 1. 清理過期的 emailVerifications
+    // 1. 清理過期的 emailVerifications - 簡化查詢避免複合索引
     console.log('🧹 開始清理過期的 email 驗證記錄...');
-    const emailVerificationsQuery = query(
-      collection(db, 'emailVerifications'),
-      where('expiresAt', '<', Timestamp.fromDate(now))
-    );
-    const expiredEmailVerifications = await getDocs(emailVerificationsQuery);
-    
-    for (const docSnapshot of expiredEmailVerifications.docs) {
-      await deleteDoc(docSnapshot.ref);
-      stats.emailVerifications.expired++;
-    }
-
-    // 2. 清理已使用的 emailVerifications (超過1天)
+    const allEmailVerifications = await getDocs(collection(db, 'emailVerifications'));
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const usedEmailVerificationsQuery = query(
-      collection(db, 'emailVerifications'),
-      where('used', '==', true),
-      where('createdAt', '<', Timestamp.fromDate(oneDayAgo))
-    );
-    const usedEmailVerifications = await getDocs(usedEmailVerificationsQuery);
     
-    for (const docSnapshot of usedEmailVerifications.docs) {
-      await deleteDoc(docSnapshot.ref);
-      stats.emailVerifications.used++;
+    for (const docSnapshot of allEmailVerifications.docs) {
+      const data = docSnapshot.data();
+      const expiresAt = data.expiresAt?.toDate();
+      const createdAt = data.createdAt?.toDate();
+      const used = data.used;
+      
+      // 清理過期的記錄
+      if (expiresAt && expiresAt < now) {
+        await deleteDoc(docSnapshot.ref);
+        stats.emailVerifications.expired++;
+      }
+      // 清理已使用且超過1天的記錄
+      else if (used && createdAt && createdAt < oneDayAgo) {
+        await deleteDoc(docSnapshot.ref);
+        stats.emailVerifications.used++;
+      }
     }
 
-    // 3. 清理過期的 gameTokens
+    // 2. 清理過期和已使用的 gameTokens - 簡化查詢避免複合索引
     console.log('🧹 開始清理過期的遊戲令牌...');
-    const gameTokensQuery = query(
-      collection(db, 'gameTokens'),
-      where('expiresAt', '<', Timestamp.fromDate(now))
-    );
-    const expiredGameTokens = await getDocs(gameTokensQuery);
+    const allGameTokens = await getDocs(collection(db, 'gameTokens'));
     
-    for (const docSnapshot of expiredGameTokens.docs) {
-      await deleteDoc(docSnapshot.ref);
-      stats.gameTokens.expired++;
+    for (const docSnapshot of allGameTokens.docs) {
+      const data = docSnapshot.data();
+      const expiresAt = data.expiresAt?.toDate();
+      const createdAt = data.createdAt?.toDate();
+      const used = data.used;
+      
+      // 清理過期的記錄
+      if (expiresAt && expiresAt < now) {
+        await deleteDoc(docSnapshot.ref);
+        stats.gameTokens.expired++;
+      }
+      // 清理已使用且超過1天的記錄
+      else if (used && createdAt && createdAt < oneDayAgo) {
+        await deleteDoc(docSnapshot.ref);
+        stats.gameTokens.used++;
+      }
     }
 
-    // 4. 清理已使用的 gameTokens (超過1天)
-    const usedGameTokensQuery = query(
-      collection(db, 'gameTokens'),
-      where('used', '==', true),
-      where('createdAt', '<', Timestamp.fromDate(oneDayAgo))
-    );
-    const usedGameTokens = await getDocs(usedGameTokensQuery);
-    
-    for (const docSnapshot of usedGameTokens.docs) {
-      await deleteDoc(docSnapshot.ref);
-      stats.gameTokens.used++;
-    }
-
-    // 5. 清理過舊的 gameHistory (超過90天的記錄)
+    // 3. 清理過舊的 gameHistory (超過90天的記錄) - 簡化查詢避免複合索引
     console.log('🧹 開始清理過舊的遊戲歷史記錄...');
     const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-    const oldGameHistoryQuery = query(
-      collection(db, 'gameHistory'),
-      where('playedAt', '<', Timestamp.fromDate(ninetyDaysAgo))
-    );
-    const oldGameHistory = await getDocs(oldGameHistoryQuery);
+    const allGameHistory = await getDocs(collection(db, 'gameHistory'));
     
-    for (const docSnapshot of oldGameHistory.docs) {
-      await deleteDoc(docSnapshot.ref);
-      stats.gameHistory.old++;
+    for (const docSnapshot of allGameHistory.docs) {
+      const data = docSnapshot.data();
+      const playedAt = data.playedAt?.toDate();
+      
+      // 清理90天前的記錄
+      if (playedAt && playedAt < ninetyDaysAgo) {
+        await deleteDoc(docSnapshot.ref);
+        stats.gameHistory.old++;
+      }
     }
 
     // 計算總清理數量
@@ -131,56 +125,68 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET 方法用於檢查需要清理的資料量
+// GET 方法用於檢查需要清理的資料量 - 簡化查詢避免複合索引
 export async function GET() {
   try {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-    // 檢查各種需要清理的資料數量
-    const expiredEmailVerifications = await getDocs(query(
-      collection(db, 'emailVerifications'),
-      where('expiresAt', '<', Timestamp.fromDate(now))
-    ));
-
-    const usedEmailVerifications = await getDocs(query(
-      collection(db, 'emailVerifications'),
-      where('used', '==', true),
-      where('createdAt', '<', Timestamp.fromDate(oneDayAgo))
-    ));
-
-    const expiredGameTokens = await getDocs(query(
-      collection(db, 'gameTokens'),
-      where('expiresAt', '<', Timestamp.fromDate(now))
-    ));
-
-    const usedGameTokens = await getDocs(query(
-      collection(db, 'gameTokens'),
-      where('used', '==', true),
-      where('createdAt', '<', Timestamp.fromDate(oneDayAgo))
-    ));
-
-    const oldGameHistory = await getDocs(query(
-      collection(db, 'gameHistory'),
-      where('playedAt', '<', Timestamp.fromDate(ninetyDaysAgo))
-    ));
-
     const cleanupNeeded = {
-      emailVerifications: {
-        expired: expiredEmailVerifications.size,
-        used: usedEmailVerifications.size
-      },
-      gameTokens: {
-        expired: expiredGameTokens.size,
-        used: usedGameTokens.size
-      },
-      gameHistory: {
-        old: oldGameHistory.size
-      },
-      totalToClean: expiredEmailVerifications.size + usedEmailVerifications.size + 
-                    expiredGameTokens.size + usedGameTokens.size + oldGameHistory.size
+      emailVerifications: { expired: 0, used: 0 },
+      gameTokens: { expired: 0, used: 0 },
+      gameHistory: { old: 0 },
+      totalToClean: 0
     };
+
+    // 檢查 emailVerifications
+    const allEmailVerifications = await getDocs(collection(db, 'emailVerifications'));
+    allEmailVerifications.docs.forEach(doc => {
+      const data = doc.data();
+      const expiresAt = data.expiresAt?.toDate();
+      const createdAt = data.createdAt?.toDate();
+      const used = data.used;
+      
+      if (expiresAt && expiresAt < now) {
+        cleanupNeeded.emailVerifications.expired++;
+      } else if (used && createdAt && createdAt < oneDayAgo) {
+        cleanupNeeded.emailVerifications.used++;
+      }
+    });
+
+    // 檢查 gameTokens
+    const allGameTokens = await getDocs(collection(db, 'gameTokens'));
+    allGameTokens.docs.forEach(doc => {
+      const data = doc.data();
+      const expiresAt = data.expiresAt?.toDate();
+      const createdAt = data.createdAt?.toDate();
+      const used = data.used;
+      
+      if (expiresAt && expiresAt < now) {
+        cleanupNeeded.gameTokens.expired++;
+      } else if (used && createdAt && createdAt < oneDayAgo) {
+        cleanupNeeded.gameTokens.used++;
+      }
+    });
+
+    // 檢查 gameHistory
+    const allGameHistory = await getDocs(collection(db, 'gameHistory'));
+    allGameHistory.docs.forEach(doc => {
+      const data = doc.data();
+      const playedAt = data.playedAt?.toDate();
+      
+      if (playedAt && playedAt < ninetyDaysAgo) {
+        cleanupNeeded.gameHistory.old++;
+      }
+    });
+
+    // 計算總數
+    cleanupNeeded.totalToClean = 
+      cleanupNeeded.emailVerifications.expired + 
+      cleanupNeeded.emailVerifications.used + 
+      cleanupNeeded.gameTokens.expired + 
+      cleanupNeeded.gameTokens.used + 
+      cleanupNeeded.gameHistory.old;
 
     return NextResponse.json({
       success: true,
