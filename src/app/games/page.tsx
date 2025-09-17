@@ -175,12 +175,12 @@ export default function GamesPage() {
         </div>
 
         {/* 遊戲規則說明 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">📋 遊戲規則</h2>
+        <div className="p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 text-shadow-lg drop-shadow-lg">📋 遊戲規則</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-purple-600 mb-2">參與方式</h3>
-              <ul className="space-y-2 text-gray-700">
+              <h3 className="font-semibold text-purple-800 mb-2 drop-shadow-md">參與方式</h3>
+              <ul className="space-y-2 text-gray-900 drop-shadow-sm">
                 <li className="flex items-center">
                   <span className="text-green-500 mr-2">✅</span>
                   每天限玩一次
@@ -196,14 +196,14 @@ export default function GamesPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-purple-600 mb-2">獎品內容</h3>
-              <div className="bg-orange-100/80 backdrop-blur-sm border border-orange-300/60 rounded-lg p-4">
+              <h3 className="font-semibold text-purple-800 mb-2 drop-shadow-md">獎品內容</h3>
+              <div className="p-4">
                 <div className="text-center">
                   <div className="text-2xl mb-2">🎁</div>
-                  <div className="font-bold text-lg text-orange-800">
+                  <div className="font-bold text-lg text-orange-900 drop-shadow-md">
                     {rewardConfig ? rewardConfig.description : '30元折價券'}
                   </div>
-                  <div className="text-sm text-orange-600 mt-1">
+                  <div className="text-sm text-orange-800 mt-1 drop-shadow-sm">
                     獲勝即可獲得
                   </div>
                 </div>
@@ -227,8 +227,8 @@ export default function GamesPage() {
 
         {/* 遊戲選擇 */}
         {step === 'select' && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          <div className="p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center drop-shadow-lg">
               選擇您想玩的遊戲
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -277,7 +277,7 @@ export default function GamesPage() {
 
         {/* Email輸入 */}
         {step === 'email' && selectedGameInfo && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
+          <div className="p-8 max-w-md mx-auto">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
                 <Image
@@ -327,7 +327,7 @@ export default function GamesPage() {
 
         {/* 驗證碼輸入 */}
         {step === 'verify' && selectedGameInfo && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
+          <div className="p-8 max-w-md mx-auto">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
                 <Image

@@ -112,7 +112,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center p-4" style={{backgroundImage: 'url(/images/backgrounds/dice-battle-bg.jpg)'}}>
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+      <div className="p-8 max-w-md w-full text-center">
         <div className="flex flex-col items-center mb-8">
           <Image
             src="/images/games/dice-battle-icon.png"
@@ -123,7 +123,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             priority
             unoptimized
           />
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-3xl font-bold text-gray-900 drop-shadow-lg">
             骰子比大小
           </h1>
         </div>
