@@ -1,69 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
-import { generateVerificationCode, isValidEmail, isCommonEmailProvider } from '../../../../lib/game-utils';
-import { sendVerificationEmail } from '../../../../lib/email-service';
+import { generateVerificationCode } from '../../../../lib/game-utils';
+import { validateMemberForGame } from '../../../../lib/member-service';
 import type { EmailVerification } from '../../../../lib/game-types';
 
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
 
-    // 驗證email格式和真實性
-    if (!isValidEmail(email)) {
-      return NextResponse.json({
-        success: false,
-        message: '請輸入有效的Email地址，不支援臨時或測試信箱'
-      }, { status: 400 });
-    }
-
-    // 檢查是否為常見的 email 提供商（可選的額外保護）
-    if (!isCommonEmailProvider(email)) {
-      console.log(`⚠️ 非常見 email 提供商: ${email}`);
-      // 暫時只記錄，不阻擋（您可以根據需要調整）
-    }
-
-    // 檢查該email今天是否已經玩過遊戲
-    const gameHistoryQuery = query(
-      collection(db, 'gameHistory'),
-      where('email', '==', email)
-    );
-
-    const gameHistorySnapshot = await getDocs(gameHistoryQuery);
+    // 驗證會員身份和遊戲資格
+    const memberValidation = await validateMemberForGame(email);
     
-    // 檢查是否有今天的記錄
-    const todayPlayRecord = gameHistorySnapshot.docs.find(doc => {
-      const playedAt = doc.data().playedAt?.toDate();
-      if (!playedAt) return false;
-      
-      // 使用台灣時區檢查是否為今天
-      const playedDate = new Date(playedAt);
-      const today = new Date();
-      
-      // 轉換為台灣時間 (UTC+8)
-      const taiwanOffset = 8 * 60; // 台灣時區偏移（分鐘）
-      const playedTaiwanTime = new Date(playedDate.getTime() + taiwanOffset * 60 * 1000);
-      const todayTaiwanTime = new Date(today.getTime() + taiwanOffset * 60 * 1000);
-      
-      const isSameDay = playedTaiwanTime.getUTCDate() === todayTaiwanTime.getUTCDate() &&
-                        playedTaiwanTime.getUTCMonth() === todayTaiwanTime.getUTCMonth() &&
-                        playedTaiwanTime.getUTCFullYear() === todayTaiwanTime.getUTCFullYear();
-      
-      // 詳細日誌，幫助除錯
-      console.log(`🕰️ 檢查 ${email} 的遊戲記錄:`, {
-        playedAt: playedDate.toISOString(),
-        playedTaiwanTime: playedTaiwanTime.toISOString(),
-        todayTaiwanTime: todayTaiwanTime.toISOString(),
-        isSameDay
-      });
-      
-      return isSameDay;
-    });
-
-    if (todayPlayRecord) {
+    if (!memberValidation.valid) {
       return NextResponse.json({
         success: false,
-        message: '您今天已經玩過遊戲了，明天再來試試吧！🎮'
+        message: memberValidation.message
       }, { status: 400 });
     }
 
@@ -109,27 +61,13 @@ export async function POST(request: NextRequest) {
 
     await addDoc(collection(db, 'emailVerifications'), verificationData);
 
-    // 發送真實的 email
-    const emailResult = await sendVerificationEmail(email, code);
-    
-    if (!emailResult.success) {
-      console.error(`Email 發送失敗 ${email}:`, emailResult.error);
-      // 即使 email 發送失敗，我們也先返回成功，避免暴露系統內部狀態
-      // 但會在伺服器端記錄錯誤
-    }
-
-    console.log(`驗證碼處理完成 ${email}:`, {
-      emailSent: emailResult.success,
-      messageId: emailResult.messageId
-    });
+    // 直接回傳驗證碼（不發送 email）
+    console.log(`🎮 會員 ${memberValidation.member?.name} (${email}) 驗證成功，驗證碼: ${code}`);
 
     return NextResponse.json({
       success: true,
-      message: emailResult.success 
-        ? '驗證碼已發送到您的信箱，請查收' 
-        : '驗證碼已發送，若未收到請檢查垃圾信件夾',
-      // 只在開發環境顯示驗證碼
-      ...(process.env.NODE_ENV === 'development' && { code: code })
+      message: `${memberValidation.message}`,
+      code: code // 直接顯示驗證碼
     });
 
   } catch (error) {

@@ -75,14 +75,10 @@ export default function GamesPage() {
 
       const data = await response.json();
 
-      if (data.success) {
-        if (data.code) {
-          setMessage(`驗證碼：${data.code}`);
+        if (data.success) {
+          setMessage(`${data.message}\n\n驗證碼：${data.code}`);
+          setStep('verify');
         } else {
-          setMessage('驗證碼已發送到您的Email，請查收');
-        }
-        setStep('verify');
-      } else {
         setError(data.message || '發送失敗，請稍後再試');
       }
     } catch {
