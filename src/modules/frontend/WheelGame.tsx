@@ -16,15 +16,15 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [gameStarted, setGameStarted] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // 轉盤配置 - 8格，4格成功4格失敗，橄欖綠失敗，黃色成功
+  // 轉盤配置 - 8格，4格成功4格失敗，深紅色失敗，黃色成功
   const wheelSections = [
-    { id: 1, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 1, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
     { id: 2, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
-    { id: 3, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 3, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
     { id: 4, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
-    { id: 5, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 5, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
     { id: 6, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
-    { id: 7, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 7, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
     { id: 8, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
   ];
 
@@ -43,6 +43,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算，讓指針指向目標
     
     console.log('🎡 旋轉角度:', finalRotation);
+    console.log('🎡 目標格子:', randomSection, '結果:', wheelSections[randomSection].type);
     
     // 設置 CSS 變數用於動畫
     document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
@@ -57,7 +58,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       // 使用預先計算的結果
       const result = wheelSections[randomSection].type as 'win' | 'lose';
       
-      // 延遲 1 秒後顯示結果
+      // 延遲 3 秒後顯示結果，讓用戶有時間看到結果
       setTimeout(async () => {
         const gameResult = {
           success: true,
@@ -75,38 +76,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     }, 3000);
   };
 
-  if (!gameStarted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">🎡 幸運轉盤</h2>
-            <p className="text-lg text-gray-700 mb-6">
-              轉動轉盤，停在綠色區域就能獲得獎品！
-            </p>
-            
-            {rewardConfig && (
-              <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-orange-300 rounded-xl p-4 mb-6 max-w-md mx-auto">
-                <div className="text-orange-800 font-semibold text-lg">
-                  🎁 獎品：{rewardConfig.description}
-                </div>
-                <div className="text-orange-600 text-sm mt-1">
-                  50% 機率獲得獎品
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <button
-            onClick={startSpin}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
-          >
-            🎯 開始轉動
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // 移除分離的開始畫面，直接顯示轉盤和按鈕
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -153,39 +123,46 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         
         <div className="mt-8">
           {isSpinning ? (
-            <div className="text-2xl font-bold text-purple-600 animate-pulse">
+            <div className="text-xl font-bold text-purple-600 animate-pulse">
               🎯 轉動中...
             </div>
           ) : (
-            <div className="text-xl text-gray-600">
-              等待結果...
-            </div>
+            <button
+              onClick={startSpin}
+              disabled={isSpinning}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-full text-lg hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              🎯 開始轉動
+            </button>
           )}
         </div>
         
-        {/* 圖例 - 放大顯示 */}
-        <div className="mt-8 flex justify-center gap-12">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded shadow-md" style={{ backgroundColor: '#FFD700' }}></div>
-            <span className="text-lg font-semibold text-gray-800">黃色 = 成功 (50%)</span>
+        {/* 圖例 - 適中大小 */}
+        <div className="mt-6 flex justify-center gap-8">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FFD700' }}></div>
+            <span className="text-sm font-medium text-gray-700">黃色 = 成功 (50%)</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded shadow-md" style={{ backgroundColor: '#8B7355' }}></div>
-            <span className="text-lg font-semibold text-gray-800">橄欖綠 = 失敗 (50%)</span>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#8B0000' }}></div>
+            <span className="text-sm font-medium text-gray-700">深紅色 = 失敗 (50%)</span>
           </div>
         </div>
       </div>
       
       <style jsx>{`
         .wheel-spinning {
-          animation: spin 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          animation: spin 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
         }
         
         @keyframes spin {
-          from {
+          0% {
             transform: rotate(0deg);
           }
-          to {
+          70% {
+            transform: rotate(calc(var(--final-rotation, 1800deg) * 0.8));
+          }
+          100% {
             transform: rotate(var(--final-rotation, 1800deg));
           }
         }
