@@ -13,7 +13,6 @@ interface WheelGameProps {
 
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [rotation, setRotation] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
@@ -121,7 +120,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             key={animationKey}
             className={`w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl ${isSpinning ? 'wheel-spinning' : ''}`}
             style={{ 
-              transform: `rotate(${rotation}deg)`,
               transformOrigin: 'center'
             }}
           >
