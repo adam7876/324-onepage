@@ -116,10 +116,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             </div>
           </div>
           
-          {/* 長指針 - 底部固定在圓心，指向轉盤邊緣 */}
+          {/* 長指針 - 底部固定在圓心，尖端朝外指向轉盤邊緣 */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
             <div className="relative">
-              {/* 指針主體 - 長而尖的白色指針，底部在圓心 */}
+              {/* 指針主體 - 長而尖的白色指針，底部在圓心，尖端朝外 */}
               <div 
                 className="absolute"
                 style={{
@@ -127,8 +127,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
                   height: '0',
                   borderLeft: '8px solid transparent',
                   borderRight: '8px solid transparent',
-                  borderBottom: '140px solid white',
-                  transform: 'translate(-50%, 0%)',
+                  borderTop: '140px solid white',
+                  transform: 'translate(-50%, -50%)',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                 }}
               />
