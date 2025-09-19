@@ -38,13 +38,17 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
     const randomSection = Math.floor(Math.random() * 8);
     // 每格45度，計算目標格子的中心角度
+    // conic-gradient 從0度開始，指針在12點方向，所以需要反向計算
     const targetAngle = randomSection * 45 + 22.5; // 每格中心角度
     // 指針固定在12點方向，轉盤需要轉到讓目標格子對準指針
-    const calculatedRotation = (extraSpins * 360) + targetAngle; // 正向計算，讓目標格子轉到指針位置
+    const calculatedRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算，讓目標格子轉到指針位置
     
-    console.log('🎡 目標格子:', randomSection, '中心角度:', targetAngle, '結果:', wheelSections[randomSection].type);
-    console.log('🎡 格子顏色:', wheelSections[randomSection].color, '類型:', wheelSections[randomSection].type);
-    console.log('🎡 旋轉角度:', calculatedRotation);
+    console.log('🎡 目標格子索引:', randomSection);
+    console.log('🎡 目標格子配置:', wheelSections[randomSection]);
+    console.log('🎡 中心角度:', targetAngle);
+    console.log('🎡 最終旋轉角度:', calculatedRotation);
+    console.log('🎡 預期結果:', wheelSections[randomSection].type);
+    console.log('🎡 預期顏色:', wheelSections[randomSection].color);
     
     // 保存最終旋轉角度
     setFinalRotation(calculatedRotation);
