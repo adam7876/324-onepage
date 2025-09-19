@@ -38,7 +38,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     const sectionCenters = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]; // 每格中心角度
     const randomSection = Math.floor(Math.random() * 8);
     const targetAngle = sectionCenters[randomSection];
-    const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算，讓指針指向目標
+    const finalRotation = (extraSpins * 360) + targetAngle; // 正向計算，讓轉盤轉到目標角度
     
     console.log('🎡 旋轉角度:', finalRotation);
     console.log('🎡 目標格子:', randomSection, '結果:', wheelSections[randomSection].type);
@@ -49,7 +49,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     // 強制重新渲染動畫
     setAnimationKey(prev => prev + 1);
     
-    // 3 秒後停止並判斷結果
+    // 4 秒後停止並判斷結果
     setTimeout(() => {
       setIsSpinning(false);
       
@@ -71,7 +71,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         };
         await onComplete(gameResult);
       }, 2000);
-    }, 3000);
+    }, 4000); // 延長到4秒確保動畫完成
   };
 
   // 移除分離的開始畫面，直接顯示轉盤和按鈕
@@ -125,9 +125,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
                 style={{
                   width: '0',
                   height: '0',
-                  borderLeft: '8px solid transparent',
-                  borderRight: '8px solid transparent',
-                  borderTop: '140px solid white',
+                  borderLeft: '5.6px solid transparent',
+                  borderRight: '5.6px solid transparent',
+                  borderTop: '98px solid white',
                   transform: 'translate(-50%, 0%)',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                 }}
@@ -167,15 +167,13 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       
       <style jsx>{`
         .wheel-spinning {
-          animation: spin 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+          animation: spin 4s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+          animation-fill-mode: forwards;
         }
         
         @keyframes spin {
           0% {
             transform: rotate(0deg);
-          }
-          70% {
-            transform: rotate(calc(var(--final-rotation, 1800deg) * 0.8));
           }
           100% {
             transform: rotate(var(--final-rotation, 1800deg));
