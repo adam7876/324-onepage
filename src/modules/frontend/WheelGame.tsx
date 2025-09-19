@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 
 interface WheelGameProps {
   onGameEnd: (result: 'win' | 'lose') => void;
