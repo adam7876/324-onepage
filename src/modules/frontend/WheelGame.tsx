@@ -33,12 +33,14 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     console.log('🎡 開始旋轉轉盤');
     setIsSpinning(true);
     
-    // 計算精確停格角度 - 確保停在格子中心
+    // 計算精確停格角度 - 確保指針指向格子中心
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
-    const sectionCenters = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]; // 每格中心角度
+    // 每格45度，中心角度：0, 45, 90, 135, 180, 225, 270, 315
+    const sectionCenters = [0, 45, 90, 135, 180, 225, 270, 315]; 
     const randomSection = Math.floor(Math.random() * 8);
     const targetAngle = sectionCenters[randomSection];
-    const finalRotation = (extraSpins * 360) + targetAngle; // 正向計算，讓轉盤轉到目標角度
+    // 指針固定在12點方向(0度)，所以轉盤需要轉到讓目標格子對準指針
+    const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算，讓目標格子對準指針
     
     console.log('🎡 旋轉角度:', finalRotation);
     console.log('🎡 目標格子:', randomSection, '結果:', wheelSections[randomSection].type);
