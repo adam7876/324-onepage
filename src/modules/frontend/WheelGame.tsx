@@ -15,6 +15,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
+  const [animationKey, setAnimationKey] = useState(0);
 
   // 轉盤配置 - 8格，4格成功4格失敗，使用您提供的色彩
   const wheelSections = [
@@ -42,7 +43,12 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     const finalRotation = (extraSpins * 360) + randomAngle;
     
     console.log('🎡 旋轉角度:', finalRotation);
-    setRotation(finalRotation);
+    
+    // 設置 CSS 變數用於動畫
+    document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
+    
+    // 強制重新渲染動畫
+    setAnimationKey(prev => prev + 1);
     
     // 3 秒後停止並判斷結果
     setTimeout(() => {
@@ -112,11 +118,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         <div className="relative">
           {/* 轉盤 */}
           <div 
-            className="w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl"
+            key={animationKey}
+            className={`w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl ${isSpinning ? 'wheel-spinning' : ''}`}
             style={{ 
               transform: `rotate(${rotation}deg)`,
-              transformOrigin: 'center',
-              transition: 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+              transformOrigin: 'center'
             }}
           >
             {/* 使用 conic-gradient 創建轉盤 */}
@@ -172,6 +178,21 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           </div>
         </div>
       </div>
+      
+      <style jsx>{`
+        .wheel-spinning {
+          animation: spin 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(var(--final-rotation, 1800deg));
+          }
+        }
+      `}</style>
     </div>
   );
 }
