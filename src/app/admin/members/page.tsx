@@ -7,9 +7,8 @@ import { Card } from '../../../components/ui/card';
 import { Input } from '../../../components/ui/input';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firestore';
-import { User } from 'firebase/auth';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../../firebase/firebaseConfig';
+import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
+import { app } from '../../../firebase/firebaseConfig';
 
 interface Member {
   id: string;
@@ -27,7 +26,7 @@ interface Member {
 }
 
 export default function MembersPage() {
-  const [user, loading, error] = useAuthState(auth);
+  const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
@@ -39,15 +38,18 @@ export default function MembersPage() {
 
   // 權限檢查
   useEffect(() => {
-    if (loading) return;
-    
-    if (!user) {
-      router.push('/admin/login');
-      return;
-    }
-    
-    setAuthChecked(true);
-  }, [user, loading, router]);
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push('/admin/login');
+        return;
+      }
+      setUser(user);
+      setAuthChecked(true);
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   // 載入會員列表
   const loadMembers = async () => {
