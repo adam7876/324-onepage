@@ -46,7 +46,8 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <script
+        {/* 暫時停用 Service Worker 以解決 Safari 相容性問題 */}
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
@@ -62,7 +63,7 @@ export default function RootLayout({
               }
             `,
           }}
-        />
+        /> */}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black`}
