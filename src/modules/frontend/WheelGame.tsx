@@ -14,6 +14,7 @@ interface WheelGameProps {
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
+  const [finalRotation, setFinalRotation] = useState(0);
 
   // 轉盤配置 - 8格，4格成功4格失敗，橙色成功、亮粉色失敗
   const wheelSections = [
@@ -39,13 +40,16 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     // 每格45度，計算目標格子的中心角度
     const targetAngle = randomSection * 45 + 22.5; // 每格中心角度
     // 指針固定在12點方向，轉盤需要轉到讓目標格子對準指針
-    const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算
+    const calculatedRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算
     
     console.log('🎡 目標格子:', randomSection, '中心角度:', targetAngle, '結果:', wheelSections[randomSection].type);
-    console.log('🎡 旋轉角度:', finalRotation);
+    console.log('🎡 旋轉角度:', calculatedRotation);
+    
+    // 保存最終旋轉角度
+    setFinalRotation(calculatedRotation);
     
     // 設置 CSS 變數用於動畫
-    document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
+    document.documentElement.style.setProperty('--final-rotation', `${calculatedRotation}deg`);
     
     // 強制重新渲染動畫
     setAnimationKey(prev => prev + 1);
@@ -88,7 +92,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             key={animationKey}
             className={`w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl ${isSpinning ? 'wheel-spinning' : ''}`}
             style={{ 
-              transformOrigin: 'center center'
+              transformOrigin: 'center center',
+              transform: isSpinning ? 'none' : `rotate(${finalRotation}deg)`
             }}
           >
             {/* 使用 conic-gradient 創建轉盤 */}
