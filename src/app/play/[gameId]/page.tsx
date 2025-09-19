@@ -9,6 +9,8 @@ import ScratchGame from '../../../components/games/ScratchGame';
 import RockPaperScissorsGame from '../../../components/games/RockPaperScissorsGame';
 import DiceBattleGame from '../../../components/games/DiceBattleGame';
 import type { GameResult } from '../../../lib/game-types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../firebase/firestore';
 
 export default function PlayGamePage() {
   const params = useParams();
@@ -20,6 +22,31 @@ export default function PlayGamePage() {
   const [error, setError] = useState('');
   const [gameData, setGameData] = useState<{email: string; gameType: string; createdAt: Date; expiresAt: Date} | null>(null);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
+  const [rewardConfig, setRewardConfig] = useState<{type: 'coupon' | 'discount'; value: number; description: string} | null>(null);
+
+  // 載入獎品配置
+  useEffect(() => {
+    const loadRewardConfig = async () => {
+      try {
+        const docRef = doc(db, 'gameConfig', 'reward');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data() as {type: 'coupon' | 'discount'; value: number; description: string};
+          console.log('🎁 從 Firestore 載入獎品配置:', data);
+          setRewardConfig(data);
+        } else {
+          console.log('❌ Firestore 中沒有獎品配置，使用預設值');
+          setRewardConfig(GAME_CONFIG.reward);
+        }
+      } catch (error) {
+        console.error('載入獎品配置失敗:', error);
+        setRewardConfig(GAME_CONFIG.reward);
+      }
+    };
+    
+    loadRewardConfig();
+  }, []);
 
   // 驗證token和遊戲類型
   useEffect(() => {
@@ -95,7 +122,10 @@ export default function PlayGamePage() {
 
     switch (gameId) {
       case 'wheel':
-        return <WheelGame onComplete={handleGameComplete} />;
+        return <WheelGame 
+          onComplete={handleGameComplete} 
+          rewardConfig={rewardConfig}
+        />;
       case 'dice':
         return <DiceGame onComplete={handleGameComplete} />;
       case 'scratch':
