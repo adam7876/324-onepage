@@ -56,7 +56,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       // 使用預先計算的結果
       const result = wheelSections[randomSection].type as 'win' | 'lose';
       
-      // 延遲 3 秒後顯示結果，讓用戶有時間看到結果
+      // 延遲 2 秒後顯示結果，讓用戶有時間看到結果
       setTimeout(async () => {
         const gameResult = {
           success: true,
@@ -70,7 +70,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.description || '獎品'}！` : '很遺憾，這次沒有中獎。'
         };
         await onComplete(gameResult);
-      }, 1000);
+      }, 2000);
     }, 3000);
   };
 
@@ -116,10 +116,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             </div>
           </div>
           
-          {/* 長指針 - 固定在轉盤外部，指向轉盤 */}
+          {/* 長指針 - 底部固定在圓心，指向轉盤邊緣 */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
             <div className="relative">
-              {/* 指針主體 - 長而尖的白色指針 */}
+              {/* 指針主體 - 長而尖的白色指針，底部在圓心 */}
               <div 
                 className="absolute"
                 style={{
@@ -127,21 +127,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
                   height: '0',
                   borderLeft: '8px solid transparent',
                   borderRight: '8px solid transparent',
-                  borderBottom: '120px solid white',
-                  transform: 'translate(-50%, -50%)',
+                  borderBottom: '140px solid white',
+                  transform: 'translate(-50%, 0%)',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
-                }}
-              />
-              {/* 指針尖端 - 深藍色 */}
-              <div 
-                className="absolute"
-                style={{
-                  width: '0',
-                  height: '0',
-                  borderLeft: '6px solid transparent',
-                  borderRight: '6px solid transparent',
-                  borderBottom: '20px solid #1e3a8a',
-                  transform: 'translate(-50%, -50%) translateY(-100px)',
                 }}
               />
             </div>
