@@ -22,6 +22,7 @@ export default function GamesPage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [rewardConfig, setRewardConfig] = useState<GameRewardConfig | null>(null);
+  const [isPWA, setIsPWA] = useState(false);
 
   // 載入獎品配置
   useEffect(() => {
@@ -45,6 +46,20 @@ export default function GamesPage() {
     };
     
     loadRewardConfig();
+  }, []);
+
+  // 偵測 PWA 模式
+  useEffect(() => {
+    const checkPWA = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isInApp = window.navigator.standalone === true;
+      setIsPWA(isStandalone || isInApp);
+    };
+    
+    checkPWA();
+    window.addEventListener('resize', checkPWA);
+    
+    return () => window.removeEventListener('resize', checkPWA);
   }, []);
 
   // 選擇遊戲
@@ -146,7 +161,7 @@ export default function GamesPage() {
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
 
   return (
-    <div className="min-h-screen relative py-12 pb-32">
+    <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100vh', minHeight: '100dvh' }}>
       {/* 背景圖片 */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -173,7 +188,7 @@ export default function GamesPage() {
         {/* 遊戲規則說明 */}
         <div className="p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">📋 遊戲規則</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className={`grid gap-6 ${isPWA ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
             <div>
               <h3 className="font-semibold text-purple-800 mb-2 ">參與方式</h3>
               <ul className="space-y-2 text-gray-900 ">
@@ -227,7 +242,7 @@ export default function GamesPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center ">
               選擇您想玩的遊戲
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${isPWA ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
               {GAME_CONFIG.games.filter(game => game.enabled).map((game) => (
                 <div
                   key={game.id}
