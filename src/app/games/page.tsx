@@ -162,7 +162,7 @@ export default function GamesPage() {
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
 
   return (
-    <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100vh', minHeight: '100dvh' }}>
+    <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100dvh' }}>
       {/* 背景圖片 */}
       <div className="absolute inset-0 z-0">
         <Image
