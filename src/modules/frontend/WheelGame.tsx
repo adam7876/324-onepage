@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface WheelGameProps {
-  onComplete: (result: { result: 'win' | 'lose'; reward?: any }) => Promise<void>;
+  onComplete: (result: { result: 'win' | 'lose'; reward?: { type: 'coupon' | 'discount'; value: number; description: string } }) => Promise<void>;
   rewardConfig?: {
     type: 'coupon' | 'discount';
     value: number;
