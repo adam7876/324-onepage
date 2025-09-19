@@ -17,16 +17,17 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [finalRotation, setFinalRotation] = useState(0);
 
   // 轉盤配置 - 8格，4格成功4格失敗，橙色成功、亮粉色失敗
-  // 重新調整順序以匹配實際視覺效果
+  // 修正順序以匹配 conic-gradient 的實際視覺效果
+  // conic-gradient 從 0° 開始，指針在 12 點方向
   const wheelSections = [
-    { id: 1, type: 'win', color: '#FF8C00', label: '成功' },    // 索引0 - 橙色 - 成功
-    { id: 2, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引1 - 亮粉色 - 失敗
-    { id: 3, type: 'win', color: '#FF8C00', label: '成功' },    // 索引2 - 橙色 - 成功
-    { id: 4, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引3 - 亮粉色 - 失敗
-    { id: 5, type: 'win', color: '#FF8C00', label: '成功' },    // 索引4 - 橙色 - 成功
-    { id: 6, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引5 - 亮粉色 - 失敗
-    { id: 7, type: 'win', color: '#FF8C00', label: '成功' },    // 索引6 - 橙色 - 成功
-    { id: 8, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引7 - 亮粉色 - 失敗
+    { id: 1, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引0: 0°-45° (12點方向) - 亮粉色失敗
+    { id: 2, type: 'win', color: '#FF8C00', label: '成功' },    // 索引1: 45°-90° - 橙色成功
+    { id: 3, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引2: 90°-135° - 亮粉色失敗
+    { id: 4, type: 'win', color: '#FF8C00', label: '成功' },    // 索引3: 135°-180° - 橙色成功
+    { id: 5, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引4: 180°-225° - 亮粉色失敗
+    { id: 6, type: 'win', color: '#FF8C00', label: '成功' },    // 索引5: 225°-270° - 橙色成功
+    { id: 7, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引6: 270°-315° - 亮粉色失敗
+    { id: 8, type: 'win', color: '#FF8C00', label: '成功' },    // 索引7: 315°-360° - 橙色成功
   ];
 
   const startSpin = () => {
