@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '../../../components/ui/button';
 import { Card } from '../../../components/ui/card';
 import { Input } from '../../../components/ui/input';
-import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../firebase/firestore';
 import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { app } from '../../../firebase/firebaseConfig';
@@ -26,7 +26,7 @@ interface Member {
 }
 
 export default function MembersPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
