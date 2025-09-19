@@ -15,16 +15,16 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [isSpinning, setIsSpinning] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // 轉盤配置 - 8格，4格成功4格失敗，使用您圖片中的顏色
+  // 轉盤配置 - 8格，4格成功4格失敗，橙色成功、亮粉色失敗
   const wheelSections = [
-    { id: 1, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
-    { id: 2, type: 'win', color: '#FFD700', label: '成功' },    // 鮮黃色 - 成功
+    { id: 1, type: 'lose', color: '#FF69B4', label: '失敗' },   // 亮粉色 - 失敗
+    { id: 2, type: 'win', color: '#FF8C00', label: '成功' },    // 橙色 - 成功
     { id: 3, type: 'lose', color: '#FF69B4', label: '失敗' },   // 亮粉色 - 失敗
     { id: 4, type: 'win', color: '#FF8C00', label: '成功' },    // 橙色 - 成功
-    { id: 5, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
-    { id: 6, type: 'win', color: '#FFD700', label: '成功' },    // 鮮黃色 - 成功
+    { id: 5, type: 'lose', color: '#FF69B4', label: '失敗' },   // 亮粉色 - 失敗
+    { id: 6, type: 'win', color: '#FF8C00', label: '成功' },    // 橙色 - 成功
     { id: 7, type: 'lose', color: '#FF69B4', label: '失敗' },   // 亮粉色 - 失敗
-    { id: 8, type: 'win', color: '#20B2AA', label: '成功' },    // 藍綠色 - 成功
+    { id: 8, type: 'win', color: '#FF8C00', label: '成功' },    // 橙色 - 成功
   ];
 
   const startSpin = () => {
@@ -81,13 +81,13 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">🎡 幸運轉盤</h2>
         
-        <div className="relative">
+        <div className="relative flex justify-center">
           {/* 轉盤 */}
           <div 
             key={animationKey}
             className={`w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl ${isSpinning ? 'wheel-spinning' : ''}`}
             style={{ 
-              transformOrigin: 'center'
+              transformOrigin: 'center center'
             }}
           >
             {/* 使用 conic-gradient 創建轉盤 */}
@@ -108,19 +108,42 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             />
             
             {/* 中心軸心 */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gray-800 rounded-full border-2 border-white shadow-lg z-10">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-800 rounded-full border-2 border-white shadow-lg z-10">
               {/* 中心小圓點 */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-blue-800 rounded-full"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-blue-800 rounded-full"></div>
               </div>
             </div>
-            
-            {/* 中心指針 - 向右上角延伸 */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-              <div className="w-0 h-0 border-l-16 border-r-16 border-b-32 border-l-transparent border-r-transparent border-b-white shadow-lg relative">
-                {/* 指針尖端 */}
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-blue-800"></div>
-              </div>
+          </div>
+          
+          {/* 長指針 - 固定在轉盤外部，指向轉盤 */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+            <div className="relative">
+              {/* 指針主體 - 長而尖的白色指針 */}
+              <div 
+                className="absolute"
+                style={{
+                  width: '0',
+                  height: '0',
+                  borderLeft: '8px solid transparent',
+                  borderRight: '8px solid transparent',
+                  borderBottom: '120px solid white',
+                  transform: 'translate(-50%, -50%)',
+                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                }}
+              />
+              {/* 指針尖端 - 深藍色 */}
+              <div 
+                className="absolute"
+                style={{
+                  width: '0',
+                  height: '0',
+                  borderLeft: '6px solid transparent',
+                  borderRight: '6px solid transparent',
+                  borderBottom: '20px solid #1e3a8a',
+                  transform: 'translate(-50%, -50%) translateY(-100px)',
+                }}
+              />
             </div>
           </div>
         </div>
@@ -144,12 +167,12 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         {/* 圖例 - 適中大小 */}
         <div className="mt-6 flex justify-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FFD700' }}></div>
-            <span className="text-sm font-medium text-gray-700">黃色/橙色/藍綠色 = 成功 (50%)</span>
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FF8C00' }}></div>
+            <span className="text-sm font-medium text-gray-700">橙色 = 成功 (50%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#8B7355' }}></div>
-            <span className="text-sm font-medium text-gray-700">橄欖綠/亮粉色 = 失敗 (50%)</span>
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FF69B4' }}></div>
+            <span className="text-sm font-medium text-gray-700">亮粉色 = 失敗 (50%)</span>
           </div>
         </div>
       </div>
