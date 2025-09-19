@@ -13,7 +13,6 @@ interface WheelGameProps {
 
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
   // 轉盤配置 - 8格，4格成功4格失敗，深紅色失敗，黃色成功
@@ -33,7 +32,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     
     console.log('🎡 開始旋轉轉盤');
     setIsSpinning(true);
-    setGameStarted(true);
     
     // 計算精確停格角度 - 確保停在格子中心
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
