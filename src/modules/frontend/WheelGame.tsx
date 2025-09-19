@@ -16,16 +16,16 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [rotation, setRotation] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
 
-  // 轉盤配置 - 8格，4格成功4格失敗
+  // 轉盤配置 - 8格，4格成功4格失敗，使用您提供的色彩
   const wheelSections = [
-    { id: 1, type: 'win', color: '#10B981', label: '成功' },
-    { id: 2, type: 'lose', color: '#EF4444', label: '失敗' },
-    { id: 3, type: 'win', color: '#10B981', label: '成功' },
-    { id: 4, type: 'lose', color: '#EF4444', label: '失敗' },
-    { id: 5, type: 'win', color: '#10B981', label: '成功' },
-    { id: 6, type: 'lose', color: '#EF4444', label: '失敗' },
-    { id: 7, type: 'win', color: '#10B981', label: '成功' },
-    { id: 8, type: 'lose', color: '#EF4444', label: '失敗' },
+    { id: 1, type: 'win', color: '#8B7355', label: '成功' },    // 橄欖綠
+    { id: 2, type: 'lose', color: '#FF8C00', label: '失敗' },   // 橘色
+    { id: 3, type: 'win', color: '#FF69B4', label: '成功' },    // 粉紅色
+    { id: 4, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠
+    { id: 5, type: 'win', color: '#FFD700', label: '成功' },    // 黃色
+    { id: 6, type: 'lose', color: '#FF69B4', label: '失敗' },   // 粉紅色
+    { id: 7, type: 'win', color: '#FF8C00', label: '成功' },    // 橘色
+    { id: 8, type: 'lose', color: '#20B2AA', label: '失敗' },   // 藍綠色
   ];
 
   const startSpin = () => {
@@ -36,9 +36,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     
     // 計算隨機旋轉角度
     // 每格 45 度，加上多圈旋轉增加戲劇效果
-    const baseRotation = Math.random() * 360;
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
-    const finalRotation = rotation + baseRotation + (extraSpins * 360);
+    const randomAngle = Math.random() * 360;
+    const finalRotation = rotation + (extraSpins * 360) + randomAngle;
     
     setRotation(finalRotation);
     
@@ -110,43 +110,39 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         <div className="relative">
           {/* 轉盤 */}
           <div 
-            className="w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl transition-transform duration-3000 ease-out"
+            className="w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl"
             style={{ 
               transform: `rotate(${rotation}deg)`,
-              transformOrigin: 'center'
+              transformOrigin: 'center',
+              transition: isSpinning ? 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
             }}
           >
-            {wheelSections.map((section, index) => {
-              const angle = (360 / wheelSections.length) * index;
-              return (
-                <div
-                  key={section.id}
-                  className="absolute w-full h-full"
-                  style={{
-                    transform: `rotate(${angle}deg)`,
-                    transformOrigin: 'center'
-                  }}
-                >
-                  <div
-                    className="w-1/2 h-1/2 absolute top-0 left-1/2 transform -translate-x-1/2"
-                    style={{
-                      background: `conic-gradient(from 0deg, ${section.color} 0deg, ${section.color} 45deg, transparent 45deg)`,
-                      clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
-                    }}
-                  />
-                </div>
-              );
-            })}
+            {/* 使用 conic-gradient 創建轉盤 */}
+            <div 
+              className="w-full h-full"
+              style={{
+                background: `conic-gradient(
+                  ${wheelSections[0].color} 0deg 45deg,
+                  ${wheelSections[1].color} 45deg 90deg,
+                  ${wheelSections[2].color} 90deg 135deg,
+                  ${wheelSections[3].color} 135deg 180deg,
+                  ${wheelSections[4].color} 180deg 225deg,
+                  ${wheelSections[5].color} 225deg 270deg,
+                  ${wheelSections[6].color} 270deg 315deg,
+                  ${wheelSections[7].color} 315deg 360deg
+                )`
+              }}
+            />
             
             {/* 中心圓圈 */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gray-800 rounded-full border-4 border-white shadow-lg flex items-center justify-center">
-              <div className="text-white font-bold text-lg">324</div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gray-800 rounded-full border-4 border-white shadow-lg flex items-center justify-center z-10">
+              <div className="text-white font-bold text-xl">324</div>
             </div>
           </div>
           
           {/* 指針 */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2">
-            <div className="w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-yellow-400 shadow-lg"></div>
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-20">
+            <div className="w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-yellow-400 shadow-lg"></div>
           </div>
         </div>
         
@@ -165,11 +161,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         {/* 圖例 */}
         <div className="mt-8 flex justify-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8B7355' }}></div>
             <span className="text-sm text-gray-600">成功 (50%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded"></div>
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF8C00' }}></div>
             <span className="text-sm text-gray-600">失敗 (50%)</span>
           </div>
         </div>
