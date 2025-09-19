@@ -53,7 +53,7 @@ export default function GamesPage() {
     const checkPWA = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
       // iOS Safari 特有的 standalone 屬性
-      const isInApp = (window.navigator as any).standalone === true;
+      const isInApp = (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
       setIsPWA(isStandalone || isInApp);
     };
     
