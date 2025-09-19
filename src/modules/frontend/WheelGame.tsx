@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface WheelGameProps {
-  onComplete: (result: { result: 'win' | 'lose'; reward?: { type: 'coupon' | 'discount'; value: number; description: string } }) => Promise<void>;
+  onComplete: (result: { success: boolean; result: 'win' | 'lose'; reward?: { type: 'coupon'; name: string; value: number; code: string }; message: string }) => Promise<void>;
   rewardConfig?: {
     type: 'coupon' | 'discount';
     value: number;
@@ -53,10 +53,18 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       
       // 延遲 1 秒後顯示結果
       setTimeout(async () => {
-        await onComplete({
+        const gameResult = {
+          success: true,
           result,
-          reward: result === 'win' ? rewardConfig : undefined
-        });
+          reward: result === 'win' ? {
+            type: 'coupon' as const,
+            name: rewardConfig?.description || '獎品',
+            value: rewardConfig?.value || 0,
+            code: `WHEEL-${Date.now()}`
+          } : undefined,
+          message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.description || '獎品'}！` : '很遺憾，這次沒有中獎。'
+        };
+        await onComplete(gameResult);
       }, 1000);
     }, 3000);
   };
