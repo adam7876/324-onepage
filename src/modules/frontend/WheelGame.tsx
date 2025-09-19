@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface WheelGameProps {
-  onComplete: (result: { success: boolean; result: 'win' | 'lose'; reward?: { name: string; value: number; type: string }; message: string }) => Promise<void>;
+  onComplete: (result: { success: boolean; result: 'win' | 'lose'; reward?: { type: 'coupon'; name: string; value: number; code: string }; message: string }) => Promise<void>;
   rewardConfig?: {
     type: 'coupon' | 'discount';
     value: number;
@@ -68,9 +68,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           success: true,
           result,
           reward: result === 'win' ? {
+            type: 'coupon' as const,
             name: rewardConfig?.description || '回饋金',
             value: rewardConfig?.value || 0,
-            type: rewardConfig?.type || 'coupon'
+            code: `WHEEL-${Date.now()}`
           } : undefined,
           message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.description || '回饋金'}！` : '很遺憾，這次沒有中獎。'
         };
