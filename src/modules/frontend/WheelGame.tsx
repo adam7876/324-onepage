@@ -15,16 +15,16 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [isSpinning, setIsSpinning] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // 轉盤配置 - 8格，4格成功4格失敗，深紅色失敗，黃色成功
+  // 轉盤配置 - 8格，4格成功4格失敗，使用您圖片中的顏色
   const wheelSections = [
-    { id: 1, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
-    { id: 2, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
-    { id: 3, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
-    { id: 4, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
-    { id: 5, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
-    { id: 6, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
-    { id: 7, type: 'lose', color: '#8B0000', label: '失敗' },   // 深紅色 - 失敗
-    { id: 8, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
+    { id: 1, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 2, type: 'win', color: '#FFD700', label: '成功' },    // 鮮黃色 - 成功
+    { id: 3, type: 'lose', color: '#FF69B4', label: '失敗' },   // 亮粉色 - 失敗
+    { id: 4, type: 'win', color: '#FF8C00', label: '成功' },    // 橙色 - 成功
+    { id: 5, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 6, type: 'win', color: '#FFD700', label: '成功' },    // 鮮黃色 - 成功
+    { id: 7, type: 'lose', color: '#FF69B4', label: '失敗' },   // 亮粉色 - 失敗
+    { id: 8, type: 'win', color: '#20B2AA', label: '成功' },    // 藍綠色 - 成功
   ];
 
   const startSpin = () => {
@@ -107,15 +107,21 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
               }}
             />
             
-            {/* 中心圓圈 */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gray-800 rounded-full border-4 border-white shadow-lg flex items-center justify-center z-10">
-              <div className="text-white font-bold text-xl">324</div>
+            {/* 中心軸心 */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gray-800 rounded-full border-2 border-white shadow-lg z-10">
+              {/* 中心小圓點 */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-blue-800 rounded-full"></div>
+              </div>
             </div>
-          </div>
-          
-          {/* 指針 - 向下指向轉盤中心 */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-20">
-            <div className="w-0 h-0 border-l-12 border-r-12 border-b-24 border-l-transparent border-r-transparent border-b-red-500 shadow-lg"></div>
+            
+            {/* 中心指針 - 向右上角延伸 */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+              <div className="w-0 h-0 border-l-16 border-r-16 border-b-32 border-l-transparent border-r-transparent border-b-white shadow-lg relative">
+                {/* 指針尖端 */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-blue-800"></div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -139,11 +145,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         <div className="mt-6 flex justify-center gap-8">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FFD700' }}></div>
-            <span className="text-sm font-medium text-gray-700">黃色 = 成功 (50%)</span>
+            <span className="text-sm font-medium text-gray-700">黃色/橙色/藍綠色 = 成功 (50%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#8B0000' }}></div>
-            <span className="text-sm font-medium text-gray-700">深紅色 = 失敗 (50%)</span>
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#8B7355' }}></div>
+            <span className="text-sm font-medium text-gray-700">橄欖綠/亮粉色 = 失敗 (50%)</span>
           </div>
         </div>
       </div>
