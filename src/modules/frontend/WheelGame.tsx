@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface WheelGameProps {
-  onGameEnd: (result: 'win' | 'lose') => void;
+  onComplete: (result: { result: 'win' | 'lose'; reward?: any }) => Promise<void>;
   rewardConfig?: {
     type: 'coupon' | 'discount';
     value: number;
@@ -11,7 +11,7 @@ interface WheelGameProps {
   };
 }
 
-export default function WheelGame({ onGameEnd, rewardConfig }: WheelGameProps) {
+export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
@@ -52,8 +52,11 @@ export default function WheelGame({ onGameEnd, rewardConfig }: WheelGameProps) {
       const result = wheelSections[sectionIndex].type as 'win' | 'lose';
       
       // 延遲 1 秒後顯示結果
-      setTimeout(() => {
-        onGameEnd(result);
+      setTimeout(async () => {
+        await onComplete({
+          result,
+          reward: result === 'win' ? rewardConfig : undefined
+        });
       }, 1000);
     }, 3000);
   };
