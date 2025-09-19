@@ -16,16 +16,16 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [gameStarted, setGameStarted] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // 轉盤配置 - 8格，4格成功4格失敗，使用您提供的色彩
+  // 轉盤配置 - 8格，4格成功4格失敗，橄欖綠失敗，黃色成功
   const wheelSections = [
-    { id: 1, type: 'win', color: '#8B7355', label: '成功' },    // 橄欖綠
-    { id: 2, type: 'lose', color: '#FF8C00', label: '失敗' },   // 橘色
-    { id: 3, type: 'win', color: '#FF69B4', label: '成功' },    // 粉紅色
-    { id: 4, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠
-    { id: 5, type: 'win', color: '#FFD700', label: '成功' },    // 黃色
-    { id: 6, type: 'lose', color: '#FF69B4', label: '失敗' },   // 粉紅色
-    { id: 7, type: 'win', color: '#FF8C00', label: '成功' },    // 橘色
-    { id: 8, type: 'lose', color: '#20B2AA', label: '失敗' },   // 藍綠色
+    { id: 1, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 2, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
+    { id: 3, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 4, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
+    { id: 5, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 6, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
+    { id: 7, type: 'lose', color: '#8B7355', label: '失敗' },   // 橄欖綠 - 失敗
+    { id: 8, type: 'win', color: '#FFD700', label: '成功' },    // 黃色 - 成功
   ];
 
   const startSpin = () => {
@@ -35,11 +35,12 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     setIsSpinning(true);
     setGameStarted(true);
     
-    // 計算隨機旋轉角度
-    // 每格 45 度，加上多圈旋轉增加戲劇效果
+    // 計算精確停格角度 - 確保停在格子中心
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
-    const randomAngle = Math.random() * 360;
-    const finalRotation = (extraSpins * 360) + randomAngle;
+    const sectionCenters = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]; // 每格中心角度
+    const randomSection = Math.floor(Math.random() * 8);
+    const targetAngle = sectionCenters[randomSection];
+    const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算，讓指針指向目標
     
     console.log('🎡 旋轉角度:', finalRotation);
     
@@ -53,10 +54,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     setTimeout(() => {
       setIsSpinning(false);
       
-      // 計算最終位置（0-360度）
-      const finalAngle = finalRotation % 360;
-      const sectionIndex = Math.floor(finalAngle / 45);
-      const result = wheelSections[sectionIndex].type as 'win' | 'lose';
+      // 使用預先計算的結果
+      const result = wheelSections[randomSection].type as 'win' | 'lose';
       
       // 延遲 1 秒後顯示結果
       setTimeout(async () => {
@@ -146,9 +145,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             </div>
           </div>
           
-          {/* 指針 */}
+          {/* 指針 - 向下指向轉盤中心 */}
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-20">
-            <div className="w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-yellow-400 shadow-lg"></div>
+            <div className="w-0 h-0 border-l-12 border-r-12 border-b-24 border-l-transparent border-r-transparent border-b-red-500 shadow-lg"></div>
           </div>
         </div>
         
@@ -164,15 +163,15 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           )}
         </div>
         
-        {/* 圖例 */}
-        <div className="mt-8 flex justify-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8B7355' }}></div>
-            <span className="text-sm text-gray-600">成功 (50%)</span>
+        {/* 圖例 - 放大顯示 */}
+        <div className="mt-8 flex justify-center gap-12">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded shadow-md" style={{ backgroundColor: '#FFD700' }}></div>
+            <span className="text-lg font-semibold text-gray-800">黃色 = 成功 (50%)</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF8C00' }}></div>
-            <span className="text-sm text-gray-600">失敗 (50%)</span>
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded shadow-md" style={{ backgroundColor: '#8B7355' }}></div>
+            <span className="text-lg font-semibold text-gray-800">橄欖綠 = 失敗 (50%)</span>
           </div>
         </div>
       </div>
