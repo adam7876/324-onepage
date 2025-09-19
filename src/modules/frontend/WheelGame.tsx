@@ -35,15 +35,14 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     
     // 計算精確停格角度 - 確保指針指向格子中心
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
-    // 每格45度，中心角度：0, 45, 90, 135, 180, 225, 270, 315
-    const sectionCenters = [0, 45, 90, 135, 180, 225, 270, 315]; 
     const randomSection = Math.floor(Math.random() * 8);
-    const targetAngle = sectionCenters[randomSection];
-    // 指針固定在12點方向(0度)，所以轉盤需要轉到讓目標格子對準指針
-    const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算，讓目標格子對準指針
+    // 每格45度，計算目標格子的中心角度
+    const targetAngle = randomSection * 45 + 22.5; // 每格中心角度
+    // 指針固定在12點方向，轉盤需要轉到讓目標格子對準指針
+    const finalRotation = (extraSpins * 360) + (360 - targetAngle); // 反向計算
     
+    console.log('🎡 目標格子:', randomSection, '中心角度:', targetAngle, '結果:', wheelSections[randomSection].type);
     console.log('🎡 旋轉角度:', finalRotation);
-    console.log('🎡 目標格子:', randomSection, '結果:', wheelSections[randomSection].type);
     
     // 設置 CSS 變數用於動畫
     document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
@@ -171,6 +170,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         .wheel-spinning {
           animation: spin 4s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
           animation-fill-mode: forwards;
+          animation-iteration-count: 1;
         }
         
         @keyframes spin {
