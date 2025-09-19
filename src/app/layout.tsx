@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "324.SAMiSA",
-  description: "324 一頁式網站",
+  title: "324遊樂園🎠",
+  description: "每天一次機會，玩遊戲領回饋金！",
   manifest: "/manifest.json",
   themeColor: "#8b5cf6",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",

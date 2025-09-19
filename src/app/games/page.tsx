@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Head from 'next/head';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firestore';
 import { GAME_CONFIG } from '../../lib/game-config';
@@ -147,12 +146,7 @@ export default function GamesPage() {
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
 
   return (
-    <>
-      <Head>
-        <title>324遊樂園🎠</title>
-        <meta name="description" content="每天一次機會，玩遊戲領回饋金！" />
-      </Head>
-      <div className="min-h-screen relative py-12 pb-32">
+    <div className="min-h-screen relative py-12 pb-32">
       {/* 背景圖片 */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -391,7 +385,6 @@ export default function GamesPage() {
         )}
 
       </div>
-    </div>
-    </>
+      </div>
   );
 }
