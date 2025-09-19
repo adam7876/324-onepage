@@ -17,11 +17,11 @@ export const GAME_CONFIG = {
     {
       id: 'wheel',
       name: '幸運轉盤',
-      description: '轉動轉盤，看看你的運氣如何！',
-      emoji: '🎯',
+      description: '轉動轉盤，停在綠色區域就能獲得獎品！',
+      emoji: '🎡',
       icon: '/images/games/wheel-icon.png',
       background: '/images/backgrounds/wheel-bg.jpg',
-      enabled: false, // 暫時停用
+      enabled: true,
     },
     {
       id: 'dice',

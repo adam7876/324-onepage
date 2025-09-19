@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { GAME_CONFIG } from '../../../lib/game-config';
-import WheelGame from '../../../components/games/WheelGame';
+import WheelGame from '../../../modules/frontend/WheelGame';
 import DiceGame from '../../../components/games/DiceGame';
 import ScratchGame from '../../../components/games/ScratchGame';
 import RockPaperScissorsGame from '../../../components/games/RockPaperScissorsGame';
