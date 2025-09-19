@@ -1,0 +1,289 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '../../../components/ui/button';
+import { Card } from '../../../components/ui/card';
+import { Input } from '../../../components/ui/input';
+import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../../firebase/firestore';
+import { User } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../../firebase/firebaseConfig';
+
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  status: 'active' | 'inactive' | 'vip' | 'suspended';
+  joinDate: string;
+  gameHistory: {
+    lastPlayed: string | null;
+    totalPlays: number;
+  };
+  updatedAt: string;
+  addedBy?: string;
+  addedAt?: string;
+}
+
+export default function MembersPage() {
+  const [user, loading, error] = useAuthState(auth);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [newMember, setNewMember] = useState({ name: '', email: '' });
+  const [addingMember, setAddingMember] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [message, setMessage] = useState('');
+  const router = useRouter();
+
+  // 權限檢查
+  useEffect(() => {
+    if (loading) return;
+    
+    if (!user) {
+      router.push('/admin/login');
+      return;
+    }
+    
+    setAuthChecked(true);
+  }, [user, loading, router]);
+
+  // 載入會員列表
+  const loadMembers = async () => {
+    setLoadingMembers(true);
+    try {
+      const membersSnapshot = await getDocs(collection(db, 'members'));
+      const membersList: Member[] = [];
+      
+      membersSnapshot.docs.forEach(doc => {
+        membersList.push({
+          id: doc.id,
+          ...doc.data()
+        } as Member);
+      });
+      
+      // 按加入日期排序
+      membersList.sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime());
+      
+      setMembers(membersList);
+    } catch (error) {
+      console.error('載入會員失敗:', error);
+      setMessage('載入會員失敗');
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authChecked) {
+      loadMembers();
+    }
+  }, [authChecked]);
+
+  // 新增會員
+  const addMember = async () => {
+    if (!newMember.name.trim() || !newMember.email.trim()) {
+      setMessage('請填寫完整資訊');
+      return;
+    }
+
+    setAddingMember(true);
+    try {
+      const normalizedEmail = newMember.email.toLowerCase().trim();
+      const docId = normalizedEmail.replace(/[.@]/g, '_');
+      
+      // 檢查是否已存在
+      const existingDoc = await getDoc(doc(db, 'members', docId));
+      
+      if (existingDoc.exists()) {
+        setMessage('此 Email 已存在');
+        setAddingMember(false);
+        return;
+      }
+      
+      // 新增會員資料
+      const memberData: Omit<Member, 'id'> = {
+        name: newMember.name.trim(),
+        email: normalizedEmail,
+        status: 'active',
+        joinDate: new Date().toISOString().split('T')[0],
+        gameHistory: {
+          lastPlayed: null,
+          totalPlays: 0
+        },
+        updatedAt: new Date().toISOString(),
+        addedBy: 'admin',
+        addedAt: new Date().toISOString()
+      };
+      
+      await setDoc(doc(db, 'members', docId), memberData);
+      
+      setMessage(`成功新增會員: ${memberData.name}`);
+      setNewMember({ name: '', email: '' });
+      
+      // 重新載入會員列表
+      await loadMembers();
+      
+    } catch (error) {
+      console.error('新增會員失敗:', error);
+      setMessage('新增會員失敗');
+    } finally {
+      setAddingMember(false);
+    }
+  };
+
+  // 搜尋會員
+  const filteredMembers = members.filter(member => 
+    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (!authChecked) {
+    return <div className="text-center py-24 text-lg">權限驗證中...</div>;
+  }
+
+  return (
+    <section className="max-w-6xl mx-auto px-4 py-16">
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">👥 會員管理</h1>
+          <Button variant="outline" onClick={() => router.back()}>
+            返回
+          </Button>
+        </div>
+
+        {/* 新增會員 */}
+        <Card className="p-6 mb-8 bg-green-50 border-green-200">
+          <h2 className="text-xl font-bold mb-4 text-green-800">➕ 新增會員</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            <Input
+              placeholder="會員姓名"
+              value={newMember.name}
+              onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+            />
+            <Input
+              placeholder="Email 地址"
+              type="email"
+              value={newMember.email}
+              onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+            />
+            <Button 
+              onClick={addMember} 
+              disabled={addingMember}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {addingMember ? '新增中...' : '新增會員'}
+            </Button>
+          </div>
+        </Card>
+
+        {/* 訊息顯示 */}
+        {message && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
+            {message}
+          </div>
+        )}
+
+        {/* 搜尋 */}
+        <div className="mb-6">
+          <Input
+            placeholder="搜尋會員姓名或 Email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
+        </div>
+
+        {/* 會員統計 */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-blue-600">{members.length}</div>
+            <div className="text-sm text-gray-600">總會員數</div>
+          </Card>
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-600">
+              {members.filter(m => m.status === 'active').length}
+            </div>
+            <div className="text-sm text-gray-600">啟用會員</div>
+          </Card>
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600">
+              {members.filter(m => m.gameHistory.totalPlays > 0).length}
+            </div>
+            <div className="text-sm text-gray-600">已玩過遊戲</div>
+          </Card>
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-orange-600">
+              {members.filter(m => m.gameHistory.lastPlayed).length}
+            </div>
+            <div className="text-sm text-gray-600">今日已玩</div>
+          </Card>
+        </div>
+
+        {/* 會員列表 */}
+        <Card className="p-6">
+          <h2 className="text-xl font-bold mb-4">📋 會員列表</h2>
+          
+          {loadingMembers ? (
+            <div className="text-center py-8">載入中...</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2">姓名</th>
+                    <th className="text-left py-2">Email</th>
+                    <th className="text-left py-2">狀態</th>
+                    <th className="text-left py-2">加入日期</th>
+                    <th className="text-left py-2">遊戲次數</th>
+                    <th className="text-left py-2">最後遊戲</th>
+                    <th className="text-left py-2">新增方式</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMembers.map((member) => (
+                    <tr key={member.id} className="border-b hover:bg-gray-50">
+                      <td className="py-2">{member.name}</td>
+                      <td className="py-2">{member.email}</td>
+                      <td className="py-2">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          member.status === 'active' ? 'bg-green-100 text-green-800' :
+                          member.status === 'vip' ? 'bg-purple-100 text-purple-800' :
+                          member.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {member.status === 'active' ? '啟用' :
+                           member.status === 'vip' ? 'VIP' :
+                           member.status === 'inactive' ? '停用' : '暫停'}
+                        </span>
+                      </td>
+                      <td className="py-2">{member.joinDate}</td>
+                      <td className="py-2">{member.gameHistory.totalPlays}</td>
+                      <td className="py-2">
+                        {member.gameHistory.lastPlayed ? 
+                          new Date(member.gameHistory.lastPlayed).toLocaleDateString() : 
+                          '未玩過'
+                        }
+                      </td>
+                      <td className="py-2">
+                        {member.addedBy === 'manual' ? '手動新增' : 
+                         member.addedBy === 'admin' ? '管理員新增' : '匯入'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              
+              {filteredMembers.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  {searchTerm ? '找不到符合條件的會員' : '沒有會員資料'}
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+      </div>
+    </section>
+  );
+}
