@@ -34,6 +34,7 @@ export default function MembersPage() {
   const [addingMember, setAddingMember] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
+  const [updatingMember, setUpdatingMember] = useState<string | null>(null);
   const router = useRouter();
 
   // 權限檢查
@@ -132,6 +133,29 @@ export default function MembersPage() {
       setMessage('新增會員失敗');
     } finally {
       setAddingMember(false);
+    }
+  };
+
+  // 更新會員狀態
+  const updateMemberStatus = async (memberId: string, newStatus: 'active' | 'inactive' | 'suspended') => {
+    setUpdatingMember(memberId);
+    try {
+      const memberRef = doc(db, 'members', memberId);
+      await setDoc(memberRef, {
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      
+      setMessage(`會員狀態已更新為: ${newStatus === 'active' ? '啟用' : newStatus === 'inactive' ? '停用' : '暫停'}`);
+      
+      // 重新載入會員列表
+      await loadMembers();
+      
+    } catch (error) {
+      console.error('更新會員狀態失敗:', error);
+      setMessage('更新會員狀態失敗');
+    } finally {
+      setUpdatingMember(null);
     }
   };
 
@@ -241,6 +265,7 @@ export default function MembersPage() {
                     <th className="text-left py-2">遊戲次數</th>
                     <th className="text-left py-2">最後遊戲</th>
                     <th className="text-left py-2">新增方式</th>
+                    <th className="text-left py-2">操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -271,6 +296,37 @@ export default function MembersPage() {
                       <td className="py-2">
                         {member.addedBy === 'manual' ? '手動新增' : 
                          member.addedBy === 'admin' ? '管理員新增' : '匯入'}
+                      </td>
+                      <td className="py-2">
+                        <div className="flex gap-1">
+                          {member.status !== 'active' && (
+                            <button
+                              onClick={() => updateMemberStatus(member.id, 'active')}
+                              disabled={updatingMember === member.id}
+                              className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs hover:bg-green-200 disabled:opacity-50"
+                            >
+                              {updatingMember === member.id ? '更新中...' : '啟用'}
+                            </button>
+                          )}
+                          {member.status !== 'inactive' && (
+                            <button
+                              onClick={() => updateMemberStatus(member.id, 'inactive')}
+                              disabled={updatingMember === member.id}
+                              className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs hover:bg-gray-200 disabled:opacity-50"
+                            >
+                              {updatingMember === member.id ? '更新中...' : '停用'}
+                            </button>
+                          )}
+                          {member.status !== 'suspended' && (
+                            <button
+                              onClick={() => updateMemberStatus(member.id, 'suspended')}
+                              disabled={updatingMember === member.id}
+                              className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200 disabled:opacity-50"
+                            >
+                              {updatingMember === member.id ? '更新中...' : '暫停'}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
