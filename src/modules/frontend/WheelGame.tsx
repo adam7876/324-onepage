@@ -31,6 +31,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const startSpin = () => {
     if (isSpinning) return;
     
+    console.log('🎡 開始旋轉轉盤');
     setIsSpinning(true);
     setGameStarted(true);
     
@@ -38,8 +39,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     // 每格 45 度，加上多圈旋轉增加戲劇效果
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
     const randomAngle = Math.random() * 360;
-    const finalRotation = rotation + (extraSpins * 360) + randomAngle;
+    const finalRotation = (extraSpins * 360) + randomAngle;
     
+    console.log('🎡 旋轉角度:', finalRotation);
     setRotation(finalRotation);
     
     // 3 秒後停止並判斷結果
@@ -114,7 +116,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             style={{ 
               transform: `rotate(${rotation}deg)`,
               transformOrigin: 'center',
-              transition: isSpinning ? 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
+              transition: 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}
           >
             {/* 使用 conic-gradient 創建轉盤 */}
