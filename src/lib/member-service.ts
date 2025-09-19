@@ -2,7 +2,7 @@
  * 會員服務 - 處理會員驗證和查詢
  */
 
-import { doc, getDoc, collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/firestore';
 
 // 會員資料介面
