@@ -29,70 +29,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
     return Math.floor(Math.random() * 6) + 1;
   };
 
-  // 創建 3D 骰子組件
-  const Dice3D = ({ isRolling, value }: { isRolling: boolean; value: number | null }) => {
+  // 獲取骰子 emoji
+  const getDiceEmoji = (value: number): string => {
     const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-    
-    const diceStyle: React.CSSProperties = {
-      position: 'relative',
-      width: '80px',
-      height: '80px',
-      transformStyle: 'preserve-3d',
-      perspective: '1000px',
-      margin: '0 auto',
-      animation: isRolling ? 'diceRoll 0.2s linear infinite' : 'none',
-    };
-
-    const faceStyle: React.CSSProperties = {
-      position: 'absolute',
-      width: '80px',
-      height: '80px',
-      background: 'white',
-      border: '2px solid #333',
-      borderRadius: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '40px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-      backfaceVisibility: 'hidden',
-    };
-
-    // 根據骰子值決定顯示哪一面
-    const getFaceTransform = (faceValue: number) => {
-      const transforms = [
-        'rotateY(0deg) translateZ(40px)',      // 1
-        'rotateY(90deg) translateZ(40px)',     // 2
-        'rotateY(180deg) translateZ(40px)',    // 3
-        'rotateY(-90deg) translateZ(40px)',    // 4
-        'rotateX(90deg) translateZ(40px)',     // 5
-        'rotateX(-90deg) translateZ(40px)',    // 6
-      ];
-      return transforms[faceValue - 1] || transforms[0];
-    };
-
-    // 處理 null 值，提供預設值
-    const diceValue = value || 1;
-    const diceEmoji = diceEmojis[diceValue - 1] || diceEmojis[0];
-
-    return (
-      <>
-        <div style={diceStyle}>
-          <div style={{...faceStyle, transform: getFaceTransform(diceValue)}}>
-            {diceEmoji}
-          </div>
-        </div>
-        <style jsx>{`
-          @keyframes diceRoll {
-            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-            25% { transform: rotateX(90deg) rotateY(90deg) rotateZ(45deg); }
-            50% { transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg); }
-            75% { transform: rotateX(270deg) rotateY(270deg) rotateZ(135deg); }
-            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
-          }
-        `}</style>
-      </>
-    );
+    return diceEmojis[value - 1] || diceEmojis[0];
   };
 
   const handleRoll = async () => {
@@ -226,7 +166,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={isRolling} value={playerDice} />
+                  <div className={`text-6xl transition-all duration-300 ${isRolling ? 'animate-bounce' : ''}`}>
+                    {playerDice ? getDiceEmoji(playerDice) : '⚀'}
+                  </div>
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 {playerDice && <p className="text-2xl font-bold text-blue-600">{playerDice}</p>}
@@ -234,7 +176,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={isRolling} value={computerDice} />
+                  <div className={`text-6xl transition-all duration-300 ${isRolling ? 'animate-bounce' : ''}`}>
+                    {computerDice ? getDiceEmoji(computerDice) : '⚀'}
+                  </div>
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 {computerDice && <p className="text-2xl font-bold text-red-600">{computerDice}</p>}
@@ -257,7 +201,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8 mb-6">
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={false} value={playerDice} />
+                  <div className="text-6xl">
+                    {playerDice ? getDiceEmoji(playerDice) : '⚀'}
+                  </div>
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 <p className="text-3xl font-bold text-blue-600">{playerDice}</p>
@@ -265,7 +211,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={false} value={computerDice} />
+                  <div className="text-6xl">
+                    {computerDice ? getDiceEmoji(computerDice) : '⚀'}
+                  </div>
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 <p className="text-3xl font-bold text-red-600">{computerDice}</p>
