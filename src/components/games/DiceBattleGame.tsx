@@ -30,7 +30,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   };
 
   // 創建 3D 骰子組件
-  const Dice3D = ({ isRolling }: { isRolling: boolean }) => {
+  const Dice3D = ({ isRolling, value }: { isRolling: boolean; value: number }) => {
+    const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    
     const diceStyle: React.CSSProperties = {
       position: 'relative',
       width: '80px',
@@ -38,7 +40,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       transformStyle: 'preserve-3d',
       perspective: '1000px',
       margin: '0 auto',
-      animation: isRolling ? 'diceRoll 0.1s linear infinite' : 'none',
+      animation: isRolling ? 'diceRoll 0.2s linear infinite' : 'none',
     };
 
     const faceStyle: React.CSSProperties = {
@@ -56,15 +58,25 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       backfaceVisibility: 'hidden',
     };
 
+    // 根據骰子值決定顯示哪一面
+    const getFaceTransform = (faceValue: number) => {
+      const transforms = [
+        'rotateY(0deg) translateZ(40px)',      // 1
+        'rotateY(90deg) translateZ(40px)',     // 2
+        'rotateY(180deg) translateZ(40px)',    // 3
+        'rotateY(-90deg) translateZ(40px)',    // 4
+        'rotateX(90deg) translateZ(40px)',     // 5
+        'rotateX(-90deg) translateZ(40px)',    // 6
+      ];
+      return transforms[faceValue - 1] || transforms[0];
+    };
+
     return (
       <>
         <div style={diceStyle}>
-          <div style={{...faceStyle, transform: 'rotateY(0deg) translateZ(40px)'}}>⚀</div>
-          <div style={{...faceStyle, transform: 'rotateY(90deg) translateZ(40px)'}}>⚁</div>
-          <div style={{...faceStyle, transform: 'rotateY(180deg) translateZ(40px)'}}>⚂</div>
-          <div style={{...faceStyle, transform: 'rotateY(-90deg) translateZ(40px)'}}>⚃</div>
-          <div style={{...faceStyle, transform: 'rotateX(90deg) translateZ(40px)'}}>⚄</div>
-          <div style={{...faceStyle, transform: 'rotateX(-90deg) translateZ(40px)'}}>⚅</div>
+          <div style={{...faceStyle, transform: getFaceTransform(value)}}>
+            {diceEmojis[value - 1]}
+          </div>
         </div>
         <style jsx>{`
           @keyframes diceRoll {
@@ -210,7 +222,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={isRolling} />
+                  <Dice3D isRolling={isRolling} value={playerDice} />
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 {playerDice && <p className="text-2xl font-bold text-blue-600">{playerDice}</p>}
@@ -218,7 +230,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={isRolling} />
+                  <Dice3D isRolling={isRolling} value={computerDice} />
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 {computerDice && <p className="text-2xl font-bold text-red-600">{computerDice}</p>}
@@ -241,7 +253,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8 mb-6">
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={false} />
+                  <Dice3D isRolling={false} value={playerDice} />
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 <p className="text-3xl font-bold text-blue-600">{playerDice}</p>
@@ -249,7 +261,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D isRolling={false} />
+                  <Dice3D isRolling={false} value={computerDice} />
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 <p className="text-3xl font-bold text-red-600">{computerDice}</p>
