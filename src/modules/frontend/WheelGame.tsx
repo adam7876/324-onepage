@@ -136,9 +136,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             
             {/* 旋轉指針 - 從中心向外 */}
             <div 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : ''}`}
               style={{
-                transform: `translate(-50%, -50%) rotate(${isSpinning ? 'var(--final-rotation, 0deg)' : pointerAngle + 'deg'})`,
+                transform: isSpinning ? 'translate(-50%, -50%)' : `translate(-50%, -50%) rotate(${pointerAngle}deg)`,
                 transformOrigin: 'center center'
               }}
             >
