@@ -32,7 +32,6 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   const [currentRound, setCurrentRound] = useState(1);
   const [playerScore, setPlayerScore] = useState(0);
   const [computerScore, setComputerScore] = useState(0);
-  const [roundResults, setRoundResults] = useState<Array<{player: Choice, computer: Choice, result: 'win' | 'lose' | 'draw'}>>([]);
   const [gameFinished, setGameFinished] = useState(false);
 
   useEffect(() => {
@@ -72,10 +71,6 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
       
       const roundResult = determineWinner(choice, computer);
       setResult(roundResult);
-      
-      // 記錄本回合結果
-      const newRoundResult = { player: choice, computer, result: roundResult };
-      setRoundResults(prev => [...prev, newRoundResult]);
       
       // 更新分數
       if (roundResult === 'win') {

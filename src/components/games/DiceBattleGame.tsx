@@ -24,7 +24,6 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [currentRound, setCurrentRound] = useState(1);
   const [playerScore, setPlayerScore] = useState(0);
   const [computerScore, setComputerScore] = useState(0);
-  const [roundResults, setRoundResults] = useState<Array<{player: number, computer: number, result: 'win' | 'lose' | 'draw'}>>([]);
   const [gameFinished, setGameFinished] = useState(false);
 
   useEffect(() => {
@@ -76,10 +75,6 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       }
 
       setResult(roundResult);
-      
-      // 記錄本回合結果
-      const newRoundResult = { player: finalPlayerDice, computer: finalComputerDice, result: roundResult };
-      setRoundResults(prev => [...prev, newRoundResult]);
       
       // 更新分數
       if (roundResult === 'win') {
