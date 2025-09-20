@@ -28,19 +28,21 @@ export default function GamesPage() {
   useEffect(() => {
     const loadRewardConfig = async () => {
       try {
+        console.log('🔄 開始載入獎品配置...');
         const docRef = doc(db, 'gameConfig', 'reward');
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data() as GameRewardConfig;
-          console.log('🎁 從 Firestore 載入獎品配置:', data);
+          console.log('✅ 從 Firestore 載入獎品配置成功:', data);
           setRewardConfig(data);
         } else {
-          console.log('❌ Firestore 中沒有獎品配置，使用預設值');
+          console.log('⚠️ Firestore 中沒有獎品配置，使用預設值:', GAME_CONFIG.reward);
           setRewardConfig(GAME_CONFIG.reward);
         }
       } catch (error) {
-        console.error('載入獎品配置失敗:', error);
+        console.error('❌ 載入獎品配置失敗:', error);
+        console.log('🔄 使用預設配置:', GAME_CONFIG.reward);
         setRewardConfig(GAME_CONFIG.reward);
       }
     };

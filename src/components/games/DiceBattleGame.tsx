@@ -31,15 +31,51 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
   // 創建 3D 骰子組件
   const Dice3D = ({ isRolling }: { isRolling: boolean }) => {
+    const diceStyle: React.CSSProperties = {
+      position: 'relative',
+      width: '80px',
+      height: '80px',
+      transformStyle: 'preserve-3d',
+      perspective: '1000px',
+      margin: '0 auto',
+      animation: isRolling ? 'diceRoll 0.1s linear infinite' : 'none',
+    };
+
+    const faceStyle: React.CSSProperties = {
+      position: 'absolute',
+      width: '80px',
+      height: '80px',
+      background: 'white',
+      border: '2px solid #333',
+      borderRadius: '8px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '40px',
+      boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+      backfaceVisibility: 'hidden',
+    };
+
     return (
-      <div className={`dice-3d ${isRolling ? 'dice-rolling' : ''}`}>
-        <div className="dice-face dice-face-1">⚀</div>
-        <div className="dice-face dice-face-2">⚁</div>
-        <div className="dice-face dice-face-3">⚂</div>
-        <div className="dice-face dice-face-4">⚃</div>
-        <div className="dice-face dice-face-5">⚄</div>
-        <div className="dice-face dice-face-6">⚅</div>
-      </div>
+      <>
+        <div style={diceStyle}>
+          <div style={{...faceStyle, transform: 'rotateY(0deg) translateZ(40px)'}}>⚀</div>
+          <div style={{...faceStyle, transform: 'rotateY(90deg) translateZ(40px)'}}>⚁</div>
+          <div style={{...faceStyle, transform: 'rotateY(180deg) translateZ(40px)'}}>⚂</div>
+          <div style={{...faceStyle, transform: 'rotateY(-90deg) translateZ(40px)'}}>⚃</div>
+          <div style={{...faceStyle, transform: 'rotateX(90deg) translateZ(40px)'}}>⚄</div>
+          <div style={{...faceStyle, transform: 'rotateX(-90deg) translateZ(40px)'}}>⚅</div>
+        </div>
+        <style jsx>{`
+          @keyframes diceRoll {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            25% { transform: rotateX(90deg) rotateY(90deg) rotateZ(45deg); }
+            50% { transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg); }
+            75% { transform: rotateX(270deg) rotateY(270deg) rotateZ(135deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
+          }
+        `}</style>
+      </>
     );
   };
 
@@ -242,61 +278,6 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </div>
         )}
       </div>
-      
-      <style jsx>{`
-        .dice-3d {
-          position: relative;
-          width: 80px;
-          height: 80px;
-          transform-style: preserve-3d;
-          perspective: 1000px;
-          margin: 0 auto;
-        }
-        
-        .dice-face {
-          position: absolute;
-          width: 80px;
-          height: 80px;
-          background: white;
-          border: 2px solid #333;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 40px;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-          backface-visibility: hidden;
-        }
-        
-        .dice-face-1 { transform: rotateY(0deg) translateZ(40px); }
-        .dice-face-2 { transform: rotateY(90deg) translateZ(40px); }
-        .dice-face-3 { transform: rotateY(180deg) translateZ(40px); }
-        .dice-face-4 { transform: rotateY(-90deg) translateZ(40px); }
-        .dice-face-5 { transform: rotateX(90deg) translateZ(40px); }
-        .dice-face-6 { transform: rotateX(-90deg) translateZ(40px); }
-        
-        .dice-rolling {
-          animation: diceRoll 0.1s linear infinite;
-        }
-        
-        @keyframes diceRoll {
-          0% {
-            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
-          }
-          25% {
-            transform: rotateX(90deg) rotateY(90deg) rotateZ(45deg);
-          }
-          50% {
-            transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg);
-          }
-          75% {
-            transform: rotateX(270deg) rotateY(270deg) rotateZ(135deg);
-          }
-          100% {
-            transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg);
-          }
-        }
-      `}</style>
     </div>
   );
 }
