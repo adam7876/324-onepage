@@ -30,7 +30,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   };
 
   // 創建 3D 骰子組件
-  const Dice3D = ({ value, isRolling }: { value: number | null; isRolling: boolean }) => {
+  const Dice3D = ({ isRolling }: { isRolling: boolean }) => {
     return (
       <div className={`dice-3d ${isRolling ? 'dice-rolling' : ''}`}>
         <div className="dice-face dice-face-1">⚀</div>
@@ -174,7 +174,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D value={playerDice} isRolling={isRolling} />
+                  <Dice3D isRolling={isRolling} />
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 {playerDice && <p className="text-2xl font-bold text-blue-600">{playerDice}</p>}
@@ -182,7 +182,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D value={computerDice} isRolling={isRolling} />
+                  <Dice3D isRolling={isRolling} />
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 {computerDice && <p className="text-2xl font-bold text-red-600">{computerDice}</p>}
@@ -205,7 +205,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8 mb-6">
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D value={playerDice} isRolling={false} />
+                  <Dice3D isRolling={false} />
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 <p className="text-3xl font-bold text-blue-600">{playerDice}</p>
@@ -213,7 +213,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <Dice3D value={computerDice} isRolling={false} />
+                  <Dice3D isRolling={false} />
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 <p className="text-3xl font-bold text-red-600">{computerDice}</p>
