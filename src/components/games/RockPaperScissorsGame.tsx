@@ -69,47 +69,49 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
       const computer = getRandomChoice();
       setComputerChoice(computer);
       
-      const roundResult = determineWinner(choice, computer);
-      setResult(roundResult);
-      
-      // 更新分數
-      if (roundResult === 'win') {
-        setPlayerScore(prev => prev + 1);
-      } else if (roundResult === 'lose') {
-        setComputerScore(prev => prev + 1);
-      }
-      
-      setIsPlaying(false);
-      
-      // 檢查是否有人已經獲勝
-      const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
-      const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
-      
-      if (newPlayerScore >= 2 || newComputerScore >= 2) {
-        // 遊戲結束
-        setGameFinished(true);
-        setHasPlayed(true);
+      // 先顯示電腦的出拳，讓用戶看到
+      setTimeout(() => {
+        const roundResult = determineWinner(choice, computer);
+        setResult(roundResult);
+        setIsPlaying(false);
         
-        setTimeout(() => {
-          if (newPlayerScore >= 2) {
-            onComplete('win', {
-              name: rewardConfig.description,
-              value: rewardConfig.value,
-              type: rewardConfig.type
-            });
-          } else {
-            onComplete('lose');
-          }
-        }, 2000);
-      } else {
-        // 繼續下一回合（包括平手）
-        setTimeout(() => {
-          setCurrentRound(prev => prev + 1);
-          setPlayerChoice(null);
-          setComputerChoice(null);
-          setResult(null);
-        }, 2000);
-      }
+        // 更新分數
+        if (roundResult === 'win') {
+          setPlayerScore(prev => prev + 1);
+        } else if (roundResult === 'lose') {
+          setComputerScore(prev => prev + 1);
+        }
+        
+        // 檢查是否有人已經獲勝
+        const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
+        const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
+        
+        if (newPlayerScore >= 2 || newComputerScore >= 2) {
+          // 遊戲結束
+          setGameFinished(true);
+          setHasPlayed(true);
+          
+          setTimeout(() => {
+            if (newPlayerScore >= 2) {
+              onComplete('win', {
+                name: rewardConfig.description,
+                value: rewardConfig.value,
+                type: rewardConfig.type
+              });
+            } else {
+              onComplete('lose');
+            }
+          }, 3000); // 增加結果顯示時間
+        } else {
+          // 繼續下一回合（包括平手）
+          setTimeout(() => {
+            setCurrentRound(prev => prev + 1);
+            setPlayerChoice(null);
+            setComputerChoice(null);
+            setResult(null);
+          }, 3000); // 增加結果顯示時間
+        }
+      }, 1000); // 給用戶時間看到電腦的出拳
     }, 1500);
   };
 
