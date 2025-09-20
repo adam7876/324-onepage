@@ -35,28 +35,32 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     console.log('🎡 開始旋轉轉盤');
     setIsSpinning(true);
     
-    // 計算精確停格角度 - 確保指針指向格子中心
-    const extraSpins = 5 + Math.random() * 5; // 5-10 圈
-    const randomSection = Math.floor(Math.random() * 8);
-    // 每格45度，計算目標格子的中心角度
-    // conic-gradient 從0度開始，指針在12點方向
-    const targetAngle = randomSection * 45 + 22.5; // 每格中心角度
-    // 指針固定在12點方向，轉盤需要轉到讓目標格子對準指針
-    // 由於指針在12點方向，需要讓目標格子轉到指針位置
-    const calculatedRotation = (extraSpins * 360) + targetAngle; // 正向計算，讓目標格子轉到指針位置
+    // 完全重新設計的轉盤邏輯
+    // 1. 先隨機選擇目標格子
+    const targetIndex = Math.floor(Math.random() * 8);
+    const targetSection = wheelSections[targetIndex];
     
-    console.log('🎡 目標格子索引:', randomSection);
-    console.log('🎡 目標格子配置:', wheelSections[randomSection]);
-    console.log('🎡 中心角度:', targetAngle);
-    console.log('🎡 最終旋轉角度:', calculatedRotation);
-    console.log('🎡 預期結果:', wheelSections[randomSection].type);
-    console.log('🎡 預期顏色:', wheelSections[randomSection].color);
+    // 2. 計算該格子的中心角度（從12點方向順時針）
+    const sectionCenterAngle = targetIndex * 45 + 22.5; // 每格45度，中心角度
+    
+    // 3. 計算轉盤需要旋轉的角度
+    // 指針固定在12點方向，轉盤需要旋轉讓目標格子對準指針
+    // 由於指針在12點方向，轉盤需要順時針旋轉
+    const extraSpins = 5 + Math.random() * 5; // 5-10 圈
+    const finalRotation = (extraSpins * 360) + sectionCenterAngle;
+    
+    console.log('🎡 目標格子索引:', targetIndex);
+    console.log('🎡 目標格子配置:', targetSection);
+    console.log('🎡 格子中心角度:', sectionCenterAngle);
+    console.log('🎡 最終旋轉角度:', finalRotation);
+    console.log('🎡 預期結果:', targetSection.type);
+    console.log('🎡 預期顏色:', targetSection.color);
     
     // 保存最終旋轉角度
-    setFinalRotation(calculatedRotation);
+    setFinalRotation(finalRotation);
     
     // 設置 CSS 變數用於動畫
-    document.documentElement.style.setProperty('--final-rotation', `${calculatedRotation}deg`);
+    document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
     
     // 強制重新渲染動畫
     setAnimationKey(prev => prev + 1);
@@ -66,7 +70,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       setIsSpinning(false);
       
       // 使用預先計算的結果
-      const result = wheelSections[randomSection].type as 'win' | 'lose';
+      const result = targetSection.type as 'win' | 'lose';
       
       // 延遲 2 秒後顯示結果，讓用戶有時間看到結果
       setTimeout(async () => {
