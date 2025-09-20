@@ -30,7 +30,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   };
 
   // 創建 3D 骰子組件
-  const Dice3D = ({ isRolling, value }: { isRolling: boolean; value: number }) => {
+  const Dice3D = ({ isRolling, value }: { isRolling: boolean; value: number | null }) => {
     const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
     
     const diceStyle: React.CSSProperties = {
@@ -71,11 +71,15 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       return transforms[faceValue - 1] || transforms[0];
     };
 
+    // 處理 null 值，提供預設值
+    const diceValue = value || 1;
+    const diceEmoji = diceEmojis[diceValue - 1] || diceEmojis[0];
+
     return (
       <>
         <div style={diceStyle}>
-          <div style={{...faceStyle, transform: getFaceTransform(value)}}>
-            {diceEmojis[value - 1]}
+          <div style={{...faceStyle, transform: getFaceTransform(diceValue)}}>
+            {diceEmoji}
           </div>
         </div>
         <style jsx>{`
