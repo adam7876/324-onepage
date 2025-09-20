@@ -79,7 +79,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     // 設置 CSS 變數
     document.documentElement.style.setProperty('--final-rotation', `${finalAngle}deg`);
     
-    // 7 秒後停止 - 增加刺激感
+    // 6.8 秒後停止 - 比 CSS 動畫稍早，避免二次轉動
     setTimeout(() => {
       setIsSpinning(false);
       
@@ -101,7 +101,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         };
         await onComplete(gameResult);
       }, 2000);
-    }, 7000);
+    }, 6800);
   };
 
   return (
