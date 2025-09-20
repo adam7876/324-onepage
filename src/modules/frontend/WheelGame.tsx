@@ -124,13 +124,24 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
               }}
             />
             
-            {/* 除錯：在每個格子上標示索引和顏色 */}
+            {/* 除錯：在每個格子上標示索引和顏色 - 重新計算位置 */}
             {wheelSections.map((section, index) => {
+              // 重新計算角度：conic-gradient從0度開始，每格45度
+              // 索引0 = 0°-45°，中心22.5°
+              // 索引1 = 45°-90°，中心67.5°
+              // 索引2 = 90°-135°，中心112.5°
+              // 索引3 = 135°-180°，中心157.5°
+              // 索引4 = 180°-225°，中心202.5°
+              // 索引5 = 225°-270°，中心247.5°
+              // 索引6 = 270°-315°，中心292.5°
+              // 索引7 = 315°-360°，中心337.5°
               const angle = index * 45 + 22.5; // 每格中心角度
               const radians = (angle * Math.PI) / 180;
-              const radius = 120; // 距離中心的距離
-              const x = 50 + (radius * Math.sin(radians)) / 3.2; // 調整位置
-              const y = 50 - (radius * Math.cos(radians)) / 3.2; // 調整位置
+              const radius = 80; // 距離中心的距離
+              
+              // 重新計算位置：使用正確的三角函數
+              const x = 50 + (radius * Math.sin(radians)) / 2.5;
+              const y = 50 - (radius * Math.cos(radians)) / 2.5;
               
               return (
                 <div
