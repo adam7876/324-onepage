@@ -14,7 +14,6 @@ interface WheelGameProps {
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [finalRotation, setFinalRotation] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // 最簡單的配置 - 8格，交替成功失敗
   const sections = [
@@ -51,7 +50,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     console.log('🎡 預期顏色:', targetSection.color);
     
     // 保存結果
-    setSelectedIndex(targetIndex);
     setFinalRotation(finalRotation);
     
     // 設置 CSS 變數
