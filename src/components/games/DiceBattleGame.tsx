@@ -165,13 +165,17 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
-                <div className="text-8xl mb-2">{getDiceEmoji(playerDice)}</div>
+                <div className={`text-8xl mb-2 ${isRolling ? 'dice-rolling' : ''}`}>
+                  {getDiceEmoji(playerDice)}
+                </div>
                 <p className="font-bold text-gray-700">你</p>
                 {playerDice && <p className="text-2xl font-bold text-blue-600">{playerDice}</p>}
               </div>
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
-                <div className="text-8xl mb-2">{getDiceEmoji(computerDice)}</div>
+                <div className={`text-8xl mb-2 ${isRolling ? 'dice-rolling' : ''}`}>
+                  {getDiceEmoji(computerDice)}
+                </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 {computerDice && <p className="text-2xl font-bold text-red-600">{computerDice}</p>}
               </div>
@@ -226,6 +230,32 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </div>
         )}
       </div>
+      
+      <style jsx>{`
+        .dice-rolling {
+          animation: diceRoll 0.1s linear infinite;
+          transform-style: preserve-3d;
+          perspective: 1000px;
+        }
+        
+        @keyframes diceRoll {
+          0% {
+            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+          }
+          25% {
+            transform: rotateX(90deg) rotateY(90deg) rotateZ(45deg) scale(1.1);
+          }
+          50% {
+            transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg) scale(0.9);
+          }
+          75% {
+            transform: rotateX(270deg) rotateY(270deg) rotateZ(135deg) scale(1.1);
+          }
+          100% {
+            transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg) scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }
