@@ -29,30 +29,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
     return Math.floor(Math.random() * 6) + 1;
   };
 
-  const getDiceEmoji = (value: number | null): string => {
-    if (value === null) return '🎲';
-    const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-    return diceEmojis[value - 1] || '🎲';
-  };
-
   // 創建 3D 骰子組件
   const Dice3D = ({ value, isRolling }: { value: number | null; isRolling: boolean }) => {
-    if (value === null) {
-      return (
-        <div className={`dice-3d ${isRolling ? 'dice-rolling' : ''}`}>
-          <div className="dice-face dice-face-1">⚀</div>
-          <div className="dice-face dice-face-2">⚁</div>
-          <div className="dice-face dice-face-3">⚂</div>
-          <div className="dice-face dice-face-4">⚃</div>
-          <div className="dice-face dice-face-5">⚄</div>
-          <div className="dice-face dice-face-6">⚅</div>
-        </div>
-      );
-    }
-
-    const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
     return (
-      <div className="dice-3d">
+      <div className={`dice-3d ${isRolling ? 'dice-rolling' : ''}`}>
         <div className="dice-face dice-face-1">⚀</div>
         <div className="dice-face dice-face-2">⚁</div>
         <div className="dice-face dice-face-3">⚂</div>
