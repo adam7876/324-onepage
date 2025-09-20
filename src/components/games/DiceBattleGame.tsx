@@ -35,6 +35,34 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
     return diceEmojis[value - 1] || '🎲';
   };
 
+  // 創建 3D 骰子組件
+  const Dice3D = ({ value, isRolling }: { value: number | null; isRolling: boolean }) => {
+    if (value === null) {
+      return (
+        <div className={`dice-3d ${isRolling ? 'dice-rolling' : ''}`}>
+          <div className="dice-face dice-face-1">⚀</div>
+          <div className="dice-face dice-face-2">⚁</div>
+          <div className="dice-face dice-face-3">⚂</div>
+          <div className="dice-face dice-face-4">⚃</div>
+          <div className="dice-face dice-face-5">⚄</div>
+          <div className="dice-face dice-face-6">⚅</div>
+        </div>
+      );
+    }
+
+    const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    return (
+      <div className="dice-3d">
+        <div className="dice-face dice-face-1">⚀</div>
+        <div className="dice-face dice-face-2">⚁</div>
+        <div className="dice-face dice-face-3">⚂</div>
+        <div className="dice-face dice-face-4">⚃</div>
+        <div className="dice-face dice-face-5">⚄</div>
+        <div className="dice-face dice-face-6">⚅</div>
+      </div>
+    );
+  };
+
   const handleRoll = async () => {
     if (hasPlayed) return;
 
@@ -165,16 +193,16 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
-                <div className={`text-8xl mb-2 ${isRolling ? 'dice-rolling' : ''}`}>
-                  {getDiceEmoji(playerDice)}
+                <div className="mb-2">
+                  <Dice3D value={playerDice} isRolling={isRolling} />
                 </div>
                 <p className="font-bold text-gray-700">你</p>
                 {playerDice && <p className="text-2xl font-bold text-blue-600">{playerDice}</p>}
               </div>
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
-                <div className={`text-8xl mb-2 ${isRolling ? 'dice-rolling' : ''}`}>
-                  {getDiceEmoji(computerDice)}
+                <div className="mb-2">
+                  <Dice3D value={computerDice} isRolling={isRolling} />
                 </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 {computerDice && <p className="text-2xl font-bold text-red-600">{computerDice}</p>}
@@ -196,13 +224,17 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           <div className="mb-8">
             <div className="flex justify-center items-center space-x-8 mb-6">
               <div className="text-center">
-                <div className="text-8xl mb-2">{getDiceEmoji(playerDice)}</div>
+                <div className="mb-2">
+                  <Dice3D value={playerDice} isRolling={false} />
+                </div>
                 <p className="font-bold text-gray-700">你</p>
                 <p className="text-3xl font-bold text-blue-600">{playerDice}</p>
               </div>
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
-                <div className="text-8xl mb-2">{getDiceEmoji(computerDice)}</div>
+                <div className="mb-2">
+                  <Dice3D value={computerDice} isRolling={false} />
+                </div>
                 <p className="font-bold text-gray-700">電腦</p>
                 <p className="text-3xl font-bold text-red-600">{computerDice}</p>
               </div>
@@ -232,27 +264,55 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       </div>
       
       <style jsx>{`
-        .dice-rolling {
-          animation: diceRoll 0.1s linear infinite;
+        .dice-3d {
+          position: relative;
+          width: 80px;
+          height: 80px;
           transform-style: preserve-3d;
           perspective: 1000px;
+          margin: 0 auto;
+        }
+        
+        .dice-face {
+          position: absolute;
+          width: 80px;
+          height: 80px;
+          background: white;
+          border: 2px solid #333;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 40px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .dice-face-1 { transform: rotateY(0deg) translateZ(40px); }
+        .dice-face-2 { transform: rotateY(90deg) translateZ(40px); }
+        .dice-face-3 { transform: rotateY(180deg) translateZ(40px); }
+        .dice-face-4 { transform: rotateY(-90deg) translateZ(40px); }
+        .dice-face-5 { transform: rotateX(90deg) translateZ(40px); }
+        .dice-face-6 { transform: rotateX(-90deg) translateZ(40px); }
+        
+        .dice-rolling {
+          animation: diceRoll 0.1s linear infinite;
         }
         
         @keyframes diceRoll {
           0% {
-            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+            transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
           }
           25% {
-            transform: rotateX(90deg) rotateY(90deg) rotateZ(45deg) scale(1.1);
+            transform: rotateX(90deg) rotateY(90deg) rotateZ(45deg);
           }
           50% {
-            transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg) scale(0.9);
+            transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg);
           }
           75% {
-            transform: rotateX(270deg) rotateY(270deg) rotateZ(135deg) scale(1.1);
+            transform: rotateX(270deg) rotateY(270deg) rotateZ(135deg);
           }
           100% {
-            transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg) scale(1);
+            transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg);
           }
         }
       `}</style>

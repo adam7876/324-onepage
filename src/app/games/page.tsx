@@ -21,7 +21,7 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [rewardConfig, setRewardConfig] = useState<GameRewardConfig | null>(null);
+  const [rewardConfig, setRewardConfig] = useState<GameRewardConfig>(GAME_CONFIG.reward);
   const [isPWA, setIsPWA] = useState(false);
 
   // 載入獎品配置
