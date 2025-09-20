@@ -224,8 +224,8 @@ export default function GamesPage() {
           </div>
         </div>
 
-        {/* 訊息顯示 */}
-        {message && (
+        {/* 訊息顯示 - 只在非驗證碼頁面顯示 */}
+        {message && step !== 'verify' && (
           <div className="text-green-800 px-4 py-3 mb-6 ">
             ✅ {message}
           </div>
@@ -351,7 +351,7 @@ export default function GamesPage() {
               </div>
               <h2 className="text-2xl font-bold text-gray-800">輸入驗證碼</h2>
               <p className="text-gray-600 mt-2">
-                驗證碼已發送至 <span className="font-medium">{email}</span>
+                請輸入下方顯示的驗證碼
               </p>
             </div>
 
@@ -387,6 +387,18 @@ export default function GamesPage() {
                 </button>
               </div>
             </div>
+
+            {/* 驗證碼顯示在下方 */}
+            {message && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="text-center">
+                  <div className="text-sm text-green-700 mb-2">您的驗證碼：</div>
+                  <div className="text-2xl font-bold text-green-800 tracking-widest">
+                    {message.split('驗證碼：')[1]}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="mt-4 text-center">
               <button
