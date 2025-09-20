@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   themeColor: "#8b5cf6",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  other: {
+    'cache-version': 'v2.1.0', // 強制清除快取
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
