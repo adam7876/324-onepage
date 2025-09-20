@@ -166,7 +166,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
                 <div className="mb-2">
-                  <div className={`text-6xl transition-all duration-300 ${isRolling ? 'animate-bounce' : ''}`}>
+                  <div className={`text-6xl transition-all duration-300 ${isRolling ? 'dice-bounce' : ''}`}>
                     {playerDice ? getDiceEmoji(playerDice) : '⚀'}
                   </div>
                 </div>
@@ -176,7 +176,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
                 <div className="mb-2">
-                  <div className={`text-6xl transition-all duration-300 ${isRolling ? 'animate-bounce' : ''}`}>
+                  <div className={`text-6xl transition-all duration-300 ${isRolling ? 'dice-bounce' : ''}`}>
                     {computerDice ? getDiceEmoji(computerDice) : '⚀'}
                   </div>
                 </div>
@@ -242,6 +242,21 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </div>
         )}
       </div>
+      
+      <style jsx>{`
+        .dice-bounce {
+          animation: diceBounce 0.6s ease-in-out infinite;
+        }
+        
+        @keyframes diceBounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
