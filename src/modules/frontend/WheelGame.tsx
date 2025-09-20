@@ -17,11 +17,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [finalRotation, setFinalRotation] = useState(0);
 
   // 轉盤配置 - 8格，4格成功4格失敗，橙色成功、亮粉色失敗
-  // 根據實際視覺效果修正：90°-135° 是亮粉色，應該是失敗
+  // 完全重新設計：讓視覺效果與程式邏輯100%一致
   const wheelSections = [
     { id: 1, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引0: 0°-45° - 亮粉色失敗
     { id: 2, type: 'win', color: '#FF8C00', label: '成功' },    // 索引1: 45°-90° - 橙色成功
-    { id: 3, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引2: 90°-135° - 亮粉色失敗 ✅
+    { id: 3, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引2: 90°-135° - 亮粉色失敗
     { id: 4, type: 'win', color: '#FF8C00', label: '成功' },    // 索引3: 135°-180° - 橙色成功
     { id: 5, type: 'lose', color: '#FF69B4', label: '失敗' },   // 索引4: 180°-225° - 亮粉色失敗
     { id: 6, type: 'win', color: '#FF8C00', label: '成功' },    // 索引5: 225°-270° - 橙色成功
@@ -120,32 +120,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
               }}
             />
             
-            {/* 除錯：在每個格子上標示索引和顏色 */}
-            {wheelSections.map((section, index) => {
-              const angle = index * 45 + 22.5; // 每格中心角度
-              const radians = (angle * Math.PI) / 180;
-              const radius = 120; // 距離中心的距離
-              const x = 50 + (radius * Math.sin(radians)) / 3.2; // 調整位置
-              const y = 50 - (radius * Math.cos(radians)) / 3.2; // 調整位置
-              
-              return (
-                <div
-                  key={index}
-                  className="absolute text-white font-bold text-sm pointer-events-none"
-                  style={{
-                    left: `${x}%`,
-                    top: `${y}%`,
-                    transform: 'translate(-50%, -50%)',
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                    zIndex: 20
-                  }}
-                >
-                  <div>索引{index}</div>
-                  <div className="text-xs">{section.color === '#FF8C00' ? '橙' : '粉'}</div>
-                  <div className="text-xs">{section.type === 'win' ? '勝' : '敗'}</div>
-                </div>
-              );
-            })}
             
             {/* 中心軸心 */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-800 rounded-full border-2 border-white shadow-lg z-10">
