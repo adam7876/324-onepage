@@ -13,7 +13,6 @@ interface WheelGameProps {
 
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [animationKey, setAnimationKey] = useState(0);
   const [finalRotation, setFinalRotation] = useState(0);
 
   // 完全重新設計的轉盤配置 - 使用明確的邏輯
@@ -57,9 +56,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     
     // 設置 CSS 變數用於動畫
     document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
-    
-    // 強制重新渲染動畫
-    setAnimationKey(prev => prev + 1);
     
     // 4 秒後停止並判斷結果
     setTimeout(() => {
