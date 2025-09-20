@@ -27,6 +27,13 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
+  
+  // 3戰2勝制相關狀態
+  const [currentRound, setCurrentRound] = useState(1);
+  const [playerScore, setPlayerScore] = useState(0);
+  const [computerScore, setComputerScore] = useState(0);
+  const [roundResults, setRoundResults] = useState<Array<{player: Choice, computer: Choice, result: 'win' | 'lose' | 'draw'}>>([]);
+  const [gameFinished, setGameFinished] = useState(false);
 
   useEffect(() => {
     // 載入獎品配置
@@ -53,7 +60,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   };
 
   const handleChoice = async (choice: Choice) => {
-    if (hasPlayed) return;
+    if (hasPlayed || gameFinished) return;
 
     setPlayerChoice(choice);
     setIsPlaying(true);
@@ -63,34 +70,51 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
       const computer = getRandomChoice();
       setComputerChoice(computer);
       
-      const gameResult = determineWinner(choice, computer);
-      setResult(gameResult);
-
-      // 如果是平手，允許再玩一次
-      if (gameResult === 'draw') {
+      const roundResult = determineWinner(choice, computer);
+      setResult(roundResult);
+      
+      // 記錄本回合結果
+      const newRoundResult = { player: choice, computer, result: roundResult };
+      setRoundResults(prev => [...prev, newRoundResult]);
+      
+      // 更新分數
+      if (roundResult === 'win') {
+        setPlayerScore(prev => prev + 1);
+      } else if (roundResult === 'lose') {
+        setComputerScore(prev => prev + 1);
+      }
+      
+      setIsPlaying(false);
+      
+      // 檢查是否有人已經獲勝
+      const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
+      const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
+      
+      if (newPlayerScore >= 2 || newComputerScore >= 2) {
+        // 遊戲結束
+        setGameFinished(true);
+        setHasPlayed(true);
+        
         setTimeout(() => {
+          if (newPlayerScore >= 2) {
+            onComplete('win', {
+              name: rewardConfig.description,
+              value: rewardConfig.value,
+              type: rewardConfig.type
+            });
+          } else {
+            onComplete('lose');
+          }
+        }, 2000);
+      } else {
+        // 繼續下一回合（包括平手）
+        setTimeout(() => {
+          setCurrentRound(prev => prev + 1);
           setPlayerChoice(null);
           setComputerChoice(null);
           setResult(null);
-          setIsPlaying(false);
-          // 平手不設定hasPlayed，讓用戶可以繼續
-        }, 3000); // 增加顯示時間
-        return;
+        }, 2000);
       }
-
-      // 只有分出勝負才設定hasPlayed
-      setHasPlayed(true);
-
-      // 提交結果
-      const reward = gameResult === 'win' && rewardConfig ? {
-        name: rewardConfig.description,
-        value: rewardConfig.value,
-        type: rewardConfig.type
-      } : undefined;
-
-      setTimeout(() => {
-        onComplete(gameResult, reward);
-      }, 4000); // 增加延遲讓用戶看清結果
     }, 1500);
   };
 
@@ -143,10 +167,27 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           </h1>
         </div>
 
-        {!hasPlayed && !isPlaying && (
+        {/* 分數顯示 */}
+        {!gameFinished && (
+          <div className="mb-6 p-4 bg-white/80 rounded-lg shadow-lg">
+            <p className="text-lg font-bold text-gray-800 mb-2">第 {currentRound} 回合</p>
+            <div className="flex justify-center space-x-8">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">你</p>
+                <p className="text-2xl font-bold text-blue-600">{playerScore}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">電腦</p>
+                <p className="text-2xl font-bold text-red-600">{computerScore}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!hasPlayed && !isPlaying && !gameFinished && (
           <>
             <p className="text-lg text-gray-600 mb-8">
-              選擇你的出拳，與電腦一較高下！
+              選擇你的出拳，與電腦一較高下！(3戰2勝)
             </p>
             <div className="grid grid-cols-3 gap-4 mb-8">
               {choices.map((choice) => (
@@ -185,7 +226,18 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           </div>
         )}
 
-        {result && hasPlayed && (
+        {/* 回合結果顯示（不顯示手勢圖示） */}
+        {result && !gameFinished && (
+          <div className="mb-8">
+            <div className={`text-2xl font-bold mb-4 ${getResultColor()}`}>
+              {getResultMessage()}
+            </div>
+            <p className="text-gray-600">準備下一回合...</p>
+          </div>
+        )}
+
+        {/* 遊戲結束結果顯示 */}
+        {gameFinished && hasPlayed && (
           <div className="mb-8">
             <div className="flex justify-center items-center space-x-8 mb-6">
               <div className="text-center">
@@ -201,6 +253,21 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
             
             <div className={`text-2xl font-bold mb-4 ${getResultColor()}`}>
               {getResultMessage()}
+            </div>
+
+            {/* 顯示最終分數 */}
+            <div className="mb-4 p-4 bg-white/80 rounded-lg shadow-lg">
+              <p className="text-lg font-bold text-gray-800 mb-2">最終結果</p>
+              <div className="flex justify-center space-x-8">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">你</p>
+                  <p className="text-2xl font-bold text-blue-600">{playerScore}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">電腦</p>
+                  <p className="text-2xl font-bold text-red-600">{computerScore}</p>
+                </div>
+              </div>
             </div>
 
             {result === 'win' && (

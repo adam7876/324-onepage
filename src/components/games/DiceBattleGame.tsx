@@ -19,6 +19,13 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [isRolling, setIsRolling] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
+  
+  // 3戰2勝制相關狀態
+  const [currentRound, setCurrentRound] = useState(1);
+  const [playerScore, setPlayerScore] = useState(0);
+  const [computerScore, setComputerScore] = useState(0);
+  const [roundResults, setRoundResults] = useState<Array<{player: number, computer: number, result: 'win' | 'lose' | 'draw'}>>([]);
+  const [gameFinished, setGameFinished] = useState(false);
 
   useEffect(() => {
     // 載入獎品配置
@@ -36,7 +43,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   };
 
   const handleRoll = async () => {
-    if (hasPlayed) return;
+    if (hasPlayed || gameFinished) return;
 
     setIsRolling(true);
     setPlayerDice(null);
@@ -59,41 +66,57 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       setComputerDice(finalComputerDice);
       setIsRolling(false);
 
-      let gameResult: 'win' | 'lose' | 'draw';
+      let roundResult: 'win' | 'lose' | 'draw';
       if (finalPlayerDice > finalComputerDice) {
-        gameResult = 'win';
+        roundResult = 'win';
       } else if (finalPlayerDice < finalComputerDice) {
-        gameResult = 'lose';
+        roundResult = 'lose';
       } else {
-        gameResult = 'draw';
+        roundResult = 'draw';
       }
 
-      setResult(gameResult);
-
-      // 如果是平手，允許再玩一次
-      if (gameResult === 'draw') {
+      setResult(roundResult);
+      
+      // 記錄本回合結果
+      const newRoundResult = { player: finalPlayerDice, computer: finalComputerDice, result: roundResult };
+      setRoundResults(prev => [...prev, newRoundResult]);
+      
+      // 更新分數
+      if (roundResult === 'win') {
+        setPlayerScore(prev => prev + 1);
+      } else if (roundResult === 'lose') {
+        setComputerScore(prev => prev + 1);
+      }
+      
+      // 檢查是否有人已經獲勝
+      const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
+      const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
+      
+      if (newPlayerScore >= 2 || newComputerScore >= 2) {
+        // 遊戲結束
+        setGameFinished(true);
+        setHasPlayed(true);
+        
         setTimeout(() => {
+          if (newPlayerScore >= 2) {
+            onComplete('win', {
+              name: rewardConfig.description,
+              value: rewardConfig.value,
+              type: rewardConfig.type
+            });
+          } else {
+            onComplete('lose');
+          }
+        }, 2000);
+      } else {
+        // 繼續下一回合（包括平手）
+        setTimeout(() => {
+          setCurrentRound(prev => prev + 1);
           setPlayerDice(null);
           setComputerDice(null);
           setResult(null);
-          // 平手不設定hasPlayed，讓用戶可以繼續
-        }, 3000); // 增加顯示時間
-        return;
+        }, 2000);
       }
-
-      // 只有分出勝負才設定hasPlayed
-      setHasPlayed(true);
-
-      // 提交結果
-      const reward = gameResult === 'win' && rewardConfig ? {
-        name: rewardConfig.description,
-        value: rewardConfig.value,
-        type: rewardConfig.type
-      } : undefined;
-
-      setTimeout(() => {
-        onComplete(gameResult, reward);
-      }, 4000); // 增加延遲讓用戶看清結果
     }, 2000);
   };
 
@@ -138,10 +161,27 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </h1>
         </div>
 
-        {!hasPlayed && !isRolling && result !== 'draw' && (
+        {/* 分數顯示 */}
+        {!gameFinished && (
+          <div className="mb-6 p-4 bg-white/80 rounded-lg shadow-lg">
+            <p className="text-lg font-bold text-gray-800 mb-2">第 {currentRound} 回合</p>
+            <div className="flex justify-center space-x-8">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">你</p>
+                <p className="text-2xl font-bold text-blue-600">{playerScore}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">電腦</p>
+                <p className="text-2xl font-bold text-red-600">{computerScore}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!hasPlayed && !isRolling && result !== 'draw' && !gameFinished && (
           <>
             <p className="text-lg text-gray-600 mb-8">
-              擲出骰子，點數比電腦大就贏！
+              擲出骰子，點數比電腦大就贏！(3戰2勝)
             </p>
             <div className="mb-8">
               <div className="text-8xl mb-4">🎲</div>
@@ -245,7 +285,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       
       <style jsx>{`
         .dice-bounce {
-          animation: diceBounce 0.6s ease-in-out infinite;
+          animation: diceBounce 1.0s ease-in-out infinite;
         }
         
         @keyframes diceBounce {
@@ -253,7 +293,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             transform: translateY(0);
           }
           50% {
-            transform: translateY(-20px);
+            transform: translateY(-12px);
           }
         }
       `}</style>
