@@ -19,6 +19,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [isRolling, setIsRolling] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
+  const [showingResult, setShowingResult] = useState(false);
   
   // 3戰2勝制相關狀態
   const [currentRound, setCurrentRound] = useState(1);
@@ -64,8 +65,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
       setPlayerDice(finalPlayerDice);
       setComputerDice(finalComputerDice);
       setIsRolling(false);
+      setShowingResult(true); // 開始顯示結果階段
 
-      // 先讓用戶看到最終的骰子點數
+      // 讓用戶看到最終的骰子點數，然後顯示結果
       setTimeout(() => {
         let roundResult: 'win' | 'lose' | 'draw';
         if (finalPlayerDice > finalComputerDice) {
@@ -112,9 +114,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             setPlayerDice(null);
             setComputerDice(null);
             setResult(null);
+            setShowingResult(false);
           }, 3000); // 增加結果顯示時間
         }
-      }, 1000); // 給用戶時間看到最終的骰子點數
+      }, 2000); // 給用戶更多時間看到最終的骰子點數
     }, 2000);
   };
 
@@ -196,10 +199,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </>
         )}
 
-        {(isRolling || result === 'draw') && !hasPlayed && (
+        {(isRolling || showingResult || result === 'draw') && !hasPlayed && (
           <div className="mb-8">
             <p className="text-xl text-gray-700 mb-6">
-              {isRolling ? '擲骰子中...' : '平手，再來一次！'}
+              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : '平手，再來一次！'}
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
