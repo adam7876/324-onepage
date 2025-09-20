@@ -79,7 +79,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     // 設置 CSS 變數
     document.documentElement.style.setProperty('--final-rotation', `${finalAngle}deg`);
     
-    // 4 秒後停止
+    // 7 秒後停止 - 增加刺激感
     setTimeout(() => {
       setIsSpinning(false);
       
@@ -101,7 +101,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         };
         await onComplete(gameResult);
       }, 2000);
-    }, 4000);
+    }, 7000);
   };
 
   return (
@@ -165,6 +165,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           {isSpinning ? (
             <div className="text-xl font-bold text-purple-600 animate-pulse">
               🎯 轉動中...
+              <div className="text-sm text-gray-600 mt-2">請稍候，結果即將揭曉...</div>
             </div>
           ) : (
             <button
@@ -192,7 +193,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       
       <style jsx>{`
         .pointer-spinning {
-          animation: spin 4s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+          animation: spin 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
           animation-fill-mode: forwards;
           animation-iteration-count: 1;
         }
@@ -200,6 +201,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         @keyframes spin {
           0% {
             transform: translate(-50%, -50%) rotate(0deg);
+          }
+          70% {
+            transform: translate(-50%, -50%) rotate(calc(var(--final-rotation, 1800deg) * 0.8));
           }
           100% {
             transform: translate(-50%, -50%) rotate(var(--final-rotation, 1800deg));
