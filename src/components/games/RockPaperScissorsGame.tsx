@@ -107,8 +107,11 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           setTimeout(() => {
             setCurrentRound(prev => prev + 1);
             setResult(null);
-            setPlayerChoice(null);
-            setComputerChoice(null);
+            // 延遲重置選擇，確保結果顯示完成
+            setTimeout(() => {
+              setPlayerChoice(null);
+              setComputerChoice(null);
+            }, 500);
           }, 3000); // 增加結果顯示時間
         }
       }, 1000); // 給用戶時間看到電腦的出拳

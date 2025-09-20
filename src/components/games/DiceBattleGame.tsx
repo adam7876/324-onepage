@@ -20,6 +20,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [hasPlayed, setHasPlayed] = useState(false);
   const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
   const [showingResult, setShowingResult] = useState(false);
+  const [showingFinalResult, setShowingFinalResult] = useState(false);
   
   // 3戰2勝制相關狀態
   const [currentRound, setCurrentRound] = useState(1);
@@ -69,54 +70,60 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
       // 讓用戶看到最終的骰子點數，然後顯示結果
       setTimeout(() => {
-        let roundResult: 'win' | 'lose' | 'draw';
-        if (finalPlayerDice > finalComputerDice) {
-          roundResult = 'win';
-        } else if (finalPlayerDice < finalComputerDice) {
-          roundResult = 'lose';
-        } else {
-          roundResult = 'draw';
-        }
+        setShowingResult(false);
+        setShowingFinalResult(true);
+        
+        setTimeout(() => {
+          let roundResult: 'win' | 'lose' | 'draw';
+          if (finalPlayerDice > finalComputerDice) {
+            roundResult = 'win';
+          } else if (finalPlayerDice < finalComputerDice) {
+            roundResult = 'lose';
+          } else {
+            roundResult = 'draw';
+          }
 
-        setResult(roundResult);
-        
-        // 更新分數
-        if (roundResult === 'win') {
-          setPlayerScore(prev => prev + 1);
-        } else if (roundResult === 'lose') {
-          setComputerScore(prev => prev + 1);
-        }
-        
-        // 檢查是否有人已經獲勝
-        const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
-        const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
-        
-        if (newPlayerScore >= 2 || newComputerScore >= 2) {
-          // 遊戲結束
-          setGameFinished(true);
-          setHasPlayed(true);
+          setResult(roundResult);
+          setShowingFinalResult(false);
           
-          setTimeout(() => {
-            if (newPlayerScore >= 2) {
-              onComplete('win', {
-                name: rewardConfig.description,
-                value: rewardConfig.value,
-                type: rewardConfig.type
-              });
-            } else {
-              onComplete('lose');
-            }
-          }, 3000); // 增加結果顯示時間
-        } else {
-          // 繼續下一回合（包括平手）
-          setTimeout(() => {
-            setCurrentRound(prev => prev + 1);
-            setPlayerDice(null);
-            setComputerDice(null);
-            setResult(null);
-            setShowingResult(false);
-          }, 3000); // 增加結果顯示時間
-        }
+          // 更新分數
+          if (roundResult === 'win') {
+            setPlayerScore(prev => prev + 1);
+          } else if (roundResult === 'lose') {
+            setComputerScore(prev => prev + 1);
+          }
+          
+          // 檢查是否有人已經獲勝
+          const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
+          const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
+          
+          if (newPlayerScore >= 2 || newComputerScore >= 2) {
+            // 遊戲結束
+            setGameFinished(true);
+            setHasPlayed(true);
+            
+            setTimeout(() => {
+              if (newPlayerScore >= 2) {
+                onComplete('win', {
+                  name: rewardConfig.description,
+                  value: rewardConfig.value,
+                  type: rewardConfig.type
+                });
+              } else {
+                onComplete('lose');
+              }
+            }, 3000); // 增加結果顯示時間
+          } else {
+            // 繼續下一回合（包括平手）
+            setTimeout(() => {
+              setCurrentRound(prev => prev + 1);
+              setPlayerDice(null);
+              setComputerDice(null);
+              setResult(null);
+              setShowingResult(false);
+            }, 3000); // 增加結果顯示時間
+          }
+        }, 1500); // 顯示最終點數的時間
       }, 2000); // 給用戶更多時間看到最終的骰子點數
     }, 2000);
   };
@@ -199,10 +206,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </>
         )}
 
-        {(isRolling || showingResult || result === 'draw') && !hasPlayed && (
+        {(isRolling || showingResult || showingFinalResult || (result === 'draw' && !gameFinished)) && !hasPlayed && (
           <div className="mb-8">
             <p className="text-xl text-gray-700 mb-6">
-              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : '平手，再來一次！'}
+              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : '平手，再來一次！'}
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
