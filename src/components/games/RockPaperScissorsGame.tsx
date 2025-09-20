@@ -176,7 +176,9 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
               </div>
               <div className="text-4xl text-gray-400">VS</div>
               <div className="text-center">
-                <div className="text-6xl mb-2">{computerChoice ? getChoiceEmoji(computerChoice) : '❓'}</div>
+                <div className={`text-6xl mb-2 ${!computerChoice ? 'thinking-animation' : ''}`}>
+                  {computerChoice ? getChoiceEmoji(computerChoice) : '🤔'}
+                </div>
                 <p className="font-bold text-gray-700">電腦</p>
               </div>
             </div>
@@ -219,6 +221,24 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           </div>
         )}
       </div>
+      
+      <style jsx>{`
+        .thinking-animation {
+          animation: thinking 1s ease-in-out infinite;
+        }
+        
+        @keyframes thinking {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          25% {
+            transform: rotate(-5deg);
+          }
+          75% {
+            transform: rotate(5deg);
+          }
+        }
+      `}</style>
     </div>
   );
 }
