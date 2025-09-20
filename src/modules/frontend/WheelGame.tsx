@@ -14,17 +14,18 @@ interface WheelGameProps {
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [finalRotation, setFinalRotation] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // 完全重新設計的轉盤配置 - 使用明確的邏輯
-  const wheelSections = [
-    { id: 0, type: 'win', color: '#FF8C00', label: '成功', angle: 0 },    // 0° - 橙色成功
-    { id: 1, type: 'lose', color: '#FF69B4', label: '失敗', angle: 45 },   // 45° - 亮粉色失敗
-    { id: 2, type: 'win', color: '#FF8C00', label: '成功', angle: 90 },    // 90° - 橙色成功
-    { id: 3, type: 'lose', color: '#FF69B4', label: '失敗', angle: 135 },  // 135° - 亮粉色失敗
-    { id: 4, type: 'win', color: '#FF8C00', label: '成功', angle: 180 },   // 180° - 橙色成功
-    { id: 5, type: 'lose', color: '#FF69B4', label: '失敗', angle: 225 },  // 225° - 亮粉色失敗
-    { id: 6, type: 'win', color: '#FF8C00', label: '成功', angle: 270 },   // 270° - 橙色成功
-    { id: 7, type: 'lose', color: '#FF69B4', label: '失敗', angle: 315 },  // 315° - 亮粉色失敗
+  // 最簡單的配置 - 8格，交替成功失敗
+  const sections = [
+    { index: 0, type: 'win', color: '#FF8C00' },   // 成功
+    { index: 1, type: 'lose', color: '#FF69B4' },  // 失敗
+    { index: 2, type: 'win', color: '#FF8C00' },   // 成功
+    { index: 3, type: 'lose', color: '#FF69B4' },  // 失敗
+    { index: 4, type: 'win', color: '#FF8C00' },   // 成功
+    { index: 5, type: 'lose', color: '#FF69B4' },  // 失敗
+    { index: 6, type: 'win', color: '#FF8C00' },   // 成功
+    { index: 7, type: 'lose', color: '#FF69B4' },  // 失敗
   ];
 
   const startSpin = () => {
@@ -33,39 +34,36 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     console.log('🎡 開始旋轉轉盤');
     setIsSpinning(true);
     
-    // 完全重新設計的轉盤邏輯 - 使用明確的角度計算
-    // 1. 先隨機選擇目標格子
+    // 1. 先隨機選擇目標索引
     const targetIndex = Math.floor(Math.random() * 8);
-    const targetSection = wheelSections[targetIndex];
+    const targetSection = sections[targetIndex];
     
     // 2. 計算轉盤需要旋轉的角度
-    // 指針固定在12點方向，轉盤需要旋轉讓目標格子對準指針
-    const targetAngle = targetSection.angle; // 目標格子的角度
+    // 每格45度，指針在12點方向，轉盤順時針旋轉
+    const targetAngle = targetIndex * 45; // 0, 45, 90, 135, 180, 225, 270, 315
     const extraSpins = 5 + Math.random() * 5; // 5-10 圈
     const finalRotation = (extraSpins * 360) + targetAngle;
     
-    console.log('🎡 目標格子索引:', targetIndex);
-    console.log('🎡 目標格子配置:', targetSection);
+    console.log('🎡 目標索引:', targetIndex);
     console.log('🎡 目標角度:', targetAngle);
     console.log('🎡 最終旋轉角度:', finalRotation);
     console.log('🎡 預期結果:', targetSection.type);
     console.log('🎡 預期顏色:', targetSection.color);
     
-    // 保存最終旋轉角度
+    // 保存結果
+    setSelectedIndex(targetIndex);
     setFinalRotation(finalRotation);
     
-    // 設置 CSS 變數用於動畫
+    // 設置 CSS 變數
     document.documentElement.style.setProperty('--final-rotation', `${finalRotation}deg`);
     
-    // 4 秒後停止並判斷結果
+    // 4 秒後停止
     setTimeout(() => {
       setIsSpinning(false);
       
-      // 使用預先計算的結果
-      const result = targetSection.type as 'win' | 'lose';
-      
-      // 延遲 2 秒後顯示結果，讓用戶有時間看到結果
+      // 2 秒後顯示結果
       setTimeout(async () => {
+        const result = targetSection.type as 'win' | 'lose';
         const gameResult = {
           success: true,
           result,
@@ -79,7 +77,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         };
         await onComplete(gameResult);
       }, 2000);
-    }, 4000); // 延長到4秒確保動畫完成
+    }, 4000);
   };
 
   return (
@@ -88,81 +86,63 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         <h2 className="text-3xl font-bold text-gray-900 mb-8">🎡 幸運轉盤</h2>
         
         <div className="relative flex justify-center">
-          {/* 完全重新設計的 SVG 轉盤 */}
+          {/* 最簡單的轉盤設計 */}
           <div className="relative">
-            <svg 
-              width="320" 
-              height="320" 
-              viewBox="0 0 320 320"
-              className={`${isSpinning ? 'wheel-spinning' : ''}`}
+            <div 
+              className={`w-80 h-80 rounded-full border-8 border-gray-800 relative overflow-hidden shadow-2xl ${isSpinning ? 'wheel-spinning' : ''}`}
               style={{ 
                 transformOrigin: 'center center',
                 transform: isSpinning ? 'none' : `rotate(${finalRotation}deg)`
               }}
             >
-              {/* 轉盤背景圓圈 */}
-              <circle cx="160" cy="160" r="150" fill="none" stroke="#374151" strokeWidth="8"/>
+              {/* 使用 conic-gradient 創建轉盤 */}
+              <div 
+                className="w-full h-full"
+                style={{
+                  background: `conic-gradient(
+                    ${sections[0].color} 0deg 45deg,
+                    ${sections[1].color} 45deg 90deg,
+                    ${sections[2].color} 90deg 135deg,
+                    ${sections[3].color} 135deg 180deg,
+                    ${sections[4].color} 180deg 225deg,
+                    ${sections[5].color} 225deg 270deg,
+                    ${sections[6].color} 270deg 315deg,
+                    ${sections[7].color} 315deg 360deg
+                  )`
+                }}
+              />
               
-              {/* 8個扇形區域 */}
-              {wheelSections.map((section, index) => {
-                const startAngle = section.angle;
-                const endAngle = section.angle + 45;
-                const radius = 150;
-                const centerX = 160;
-                const centerY = 160;
-                
-                // 計算扇形路徑
-                const startAngleRad = (startAngle * Math.PI) / 180;
-                const endAngleRad = (endAngle * Math.PI) / 180;
-                
-                const x1 = centerX + radius * Math.cos(startAngleRad);
-                const y1 = centerY + radius * Math.sin(startAngleRad);
-                const x2 = centerX + radius * Math.cos(endAngleRad);
-                const y2 = centerY + radius * Math.sin(endAngleRad);
-                
-                const largeArcFlag = 45 > 180 ? 1 : 0;
-                
-                const pathData = [
-                  `M ${centerX} ${centerY}`,
-                  `L ${x1} ${y1}`,
-                  `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-                  'Z'
-                ].join(' ');
+              {/* 標籤 - 簡單直接 */}
+              {sections.map((section, index) => {
+                const angle = index * 45 + 22.5; // 每格中心角度
+                const radians = (angle * Math.PI) / 180;
+                const radius = 100;
+                const x = 50 + (radius * Math.sin(radians)) / 3.2;
+                const y = 50 - (radius * Math.cos(radians)) / 3.2;
                 
                 return (
-                  <g key={index}>
-                    <path
-                      d={pathData}
-                      fill={section.color}
-                      stroke="#374151"
-                      strokeWidth="2"
-                    />
-                    {/* 標籤文字 */}
-                    <text
-                      x={centerX + (radius * 0.7) * Math.cos(((startAngle + endAngle) / 2) * Math.PI / 180)}
-                      y={centerY + (radius * 0.7) * Math.sin(((startAngle + endAngle) / 2) * Math.PI / 180)}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-white font-bold text-sm pointer-events-none"
-                      style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}
-                    >
-                      <tspan x={centerX + (radius * 0.7) * Math.cos(((startAngle + endAngle) / 2) * Math.PI / 180)} dy="-8">索引{index}</tspan>
-                      <tspan x={centerX + (radius * 0.7) * Math.cos(((startAngle + endAngle) / 2) * Math.PI / 180)} dy="12" className="text-xs">
-                        {section.color === '#FF8C00' ? '橙' : '粉'}
-                      </tspan>
-                      <tspan x={centerX + (radius * 0.7) * Math.cos(((startAngle + endAngle) / 2) * Math.PI / 180)} dy="12" className="text-xs">
-                        {section.type === 'win' ? '勝' : '敗'}
-                      </tspan>
-                    </text>
-                  </g>
+                  <div
+                    key={index}
+                    className="absolute text-white font-bold text-sm pointer-events-none"
+                    style={{
+                      left: `${x}%`,
+                      top: `${y}%`,
+                      transform: 'translate(-50%, -50%)',
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      zIndex: 20
+                    }}
+                  >
+                    <div>索引{index}</div>
+                    <div className="text-xs">{section.type === 'win' ? '勝' : '敗'}</div>
+                  </div>
                 );
               })}
               
               {/* 中心圓圈 */}
-              <circle cx="160" cy="160" r="24" fill="#374151" stroke="white" strokeWidth="4"/>
-              <circle cx="160" cy="160" r="8" fill="white"/>
-              <circle cx="160" cy="160" r="4" fill="#1e40af"/>
-            </svg>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-800 rounded-full border-2 border-white shadow-lg z-10">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full"></div>
+              </div>
+            </div>
             
             {/* 固定指針 */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
