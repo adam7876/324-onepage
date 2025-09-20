@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { getRewardConfig } from '../../lib/game-utils';
-import type { RewardType } from '../../lib/game-config';
+import { GAME_CONFIG, type RewardType } from '../../lib/game-config';
 
 interface DiceBattleGameProps {
   token: string;
@@ -18,7 +18,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [result, setResult] = useState<'win' | 'lose' | 'draw' | null>(null);
   const [isRolling, setIsRolling] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [rewardConfig, setRewardConfig] = useState<RewardType | null>(null);
+  const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
 
   useEffect(() => {
     // 載入獎品配置
@@ -265,6 +265,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           justify-content: center;
           font-size: 40px;
           box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+          backface-visibility: hidden;
         }
         
         .dice-face-1 { transform: rotateY(0deg) translateZ(40px); }

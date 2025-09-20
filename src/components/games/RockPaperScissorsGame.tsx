@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { getRewardConfig } from '../../lib/game-utils';
-import type { RewardType } from '../../lib/game-config';
+import { GAME_CONFIG, type RewardType } from '../../lib/game-config';
 
 interface RockPaperScissorsGameProps {
   token: string;
@@ -26,7 +26,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   const [result, setResult] = useState<'win' | 'lose' | 'draw' | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [rewardConfig, setRewardConfig] = useState<RewardType | null>(null);
+  const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
 
   useEffect(() => {
     // 載入獎品配置
