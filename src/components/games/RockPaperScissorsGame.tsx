@@ -107,11 +107,8 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           setTimeout(() => {
             setCurrentRound(prev => prev + 1);
             setResult(null);
-            // 延遲重置選擇，避免UI顯示❓
-            setTimeout(() => {
-              setPlayerChoice(null);
-              setComputerChoice(null);
-            }, 100);
+            setPlayerChoice(null);
+            setComputerChoice(null);
           }, 3000); // 增加結果顯示時間
         }
       }, 1000); // 給用戶時間看到電腦的出拳
@@ -213,7 +210,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
                 <div className="text-6xl mb-2">
-                  {playerChoice ? getChoiceEmoji(playerChoice) : '⏳'}
+                  {getChoiceEmoji(playerChoice!)}
                 </div>
                 <p className="font-bold text-gray-700">你</p>
               </div>
