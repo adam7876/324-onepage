@@ -110,31 +110,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
                 }}
               />
               
-              {/* 標籤 - 簡單直接 */}
-              {sections.map((section, index) => {
-                const angle = index * 45 + 22.5; // 每格中心角度
-                const radians = (angle * Math.PI) / 180;
-                const radius = 100;
-                const x = 50 + (radius * Math.sin(radians)) / 3.2;
-                const y = 50 - (radius * Math.cos(radians)) / 3.2;
-                
-                return (
-                  <div
-                    key={index}
-                    className="absolute text-white font-bold text-sm pointer-events-none"
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      transform: 'translate(-50%, -50%)',
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                      zIndex: 20
-                    }}
-                  >
-                    <div>索引{index}</div>
-                    <div className="text-xs">{section.type === 'win' ? '勝' : '敗'}</div>
-                  </div>
-                );
-              })}
+              {/* 移除所有標籤，純粹根據顏色判斷 */}
               
               {/* 中心圓圈 */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-800 rounded-full border-2 border-white shadow-lg z-10">
