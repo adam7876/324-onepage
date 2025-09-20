@@ -98,14 +98,14 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
                 className="w-full h-full"
                 style={{
                   background: `conic-gradient(
-                    ${sections[0].color} 0deg 45deg,
-                    ${sections[1].color} 45deg 90deg,
-                    ${sections[2].color} 90deg 135deg,
-                    ${sections[3].color} 135deg 180deg,
-                    ${sections[4].color} 180deg 225deg,
-                    ${sections[5].color} 225deg 270deg,
-                    ${sections[6].color} 270deg 315deg,
-                    ${sections[7].color} 315deg 360deg
+                    ${sections[0].color} 270deg 315deg,
+                    ${sections[1].color} 315deg 360deg,
+                    ${sections[2].color} 0deg 45deg,
+                    ${sections[3].color} 45deg 90deg,
+                    ${sections[4].color} 90deg 135deg,
+                    ${sections[5].color} 135deg 180deg,
+                    ${sections[6].color} 180deg 225deg,
+                    ${sections[7].color} 225deg 270deg
                   )`
                 }}
               />
