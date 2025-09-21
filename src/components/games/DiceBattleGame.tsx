@@ -128,8 +128,8 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               setShowingRoundResult(false);
             }, 3000); // 增加結果顯示時間
           }
-        }, 1500); // 顯示最終點數的時間
-      }, 2000); // 給用戶更多時間看到最終的骰子點數
+        }, 1000); // 顯示最終點數的時間
+      }, 1000); // 給用戶更多時間看到最終的骰子點數
     }, 2000);
   };
 
