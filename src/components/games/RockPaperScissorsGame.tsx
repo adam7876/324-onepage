@@ -80,11 +80,11 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
       const computer = getRandomChoice();
       setComputerChoice(computer);
       
-      // 第三步：顯示結果 (2秒後) - 固定2秒讓用戶看到電腦出拳
+      // 第三步：顯示結果 (2秒後) - 在雙方出拳畫面直接顯示結果
       setTimeout(() => {
         const roundResult = determineWinner(choice, computer);
         setResult(roundResult);
-        setIsPlaying(false);
+        // 保持 isPlaying = true，不跳轉回選擇頁面
         
         // 更新分數
         let newPlayerScore = playerScore;
@@ -103,6 +103,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           // 遊戲結束
           setGameFinished(true);
           setHasPlayed(true);
+          setIsPlaying(false); // 遊戲結束時才設置為 false
           
           setTimeout(() => {
             if (newPlayerScore >= 2) {
@@ -236,8 +237,8 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           </div>
         )}
 
-        {/* 回合結果顯示（不顯示手勢圖示） */}
-        {result && !gameFinished && !isPlaying && (
+        {/* 回合結果顯示（在雙方出拳畫面顯示） */}
+        {result && !gameFinished && isPlaying && (
           <div className="mb-8">
             <div className={`text-2xl font-bold mb-4 ${getResultColor()}`}>
               {getResultMessage()}
