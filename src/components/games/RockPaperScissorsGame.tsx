@@ -75,12 +75,12 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
     setResult(null);
     setIsPlaying(true);
 
-    // 第二步：電腦思考 (1.5秒)
+    // 第二步：電腦思考 (1.5秒) - 跟第一次一樣
     setTimeout(() => {
       const computer = getRandomChoice();
       setComputerChoice(computer);
       
-      // 第三步：顯示結果 (2秒後，給用戶時間看到電腦的出拳)
+      // 第三步：顯示結果 (1.5秒後) - 跟第一次一樣的時間
       setTimeout(() => {
         const roundResult = determineWinner(choice, computer);
         setResult(roundResult);
@@ -122,8 +122,8 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
             resetRound(); // 使用統一的清空函數
           }, 3000);
         }
-      }, 2000); // 增加時間，讓用戶看到電腦的出拳
-    }, 1500); // 電腦思考時間
+      }, 1500); // 跟第一次一樣的時間
+    }, 1500); // 跟第一次一樣的時間
   };
 
   const getChoiceEmoji = (choice: Choice) => {
