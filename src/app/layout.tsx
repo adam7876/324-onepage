@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   themeColor: "#8b5cf6",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   other: {
-    'cache-version': 'v2.1.0', // 強制清除快取
+    'cache-version': 'v2.2.0', // 強制清除快取
   },
   appleWebApp: {
     capable: true,
@@ -49,8 +49,8 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        {/* 暫時停用 Service Worker 以解決 Safari 相容性問題 */}
-        {/* <script
+        {/* Service Worker 註冊 - 已修正快取問題 */}
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
@@ -58,6 +58,11 @@ export default function RootLayout({
                   navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
                       console.log('SW registered: ', registration);
+                      // 檢查是否有新的 Service Worker 等待激活
+                      if (registration.waiting) {
+                        console.log('New SW waiting, forcing activation');
+                        registration.waiting.postMessage({ action: 'skipWaiting' });
+                      }
                     })
                     .catch(function(registrationError) {
                       console.log('SW registration failed: ', registrationError);
@@ -66,7 +71,7 @@ export default function RootLayout({
               }
             `,
           }}
-        /> */}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black`}
