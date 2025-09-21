@@ -33,6 +33,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   const [playerScore, setPlayerScore] = useState(0);
   const [computerScore, setComputerScore] = useState(0);
   const [gameFinished, setGameFinished] = useState(false);
+  const [showingRoundResult, setShowingRoundResult] = useState(false);
 
   useEffect(() => {
     // 載入獎品配置
@@ -74,6 +75,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
         const roundResult = determineWinner(choice, computer);
         setResult(roundResult);
         setIsPlaying(false);
+        setShowingRoundResult(true);
         
         // 更新分數
         if (roundResult === 'win') {
@@ -107,11 +109,9 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
           setTimeout(() => {
             setCurrentRound(prev => prev + 1);
             setResult(null);
-            // 延遲重置選擇，確保結果顯示完成
-            setTimeout(() => {
-              setPlayerChoice(null);
-              setComputerChoice(null);
-            }, 500);
+            setShowingRoundResult(false);
+            setPlayerChoice(null);
+            setComputerChoice(null);
           }, 3000); // 增加結果顯示時間
         }
       }, 1000); // 給用戶時間看到電腦的出拳
@@ -229,7 +229,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
         )}
 
         {/* 回合結果顯示（不顯示手勢圖示） */}
-        {result && !gameFinished && (
+        {result && !gameFinished && showingRoundResult && (
           <div className="mb-8">
             <div className={`text-2xl font-bold mb-4 ${getResultColor()}`}>
               {getResultMessage()}
