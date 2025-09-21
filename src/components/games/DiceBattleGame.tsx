@@ -233,12 +233,9 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             </div>
             
             {result === 'draw' && !isRolling && (
-              <button
-                onClick={handleRoll}
-                className="mt-6 bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-xl transform hover:scale-105 transition-all shadow-lg"
-              >
+              <div className="mt-6 bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg opacity-75">
                 🎲 再來一次
-              </button>
+              </div>
             )}
           </div>
         )}
