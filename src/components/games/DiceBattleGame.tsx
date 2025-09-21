@@ -20,7 +20,6 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [hasPlayed, setHasPlayed] = useState(false);
   const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
   const [showingResult, setShowingResult] = useState(false);
-  const [showingFinalResult, setShowingFinalResult] = useState(false);
   const [showingRoundResult, setShowingRoundResult] = useState(false);
   
   // 3戰2勝制相關狀態
@@ -186,7 +185,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </div>
         )}
 
-        {!hasPlayed && !isRolling && !result && !gameFinished && !showingResult && !showingFinalResult && !showingRoundResult && (
+        {!hasPlayed && !isRolling && !result && !gameFinished && !showingResult && !showingRoundResult && (
           <>
             <p className="text-lg text-gray-600 mb-8">
               擲出骰子，點數比電腦大就贏！(3戰2勝)
@@ -206,10 +205,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </>
         )}
 
-        {(isRolling || showingResult || showingFinalResult || showingRoundResult) && !hasPlayed && (
+        {(isRolling || showingResult || showingRoundResult) && !hasPlayed && (
           <div className="mb-8">
             <p className={`text-xl mb-6 ${showingRoundResult ? getResultColor() : 'text-gray-700'}`}>
-              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : showingRoundResult ? getResultMessage() : '平手，再來一次！'}
+              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingRoundResult ? getResultMessage() : '平手，再來一次！'}
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
