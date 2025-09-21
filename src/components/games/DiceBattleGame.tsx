@@ -71,65 +71,60 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
       // 讓用戶看到最終的骰子點數，然後顯示結果
       setTimeout(() => {
-        // 不設置 setShowingResult(false)，保持骰子動畫頁面
-        setShowingFinalResult(true);
-        
-        setTimeout(() => {
-          let roundResult: 'win' | 'lose' | 'draw';
-          if (finalPlayerDice > finalComputerDice) {
-            roundResult = 'win';
-          } else if (finalPlayerDice < finalComputerDice) {
-            roundResult = 'lose';
-          } else {
-            roundResult = 'draw';
-          }
+        let roundResult: 'win' | 'lose' | 'draw';
+        if (finalPlayerDice > finalComputerDice) {
+          roundResult = 'win';
+        } else if (finalPlayerDice < finalComputerDice) {
+          roundResult = 'lose';
+        } else {
+          roundResult = 'draw';
+        }
 
-          setResult(roundResult);
-          // 不設置 setShowingFinalResult(false)，保持骰子動畫頁面
-          setShowingRoundResult(true);
-          // 保持 isRolling = false，不跳轉回選擇頁面
+        setResult(roundResult);
+        // 直接顯示結果，不設置 setShowingResult(false)，保持骰子動畫頁面
+        setShowingRoundResult(true);
+        // 保持 isRolling = false，不跳轉回選擇頁面
           
-          // 更新分數
-          if (roundResult === 'win') {
-            setPlayerScore(prev => prev + 1);
-          } else if (roundResult === 'lose') {
-            setComputerScore(prev => prev + 1);
-          }
+        // 更新分數
+        if (roundResult === 'win') {
+          setPlayerScore(prev => prev + 1);
+        } else if (roundResult === 'lose') {
+          setComputerScore(prev => prev + 1);
+        }
+        
+        // 檢查是否有人已經獲勝
+        const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
+        const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
+        
+        if (newPlayerScore >= 2 || newComputerScore >= 2) {
+          // 遊戲結束
+          setGameFinished(true);
+          setHasPlayed(true);
           
-          // 檢查是否有人已經獲勝
-          const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
-          const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
-          
-          if (newPlayerScore >= 2 || newComputerScore >= 2) {
-            // 遊戲結束
-            setGameFinished(true);
-            setHasPlayed(true);
-            
-            setTimeout(() => {
-              if (newPlayerScore >= 2) {
-                onComplete('win', {
-                  name: rewardConfig.description,
-                  value: rewardConfig.value,
-                  type: rewardConfig.type
-                });
-              } else {
-                onComplete('lose');
-              }
-            }, 3000); // 增加結果顯示時間
-          } else {
-            // 繼續下一回合（包括平手）
-            setTimeout(() => {
-              setCurrentRound(prev => prev + 1);
-              setPlayerDice(null);
-              setComputerDice(null);
-              setResult(null);
-              // 保持 showingResult = true，不跳轉回選擇頁面
-              setShowingFinalResult(false);
-              setShowingRoundResult(false);
-            }, 3000); // 增加結果顯示時間
-          }
-        }, 1000); // 顯示最終點數的時間
-      }, 1000); // 給用戶更多時間看到最終的骰子點數
+          setTimeout(() => {
+            if (newPlayerScore >= 2) {
+              onComplete('win', {
+                name: rewardConfig.description,
+                value: rewardConfig.value,
+                type: rewardConfig.type
+              });
+            } else {
+              onComplete('lose');
+            }
+          }, 3000); // 增加結果顯示時間
+        } else {
+          // 繼續下一回合（包括平手）
+          setTimeout(() => {
+            setCurrentRound(prev => prev + 1);
+            setPlayerDice(null);
+            setComputerDice(null);
+            setResult(null);
+            // 保持 showingResult = true，不跳轉回選擇頁面
+            setShowingResult(false);
+            setShowingRoundResult(false);
+          }, 3000); // 增加結果顯示時間
+        }
+      }, 2000); // 給用戶更多時間看到最終的骰子點數
     }, 2000);
   };
 
