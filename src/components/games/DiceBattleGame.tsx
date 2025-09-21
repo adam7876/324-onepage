@@ -21,6 +21,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
   const [rewardConfig, setRewardConfig] = useState<RewardType>(GAME_CONFIG.reward);
   const [showingResult, setShowingResult] = useState(false);
   const [showingFinalResult, setShowingFinalResult] = useState(false);
+  const [showingRoundResult, setShowingRoundResult] = useState(false);
   
   // 3戰2勝制相關狀態
   const [currentRound, setCurrentRound] = useState(1);
@@ -85,6 +86,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
           setResult(roundResult);
           setShowingFinalResult(false);
+          setShowingRoundResult(true);
           // 保持 isRolling = false，不跳轉回選擇頁面
           
           // 更新分數
@@ -122,6 +124,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               setComputerDice(null);
               setResult(null);
               setShowingResult(false);
+              setShowingRoundResult(false);
             }, 3000); // 增加結果顯示時間
           }
         }, 1500); // 顯示最終點數的時間
@@ -207,10 +210,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </>
         )}
 
-        {(isRolling || showingResult || showingFinalResult || (result && !gameFinished)) && !hasPlayed && (
+        {(isRolling || showingResult || showingFinalResult || showingRoundResult) && !hasPlayed && (
           <div className="mb-8">
-            <p className={`text-xl mb-6 ${result && !isRolling && !showingResult && !showingFinalResult ? getResultColor() : 'text-gray-700'}`}>
-              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : result === 'draw' ? '平手，再來一次！' : getResultMessage()}
+            <p className={`text-xl mb-6 ${showingRoundResult ? getResultColor() : 'text-gray-700'}`}>
+              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : showingRoundResult ? getResultMessage() : '平手，再來一次！'}
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
