@@ -123,7 +123,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               setPlayerDice(null);
               setComputerDice(null);
               setResult(null);
-              setShowingResult(false);
+              // 保持 showingResult = true，不跳轉回選擇頁面
               setShowingFinalResult(false);
               setShowingRoundResult(false);
             }, 3000); // 增加結果顯示時間
