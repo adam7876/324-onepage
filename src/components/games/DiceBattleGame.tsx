@@ -191,7 +191,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </div>
         )}
 
-        {!hasPlayed && !isRolling && !result && !gameFinished && (
+        {!hasPlayed && !isRolling && !result && !gameFinished && !showingResult && !showingFinalResult && !showingRoundResult && (
           <>
             <p className="text-lg text-gray-600 mb-8">
               擲出骰子，點數比電腦大就贏！(3戰2勝)
