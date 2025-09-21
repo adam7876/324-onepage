@@ -85,6 +85,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
           setResult(roundResult);
           setShowingFinalResult(false);
+          // 保持 isRolling = false，不跳轉回選擇頁面
           
           // 更新分數
           if (roundResult === 'win') {
@@ -206,10 +207,10 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </>
         )}
 
-        {(isRolling || showingResult || showingFinalResult || (result === 'draw' && !gameFinished)) && !hasPlayed && (
+        {(isRolling || showingResult || showingFinalResult || (result && !gameFinished && !hasPlayed)) && !hasPlayed && (
           <div className="mb-8">
-            <p className="text-xl text-gray-700 mb-6">
-              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : '平手，再來一次！'}
+            <p className={`text-xl mb-6 ${result && !isRolling && !showingResult && !showingFinalResult ? getResultColor() : 'text-gray-700'}`}>
+              {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : result === 'draw' ? '平手，再來一次！' : getResultMessage()}
             </p>
             <div className="flex justify-center items-center space-x-8">
               <div className="text-center">
