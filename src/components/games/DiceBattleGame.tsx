@@ -71,7 +71,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
 
       // 讓用戶看到最終的骰子點數，然後顯示結果
       setTimeout(() => {
-        setShowingResult(false);
+        // 不設置 setShowingResult(false)，保持骰子動畫頁面
         setShowingFinalResult(true);
         
         setTimeout(() => {
@@ -85,7 +85,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           }
 
           setResult(roundResult);
-          setShowingFinalResult(false);
+          // 不設置 setShowingFinalResult(false)，保持骰子動畫頁面
           setShowingRoundResult(true);
           // 保持 isRolling = false，不跳轉回選擇頁面
           
@@ -124,6 +124,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
               setComputerDice(null);
               setResult(null);
               setShowingResult(false);
+              setShowingFinalResult(false);
               setShowingRoundResult(false);
             }, 3000); // 增加結果顯示時間
           }
