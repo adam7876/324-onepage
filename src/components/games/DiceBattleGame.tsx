@@ -207,7 +207,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
           </>
         )}
 
-        {(isRolling || showingResult || showingFinalResult || (result && !gameFinished && !hasPlayed)) && !hasPlayed && (
+        {(isRolling || showingResult || showingFinalResult || (result && !gameFinished)) && !hasPlayed && (
           <div className="mb-8">
             <p className={`text-xl mb-6 ${result && !isRolling && !showingResult && !showingFinalResult ? getResultColor() : 'text-gray-700'}`}>
               {isRolling ? '擲骰子中...' : showingResult ? '結果揭曉...' : showingFinalResult ? '最終結果...' : result === 'draw' ? '平手，再來一次！' : getResultMessage()}
