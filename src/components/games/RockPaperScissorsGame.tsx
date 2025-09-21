@@ -58,11 +58,20 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
     return 'lose';
   };
 
+  // 清空所有狀態的函數
+  const resetRound = () => {
+    setPlayerChoice(null);
+    setComputerChoice(null);
+    setResult(null);
+    setIsPlaying(false);
+  };
+
   const handleChoice = async (choice: Choice) => {
-    if (hasPlayed || gameFinished) return;
+    if (hasPlayed || gameFinished || isPlaying) return;
 
     // 第一步：用戶出拳
     setPlayerChoice(choice);
+    setComputerChoice(null);
     setResult(null);
     setIsPlaying(true);
 
@@ -78,16 +87,18 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
         setIsPlaying(false);
         
         // 更新分數
+        let newPlayerScore = playerScore;
+        let newComputerScore = computerScore;
+        
         if (roundResult === 'win') {
-          setPlayerScore(prev => prev + 1);
+          newPlayerScore = playerScore + 1;
+          setPlayerScore(newPlayerScore);
         } else if (roundResult === 'lose') {
-          setComputerScore(prev => prev + 1);
+          newComputerScore = computerScore + 1;
+          setComputerScore(newComputerScore);
         }
         
         // 檢查是否有人已經獲勝
-        const newPlayerScore = roundResult === 'win' ? playerScore + 1 : playerScore;
-        const newComputerScore = roundResult === 'lose' ? computerScore + 1 : computerScore;
-        
         if (newPlayerScore >= 2 || newComputerScore >= 2) {
           // 遊戲結束
           setGameFinished(true);
@@ -107,11 +118,8 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
         } else {
           // 繼續下一回合（包括平手）
           setTimeout(() => {
-            // 清空所有狀態，準備下一回合
             setCurrentRound(prev => prev + 1);
-            setPlayerChoice(null);
-            setComputerChoice(null);
-            setResult(null);
+            resetRound(); // 使用統一的清空函數
           }, 3000);
         }
       }, 1000); // 給用戶時間看到電腦的出拳
