@@ -63,7 +63,6 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
 
     // 第一步：用戶出拳
     setPlayerChoice(choice);
-    setComputerChoice(null);
     setResult(null);
     setIsPlaying(true);
 
