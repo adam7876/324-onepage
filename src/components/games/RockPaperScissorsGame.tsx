@@ -33,7 +33,6 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   const [playerScore, setPlayerScore] = useState(0);
   const [computerScore, setComputerScore] = useState(0);
   const [gameFinished, setGameFinished] = useState(false);
-  const [showingRoundResult, setShowingRoundResult] = useState(false);
 
   useEffect(() => {
     // 載入獎品配置
@@ -62,20 +61,22 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
   const handleChoice = async (choice: Choice) => {
     if (hasPlayed || gameFinished) return;
 
+    // 第一步：用戶出拳
     setPlayerChoice(choice);
+    setComputerChoice(null);
+    setResult(null);
     setIsPlaying(true);
 
-    // 延遲顯示電腦選擇，增加緊張感
+    // 第二步：電腦思考 (1.5秒)
     setTimeout(() => {
       const computer = getRandomChoice();
       setComputerChoice(computer);
       
-      // 先顯示電腦的出拳，讓用戶看到
+      // 第三步：顯示結果 (1秒後)
       setTimeout(() => {
         const roundResult = determineWinner(choice, computer);
         setResult(roundResult);
         setIsPlaying(false);
-        setShowingRoundResult(true);
         
         // 更新分數
         if (roundResult === 'win') {
@@ -103,19 +104,19 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
             } else {
               onComplete('lose');
             }
-          }, 3000); // 增加結果顯示時間
+          }, 3000);
         } else {
           // 繼續下一回合（包括平手）
           setTimeout(() => {
+            // 清空所有狀態，準備下一回合
             setCurrentRound(prev => prev + 1);
-            setResult(null);
-            setShowingRoundResult(false);
             setPlayerChoice(null);
             setComputerChoice(null);
-          }, 3000); // 增加結果顯示時間
+            setResult(null);
+          }, 3000);
         }
       }, 1000); // 給用戶時間看到電腦的出拳
-    }, 1500);
+    }, 1500); // 電腦思考時間
   };
 
   const getChoiceEmoji = (choice: Choice) => {
@@ -229,7 +230,7 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
         )}
 
         {/* 回合結果顯示（不顯示手勢圖示） */}
-        {result && !gameFinished && showingRoundResult && (
+        {result && !gameFinished && !isPlaying && (
           <div className="mb-8">
             <div className={`text-2xl font-bold mb-4 ${getResultColor()}`}>
               {getResultMessage()}
