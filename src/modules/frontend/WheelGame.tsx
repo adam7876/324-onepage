@@ -194,7 +194,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         }
         
         .pointer-stopped {
-          transform: translate(-50%, -50%) rotate(var(--final-rotation, 0deg));
+          /* 保持動畫結束時的位置，不額外轉動 */
+          animation: none;
         }
         
         @keyframes spin {

@@ -312,7 +312,21 @@ export default function MembersPage() {
                       <td className="py-2">{member.gameHistory.totalPlays}</td>
                       <td className="py-2">
                         {member.gameHistory.lastPlayed ? 
-                          new Date(member.gameHistory.lastPlayed).toLocaleDateString() : 
+                          (() => {
+                            try {
+                              let lastPlayed: Date;
+                              if (typeof member.gameHistory.lastPlayed === 'string') {
+                                lastPlayed = new Date(member.gameHistory.lastPlayed);
+                              } else if (member.gameHistory.lastPlayed && typeof member.gameHistory.lastPlayed === 'object' && 'toDate' in member.gameHistory.lastPlayed) {
+                                lastPlayed = (member.gameHistory.lastPlayed as { toDate: () => Date }).toDate();
+                              } else {
+                                return '格式錯誤';
+                              }
+                              return lastPlayed.toLocaleDateString('zh-TW');
+                            } catch (error) {
+                              return '日期錯誤';
+                            }
+                          })() : 
                           '未玩過'
                         }
                       </td>
