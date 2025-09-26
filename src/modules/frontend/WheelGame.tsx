@@ -136,9 +136,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             
             {/* 旋轉指針 - 從中心向外 */}
             <div 
-              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : ''}`}
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : 'pointer-stopped'}`}
               style={{
-                transform: isSpinning ? 'translate(-50%, -50%)' : `translate(-50%, -50%) rotate(${pointerAngle}deg)`,
                 transformOrigin: 'center center'
               }}
             >
@@ -196,6 +195,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           animation: spin 7s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
           animation-fill-mode: forwards;
           animation-iteration-count: 1;
+        }
+        
+        .pointer-stopped {
+          transform: translate(-50%, -50%) rotate(var(--final-rotation, 0deg));
         }
         
         @keyframes spin {
