@@ -40,7 +40,7 @@ export default function GamesPage() {
         setGameStatus({
           isOpen: true,
           maintenanceMessage: '今日為遊樂園休息日，請明天再來！',
-          maintenanceTitle: '🎠 遊樂園休息日 🎠',
+          maintenanceTitle: '遊樂園休息日',
           maintenanceHint: '💡 提示：請明天再來遊玩，每天都有新的機會！',
           lastUpdated: new Date(),
         });
@@ -232,7 +232,15 @@ export default function GamesPage() {
           {/* 休息日內容 */}
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
             <div className="text-center">
-              <div className="text-8xl mb-6">🎠</div>
+              <div className="mb-6">
+                <Image
+                  src="/images/custom-icon.png"
+                  alt="遊樂園圖示"
+                  width={128}
+                  height={128}
+                  className="mx-auto"
+                />
+              </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 遊樂園暫時休息
               </h2>
@@ -269,7 +277,15 @@ export default function GamesPage() {
         {/* 頁面標題 */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            324遊樂園🎠
+            <div className="flex items-center justify-center gap-2">
+              <span>324遊樂園</span>
+              <Image
+                src="/images/custom-icon-small.png"
+                alt="遊樂園圖示"
+                width={24}
+                height={24}
+              />
+            </div>
           </h1>
           <p className="text-lg text-gray-800">
             每天一次機會，玩遊戲領回饋金！

@@ -13,7 +13,7 @@ export interface GameStatus {
 const DEFAULT_GAME_STATUS: GameStatus = {
   isOpen: true,
   maintenanceMessage: '今日為遊樂園休息日，請明天再來！',
-  maintenanceTitle: '🎠 遊樂園休息日 🎠',
+  maintenanceTitle: '遊樂園休息日',
   maintenanceHint: '💡 提示：請明天再來遊玩，每天都有新的機會！',
   lastUpdated: new Date(),
 };
