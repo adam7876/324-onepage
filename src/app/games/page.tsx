@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firestore';
 import { GAME_CONFIG } from '../../lib/game-config';
 import { isValidEmail } from '../../lib/game-utils';
+import { getGameStatus, GameStatus } from '../../lib/game-status-service';
 
 interface GameRewardConfig {
   type: 'coupon' | 'discount';
@@ -23,6 +24,32 @@ export default function GamesPage() {
   const [error, setError] = useState('');
   const [rewardConfig, setRewardConfig] = useState<GameRewardConfig>(GAME_CONFIG.reward);
   const [isPWA, setIsPWA] = useState(false);
+  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+
+  // 載入遊戲狀態
+  useEffect(() => {
+    const loadGameStatus = async () => {
+      try {
+        const status = await getGameStatus();
+        setGameStatus(status);
+        console.log('遊戲狀態載入成功:', status);
+      } catch (error) {
+        console.error('載入遊戲狀態失敗:', error);
+        // 使用預設狀態
+        setGameStatus({
+          isOpen: true,
+          maintenanceMessage: '今日為遊樂園休息日，請明天再來！',
+          maintenanceTitle: '🎠 遊樂園休息日 🎠',
+          lastUpdated: new Date(),
+        });
+      } finally {
+        setLoadingStatus(false);
+      }
+    };
+
+    loadGameStatus();
+  }, []);
 
   // 載入獎品配置
   useEffect(() => {
@@ -162,6 +189,66 @@ export default function GamesPage() {
   };
 
   const selectedGameInfo = GAME_CONFIG.games.find(g => g.id === selectedGame);
+
+  // 載入中
+  if (loadingStatus) {
+    return (
+      <div className="min-h-screen relative py-12 pb-32 flex items-center justify-center" style={{ minHeight: '100dvh' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">載入中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 遊戲關閉時顯示休息日頁面
+  if (gameStatus && !gameStatus.isOpen) {
+    return (
+      <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100dvh' }}>
+        {/* 背景圖片 */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/backgrounds/games-bg.jpg"
+            alt="遊戲背景"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
+          {/* 休息日標題 */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              {gameStatus.maintenanceTitle}
+            </h1>
+            <p className="text-xl md:text-2xl text-white/90">
+              {gameStatus.maintenanceMessage}
+            </p>
+          </div>
+
+          {/* 休息日內容 */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
+            <div className="text-center">
+              <div className="text-8xl mb-6">🎠</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                遊樂園暫時休息
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                我們正在進行維護，請稍後再來遊玩！
+              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-800">
+                  💡 提示：請明天再來遊玩，每天都有新的機會！
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100dvh' }}>

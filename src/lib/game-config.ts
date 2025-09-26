@@ -5,6 +5,13 @@ export const GAME_CONFIG = {
   dailyLimit: 1,
   tokenExpiryHours: 24,
   
+  // 遊戲狀態設定
+  gameStatus: {
+    isOpen: true, // 遊戲是否開放
+    maintenanceMessage: '今日為遊樂園休息日，請明天再來！', // 休息日訊息
+    maintenanceTitle: '🎠 遊樂園休息日 🎠', // 休息日標題
+  },
+  
   // Email設定
   email: {
     enabled: true,
