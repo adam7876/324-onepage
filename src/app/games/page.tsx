@@ -221,14 +221,12 @@ export default function GamesPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
           {/* 休息日標題 */}
           <div className="text-center mb-12">
-            <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-6 mb-6">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
-                {gameStatus.maintenanceTitle}
-              </h1>
-              <p className="text-xl md:text-2xl text-white drop-shadow-md">
-                {gameStatus.maintenanceMessage}
-              </p>
-            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
+              {gameStatus.maintenanceTitle}
+            </h1>
+            <p className="text-xl md:text-2xl text-white drop-shadow-xl">
+              {gameStatus.maintenanceMessage}
+            </p>
           </div>
 
           {/* 休息日內容 */}
