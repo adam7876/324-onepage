@@ -221,8 +221,22 @@ export default function GamesPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
           {/* 休息日標題 */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold text-red-900 mb-4 drop-shadow-lg">
-              {gameStatus.maintenanceTitle}
+            <h1 className="text-4xl md:text-6xl font-bold text-red-900 mb-4 drop-shadow-lg flex items-center justify-center gap-4">
+              <Image
+                src="/images/custom-icon-small.png"
+                alt="遊樂園圖示"
+                width={32}
+                height={32}
+                className="flex-shrink-0"
+              />
+              <span>{gameStatus.maintenanceTitle.replace(/🎠/g, '').trim()}</span>
+              <Image
+                src="/images/custom-icon-small.png"
+                alt="遊樂園圖示"
+                width={32}
+                height={32}
+                className="flex-shrink-0"
+              />
             </h1>
             <p className="text-xl md:text-2xl text-red-800 drop-shadow-md">
               {gameStatus.maintenanceMessage}
