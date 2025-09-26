@@ -65,6 +65,25 @@ export async function POST(request: NextRequest) {
     // 儲存遊戲記錄
     await addDoc(collection(db, 'gameHistory'), gameRecord);
 
+    // 更新會員數據
+    const memberQuery = query(
+      collection(db, 'members'),
+      where('email', '==', tokenData.email.toLowerCase().trim())
+    );
+    const memberSnapshot = await getDocs(memberQuery);
+    
+    if (!memberSnapshot.empty) {
+      const memberDoc = memberSnapshot.docs[0];
+      const memberData = memberDoc.data();
+      
+      // 更新會員的遊戲歷史
+      await updateDoc(doc(db, 'members', memberDoc.id), {
+        'gameHistory.lastPlayed': Timestamp.fromDate(now),
+        'gameHistory.totalPlays': (memberData.gameHistory?.totalPlays || 0) + 1,
+        updatedAt: Timestamp.fromDate(now)
+      });
+    }
+
     // 標記token為已使用
     await updateDoc(doc(db, 'gameTokens', tokenDoc.id), {
       used: true

@@ -79,11 +79,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     setTimeout(() => {
       setIsSpinning(false);
       
-      // 動畫結束後，確保指針停在正確位置
-      setTimeout(() => {
-        document.documentElement.style.setProperty('--final-rotation', `${finalAngle}deg`);
-      }, 100);
-      
       // 使用預先計算的結果
       const result = resultSection.type as 'win' | 'lose';
       
