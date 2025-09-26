@@ -249,7 +249,7 @@ export default function MembersPage() {
                 if (typeof m.gameHistory.lastPlayed === 'string') {
                   lastPlayed = new Date(m.gameHistory.lastPlayed);
                 } else if (m.gameHistory.lastPlayed && typeof m.gameHistory.lastPlayed === 'object' && 'toDate' in m.gameHistory.lastPlayed) {
-                  lastPlayed = (m.gameHistory.lastPlayed as any).toDate();
+                  lastPlayed = (m.gameHistory.lastPlayed as { toDate: () => Date }).toDate();
                 } else {
                   return false;
                 }

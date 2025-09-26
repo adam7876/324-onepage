@@ -13,7 +13,6 @@ interface WheelGameProps {
 
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [pointerAngle, setPointerAngle] = useState(0);
 
   // 固定轉盤配置 - 8格，交替成功失敗
   const sections = [
@@ -72,9 +71,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     console.log('🎡 指針指向區塊:', resultSection);
     console.log('🎡 預期結果:', resultSection.type);
     console.log('🎡 預期顏色:', resultSection.color);
-    
-    // 保存指針角度
-    setPointerAngle(finalAngle);
     
     // 設置 CSS 變數
     document.documentElement.style.setProperty('--final-rotation', `${finalAngle}deg`);
