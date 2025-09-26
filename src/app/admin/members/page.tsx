@@ -323,7 +323,7 @@ export default function MembersPage() {
                                 return '格式錯誤';
                               }
                               return lastPlayed.toLocaleDateString('zh-TW');
-                            } catch (error) {
+                            } catch {
                               return '日期錯誤';
                             }
                           })() : 
