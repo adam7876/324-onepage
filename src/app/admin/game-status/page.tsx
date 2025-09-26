@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../../../firebase/firebaseConfig';
 import { getGameStatus, setGameStatus, toggleGameStatus, GameStatus } from '../../../lib/game-status-service';
 
 export default function GameStatusPage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [gameStatus, setGameStatusState] = useState<GameStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
