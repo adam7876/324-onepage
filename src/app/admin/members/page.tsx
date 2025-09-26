@@ -241,7 +241,30 @@ export default function MembersPage() {
           </Card>
           <Card className="p-4 text-center">
             <div className="text-2xl font-bold text-orange-600">
-              {members.filter(m => m.gameHistory.lastPlayed).length}
+              {members.filter(m => {
+                if (!m.gameHistory.lastPlayed) return false;
+                
+                // 處理不同類型的 lastPlayed
+                let lastPlayed: Date;
+                if (typeof m.gameHistory.lastPlayed === 'string') {
+                  lastPlayed = new Date(m.gameHistory.lastPlayed);
+                } else if (m.gameHistory.lastPlayed && typeof m.gameHistory.lastPlayed === 'object' && 'toDate' in m.gameHistory.lastPlayed) {
+                  lastPlayed = (m.gameHistory.lastPlayed as any).toDate();
+                } else {
+                  return false;
+                }
+                
+                const today = new Date();
+                
+                // 檢查是否為今天（台灣時區）
+                const taiwanOffset = 8 * 60; // 台灣時區偏移（分鐘）
+                const lastPlayedTaiwan = new Date(lastPlayed.getTime() + taiwanOffset * 60 * 1000);
+                const todayTaiwan = new Date(today.getTime() + taiwanOffset * 60 * 1000);
+                
+                return lastPlayedTaiwan.getUTCDate() === todayTaiwan.getUTCDate() &&
+                       lastPlayedTaiwan.getUTCMonth() === todayTaiwan.getUTCMonth() &&
+                       lastPlayedTaiwan.getUTCFullYear() === todayTaiwan.getUTCFullYear();
+              }).length}
             </div>
             <div className="text-sm text-gray-600">今日已玩</div>
           </Card>
