@@ -41,6 +41,7 @@ export default function GamesPage() {
           isOpen: true,
           maintenanceMessage: '今日為遊樂園休息日，請明天再來！',
           maintenanceTitle: '🎠 遊樂園休息日 🎠',
+          maintenanceHint: '💡 提示：請明天再來遊玩，每天都有新的機會！',
           lastUpdated: new Date(),
         });
       } finally {
@@ -220,12 +221,14 @@ export default function GamesPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
           {/* 休息日標題 */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
-              {gameStatus.maintenanceTitle}
-            </h1>
-            <p className="text-xl md:text-2xl text-white drop-shadow-md">
-              {gameStatus.maintenanceMessage}
-            </p>
+            <div className="bg-black/50 backdrop-blur-sm rounded-2xl p-6 mb-6">
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                {gameStatus.maintenanceTitle}
+              </h1>
+              <p className="text-xl md:text-2xl text-white drop-shadow-md">
+                {gameStatus.maintenanceMessage}
+              </p>
+            </div>
           </div>
 
           {/* 休息日內容 */}
@@ -240,7 +243,7 @@ export default function GamesPage() {
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-yellow-800">
-                  💡 提示：請明天再來遊玩，每天都有新的機會！
+                  {gameStatus.maintenanceHint}
                 </p>
               </div>
             </div>

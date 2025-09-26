@@ -13,6 +13,8 @@ export default function GameStatusPage() {
   const [message, setMessage] = useState('');
   const [tempTitle, setTempTitle] = useState('');
   const [tempMessage, setTempMessage] = useState('');
+  const [tempHint, setTempHint] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   // 檢查認證狀態並載入遊戲狀態
   useEffect(() => {
@@ -25,6 +27,7 @@ export default function GameStatusPage() {
           setGameStatusState(status);
           setTempTitle(status.maintenanceTitle);
           setTempMessage(status.maintenanceMessage);
+          setTempHint(status.maintenanceHint);
         } catch (error) {
           console.error('載入遊戲狀態失敗:', error);
           setMessage('載入遊戲狀態失敗');
@@ -54,13 +57,13 @@ export default function GameStatusPage() {
   // 防抖動存檔函數
   const debouncedSave = (() => {
     let timeoutId: NodeJS.Timeout;
-    return (field: 'maintenanceTitle' | 'maintenanceMessage', value: string) => {
+    return (field: 'maintenanceTitle' | 'maintenanceMessage' | 'maintenanceHint', value: string) => {
       clearTimeout(timeoutId);
+      setIsEditing(true);
       timeoutId = setTimeout(async () => {
         if (!gameStatus) return;
         
         try {
-          setSaving(true);
           const updatedStatus = {
             ...gameStatus,
             [field]: value,
@@ -73,7 +76,7 @@ export default function GameStatusPage() {
           console.error('更新訊息失敗:', error);
           setMessage('更新訊息失敗');
         } finally {
-          setSaving(false);
+          setIsEditing(false);
         }
       }, 1000); // 1秒後存檔
     };
@@ -87,6 +90,11 @@ export default function GameStatusPage() {
   const handleMessageChange = (value: string) => {
     setTempMessage(value);
     debouncedSave('maintenanceMessage', value);
+  };
+
+  const handleHintChange = (value: string) => {
+    setTempHint(value);
+    debouncedSave('maintenanceHint', value);
   };
 
   if (loading) {
@@ -143,14 +151,14 @@ export default function GameStatusPage() {
                   </div>
                   <button
                     onClick={handleToggleStatus}
-                    disabled={saving}
+                    disabled={saving || isEditing}
                     className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                       gameStatus.isOpen
                         ? 'bg-red-500 hover:bg-red-600 text-white'
                         : 'bg-green-500 hover:bg-green-600 text-white'
-                    } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${(saving || isEditing) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {saving ? '處理中...' : gameStatus.isOpen ? '關閉遊戲' : '開啟遊戲'}
+                    {saving ? '處理中...' : isEditing ? '編輯中...' : gameStatus.isOpen ? '關閉遊戲' : '開啟遊戲'}
                   </button>
                 </div>
               </div>
@@ -183,6 +191,18 @@ export default function GameStatusPage() {
                       placeholder="例如：今日為遊樂園休息日，請明天再來！"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      提示內容
+                    </label>
+                    <input
+                      type="text"
+                      value={tempHint}
+                      onChange={(e) => handleHintChange(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="例如：💡 提示：請明天再來遊玩，每天都有新的機會！"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -194,9 +214,14 @@ export default function GameStatusPage() {
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">
                       {tempTitle}
                     </h3>
-                    <p className="text-lg text-gray-600">
+                    <p className="text-lg text-gray-600 mb-4">
                       {tempMessage}
                     </p>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <p className="text-yellow-800 text-sm">
+                        {tempHint}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
