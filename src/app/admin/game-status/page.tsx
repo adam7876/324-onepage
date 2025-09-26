@@ -188,7 +188,7 @@ export default function GameStatusPage() {
                       onChange={(e) => handleMessageChange(e.target.value)}
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="例如：今日為遊樂園休息日，請明天再來！"
+                      placeholder="例如：今日為遊樂園休息日，請下次再來！"
                     />
                   </div>
                   <div>
@@ -200,7 +200,7 @@ export default function GameStatusPage() {
                       value={tempHint}
                       onChange={(e) => handleHintChange(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="例如：💡 提示：請明天再來遊玩，每天都有新的機會！"
+                      placeholder="例如：💡 提示：請下次再來遊玩，每次都有新的機會！"
                     />
                   </div>
                 </div>

@@ -101,7 +101,7 @@ export async function validateMemberForGame(email: string): Promise<MemberValida
       return {
         valid: false,
         member,
-        message: `親愛的 ${member.name}，您今天已經玩過遊戲了！明天再來試試運氣吧 🎮`,
+        message: `親愛的 ${member.name}，您今天已經玩過遊戲了！下次再來試試運氣吧 🎮`,
         code: 'PLAYED_TODAY'
       };
     }

@@ -39,9 +39,9 @@ export default function GamesPage() {
         // 使用預設狀態
         setGameStatus({
           isOpen: true,
-          maintenanceMessage: '今日為遊樂園休息日，請明天再來！',
+          maintenanceMessage: '今日為遊樂園休息日，請下次再來！',
           maintenanceTitle: '遊樂園休息日',
-          maintenanceHint: '💡 提示：請明天再來遊玩，每天都有新的機會！',
+          maintenanceHint: '💡 提示：請下次再來遊玩，每次都有新的機會！',
           lastUpdated: new Date(),
         });
       } finally {

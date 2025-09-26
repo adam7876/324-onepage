@@ -253,7 +253,7 @@ export default function PlayGamePage() {
                 很遺憾！
               </h2>
               <p className="text-gray-600 mb-6">
-                這次沒有中獎，明天再來試試運氣吧！
+                這次沒有中獎，下次再來試試運氣吧！
               </p>
             </div>
           )}
