@@ -36,15 +36,6 @@ export default function GameStatusPage() {
     return () => unsubscribe();
   }, []);
 
-  const loadGameStatus = async () => {
-    try {
-      const status = await getGameStatus();
-      setGameStatusState(status);
-    } catch (error) {
-      console.error('載入遊戲狀態失敗:', error);
-      setMessage('載入遊戲狀態失敗');
-    }
-  };
 
   const handleToggleStatus = async () => {
     try {
