@@ -11,23 +11,30 @@ export default function GameStatusPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [tempTitle, setTempTitle] = useState('');
+  const [tempMessage, setTempMessage] = useState('');
 
-  // 檢查認證狀態
+  // 檢查認證狀態並載入遊戲狀態
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        // 同時載入遊戲狀態
+        try {
+          const status = await getGameStatus();
+          setGameStatusState(status);
+          setTempTitle(status.maintenanceTitle);
+          setTempMessage(status.maintenanceMessage);
+        } catch (error) {
+          console.error('載入遊戲狀態失敗:', error);
+          setMessage('載入遊戲狀態失敗');
+        }
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
-
-  // 載入遊戲狀態
-  useEffect(() => {
-    if (user) {
-      loadGameStatus();
-    }
-  }, [user]);
 
   const loadGameStatus = async () => {
     try {
@@ -53,25 +60,42 @@ export default function GameStatusPage() {
     }
   };
 
-  const handleUpdateMessage = async (field: 'maintenanceTitle' | 'maintenanceMessage', value: string) => {
-    if (!gameStatus) return;
-    
-    try {
-      setSaving(true);
-      const updatedStatus = {
-        ...gameStatus,
-        [field]: value,
-        lastUpdated: new Date(),
-      };
-      await setGameStatus(updatedStatus);
-      setGameStatusState(updatedStatus);
-      setMessage('訊息已更新');
-    } catch (error) {
-      console.error('更新訊息失敗:', error);
-      setMessage('更新訊息失敗');
-    } finally {
-      setSaving(false);
-    }
+  // 防抖動存檔函數
+  const debouncedSave = (() => {
+    let timeoutId: NodeJS.Timeout;
+    return (field: 'maintenanceTitle' | 'maintenanceMessage', value: string) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(async () => {
+        if (!gameStatus) return;
+        
+        try {
+          setSaving(true);
+          const updatedStatus = {
+            ...gameStatus,
+            [field]: value,
+            lastUpdated: new Date(),
+          };
+          await setGameStatus(updatedStatus);
+          setGameStatusState(updatedStatus);
+          setMessage('訊息已更新');
+        } catch (error) {
+          console.error('更新訊息失敗:', error);
+          setMessage('更新訊息失敗');
+        } finally {
+          setSaving(false);
+        }
+      }, 1000); // 1秒後存檔
+    };
+  })();
+
+  const handleTitleChange = (value: string) => {
+    setTempTitle(value);
+    debouncedSave('maintenanceTitle', value);
+  };
+
+  const handleMessageChange = (value: string) => {
+    setTempMessage(value);
+    debouncedSave('maintenanceMessage', value);
   };
 
   if (loading) {
@@ -150,8 +174,8 @@ export default function GameStatusPage() {
                     </label>
                     <input
                       type="text"
-                      value={gameStatus.maintenanceTitle}
-                      onChange={(e) => handleUpdateMessage('maintenanceTitle', e.target.value)}
+                      value={tempTitle}
+                      onChange={(e) => handleTitleChange(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="例如：🎠 遊樂園休息日 🎠"
                     />
@@ -161,8 +185,8 @@ export default function GameStatusPage() {
                       休息日訊息
                     </label>
                     <textarea
-                      value={gameStatus.maintenanceMessage}
-                      onChange={(e) => handleUpdateMessage('maintenanceMessage', e.target.value)}
+                      value={tempMessage}
+                      onChange={(e) => handleMessageChange(e.target.value)}
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="例如：今日為遊樂園休息日，請明天再來！"
@@ -177,10 +201,10 @@ export default function GameStatusPage() {
                 <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-6">
                   <div className="text-center">
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                      {gameStatus.maintenanceTitle}
+                      {tempTitle}
                     </h3>
                     <p className="text-lg text-gray-600">
-                      {gameStatus.maintenanceMessage}
+                      {tempMessage}
                     </p>
                   </div>
                 </div>
