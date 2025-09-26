@@ -229,31 +229,6 @@ export default function GamesPage() {
             </p>
           </div>
 
-          {/* 休息日內容 */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
-            <div className="text-center">
-              <div className="mb-6">
-                <Image
-                  src="/images/custom-icon.png"
-                  alt="遊樂園圖示"
-                  width={128}
-                  height={128}
-                  className="mx-auto"
-                />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                遊樂園暫時休息
-              </h2>
-              <p className="text-lg text-gray-600 mb-6">
-                我們正在進行維護，請稍後再來遊玩！
-              </p>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-800">
-                  {gameStatus.maintenanceHint}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     );
