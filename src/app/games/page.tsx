@@ -221,22 +221,8 @@ export default function GamesPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
           {/* 休息日標題 */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold text-red-900 mb-4 drop-shadow-lg flex items-center justify-center gap-4">
-              <Image
-                src="/images/custom-icon-small.png"
-                alt="遊樂園圖示"
-                width={32}
-                height={32}
-                className="flex-shrink-0"
-              />
-              <span>{gameStatus.maintenanceTitle.replace(/🎠/g, '').trim()}</span>
-              <Image
-                src="/images/custom-icon-small.png"
-                alt="遊樂園圖示"
-                width={32}
-                height={32}
-                className="flex-shrink-0"
-              />
+            <h1 className="text-4xl md:text-6xl font-bold text-red-900 mb-4 drop-shadow-lg">
+              {gameStatus.maintenanceTitle.replace(/🎠/g, '').trim()}
             </h1>
             <p className="text-xl md:text-2xl text-red-800 drop-shadow-md">
               {gameStatus.maintenanceMessage}
@@ -291,15 +277,7 @@ export default function GamesPage() {
         {/* 頁面標題 */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <div className="flex items-center justify-center gap-2">
-              <span>324遊樂園</span>
-              <Image
-                src="/images/custom-icon-small.png"
-                alt="遊樂園圖示"
-                width={24}
-                height={24}
-              />
-            </div>
+            324遊樂園
           </h1>
           <p className="text-lg text-gray-800">
             每天一次機會，玩遊戲領回饋金！
