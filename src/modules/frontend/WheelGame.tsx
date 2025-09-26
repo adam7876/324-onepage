@@ -13,6 +13,7 @@ interface WheelGameProps {
 
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
 
   // 固定轉盤配置 - 8格，交替成功失敗
   const sections = [
@@ -75,8 +76,9 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     // 設置 CSS 變數
     document.documentElement.style.setProperty('--final-rotation', `${finalAngle}deg`);
     
-    // 7 秒後停止 - 與 CSS 動畫完全同步
+    // 7 秒後動畫完成 - 與 CSS 動畫完全同步
     setTimeout(() => {
+      setAnimationComplete(true);
       setIsSpinning(false);
       
       // 使用預先計算的結果
@@ -132,7 +134,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             
             {/* 旋轉指針 - 從中心向外 */}
             <div 
-              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : 'pointer-stopped'}`}
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : animationComplete ? 'pointer-finished' : ''}`}
               style={{
                 transformOrigin: 'center center'
               }}
@@ -193,9 +195,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           animation-iteration-count: 1;
         }
         
-        .pointer-stopped {
-          /* 保持動畫結束時的位置，不額外轉動 */
+        .pointer-finished {
+          /* 動畫完成後，保持最終位置，不額外轉動 */
           animation: none;
+          transform: translate(-50%, -50%) rotate(var(--final-rotation, 0deg));
         }
         
         @keyframes spin {
