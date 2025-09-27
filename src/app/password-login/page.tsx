@@ -11,21 +11,8 @@ export default function PasswordLoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isPWA, setIsPWA] = useState(false);
   const router = useRouter();
 
-  // 檢查是否為 PWA
-  useEffect(() => {
-    const checkPWA = () => {
-      const isStandalone = (window.navigator as Navigator & { standalone?: boolean }).standalone;
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator as any).standalone;
-      
-      return isStandalone || (isIOS && isInStandaloneMode);
-    };
-
-    setIsPWA(checkPWA());
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

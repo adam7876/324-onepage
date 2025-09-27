@@ -2,7 +2,7 @@
  * 個別遊戲開關服務
  */
 
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/firestore';
 
 // 遊戲開關狀態介面

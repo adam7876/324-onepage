@@ -28,7 +28,6 @@ export default function GamesPage() {
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [gameSwitchConfig, setGameSwitchConfig] = useState<GameSwitchConfig | null>(null);
-  const [passwordVerified, setPasswordVerified] = useState(false);
 
   // 載入遊戲狀態和密碼驗證
   useEffect(() => {
@@ -36,7 +35,6 @@ export default function GamesPage() {
       try {
         // 檢查密碼驗證狀態
         const isPasswordVerified = sessionStorage.getItem('gamePasswordVerified') === 'true';
-        setPasswordVerified(isPasswordVerified);
         
         if (!isPasswordVerified) {
           // 如果沒有密碼驗證，跳轉到密碼登入頁面
