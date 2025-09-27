@@ -7,6 +7,7 @@ import { db } from '../../firebase/firestore';
 import { GAME_CONFIG } from '../../lib/game-config';
 import { isValidEmail } from '../../lib/game-utils';
 import { getGameStatus, GameStatus } from '../../lib/game-status-service';
+import { getGameSwitchConfig, GameSwitchConfig } from '../../lib/game-switch-service';
 
 interface GameRewardConfig {
   type: 'coupon' | 'discount';
@@ -26,16 +27,34 @@ export default function GamesPage() {
   const [isPWA, setIsPWA] = useState(false);
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
+  const [gameSwitchConfig, setGameSwitchConfig] = useState<GameSwitchConfig | null>(null);
+  const [passwordVerified, setPasswordVerified] = useState(false);
 
-  // 載入遊戲狀態
+  // 載入遊戲狀態和密碼驗證
   useEffect(() => {
-    const loadGameStatus = async () => {
+    const loadGameData = async () => {
       try {
+        // 檢查密碼驗證狀態
+        const isPasswordVerified = sessionStorage.getItem('gamePasswordVerified') === 'true';
+        setPasswordVerified(isPasswordVerified);
+        
+        if (!isPasswordVerified) {
+          // 如果沒有密碼驗證，跳轉到密碼登入頁面
+          window.location.href = '/password-login';
+          return;
+        }
+
+        // 載入遊戲狀態
         const status = await getGameStatus();
         setGameStatus(status);
         console.log('遊戲狀態載入成功:', status);
+
+        // 載入遊戲開關設定
+        const switchConfig = await getGameSwitchConfig();
+        setGameSwitchConfig(switchConfig);
+        console.log('遊戲開關設定載入成功:', switchConfig);
       } catch (error) {
-        console.error('載入遊戲狀態失敗:', error);
+        console.error('載入遊戲數據失敗:', error);
         // 使用預設狀態
         setGameStatus({
           isOpen: true,
@@ -44,12 +63,18 @@ export default function GamesPage() {
           maintenanceHint: '💡 提示：請下次再來遊玩，每次都有新的機會！',
           lastUpdated: new Date(),
         });
+        setGameSwitchConfig({
+          wheel: false,
+          rockPaperScissors: true,
+          dice: true,
+          lastUpdated: new Date(),
+        });
       } finally {
         setLoadingStatus(false);
       }
     };
 
-    loadGameStatus();
+    loadGameData();
   }, []);
 
   // 載入獎品配置
@@ -339,45 +364,68 @@ export default function GamesPage() {
               選擇您想玩的遊戲
             </h2>
             <div className={`grid gap-6 ${isPWA ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
-              {GAME_CONFIG.games.filter(game => game.enabled).map((game) => (
-                <div
-                  key={game.id}
-                  onClick={() => handleGameSelect(game.id)}
-                  className="relative bg-white/95 backdrop-blur-sm rounded-xl p-6 cursor-pointer hover:shadow-xl transform hover:scale-105 transition-all overflow-hidden group"
-                >
-                  {/* 遊戲圖標 */}
-                  <div className="flex justify-center mb-4">
-                    <div className="relative w-16 h-16">
-                      <Image
-                        src={game.icon}
-                        alt={game.name}
-                        fill
-                        className="object-contain"
-                        onError={(e) => {
-                          // 如果圖片載入失敗，顯示emoji
-                          e.currentTarget.style.display = 'none';
-                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                          if (fallback) {
-                            fallback.style.display = 'block';
-                          }
-                        }}
-                      />
-                      <div 
-                        className="text-4xl text-center w-full h-full flex items-center justify-center hidden"
-                        style={{ display: 'none' }}
-                      >
-                        {game.emoji}
+              {GAME_CONFIG.games.filter(game => game.enabled).map((game) => {
+                // 檢查遊戲是否開啟
+                const isGameOpen = gameSwitchConfig ? 
+                  (game.id === 'wheel' ? gameSwitchConfig.wheel :
+                   game.id === 'rock-paper-scissors' ? gameSwitchConfig.rockPaperScissors :
+                   game.id === 'dice-battle' ? gameSwitchConfig.dice : true) : true;
+
+                return (
+                  <div
+                    key={game.id}
+                    onClick={() => isGameOpen ? handleGameSelect(game.id) : null}
+                    className={`relative bg-white/95 backdrop-blur-sm rounded-xl p-6 transition-all overflow-hidden group ${
+                      isGameOpen 
+                        ? 'cursor-pointer hover:shadow-xl transform hover:scale-105' 
+                        : 'cursor-not-allowed opacity-60'
+                    }`}
+                  >
+                    {/* 遊戲圖標 */}
+                    <div className="flex justify-center mb-4">
+                      <div className="relative w-16 h-16">
+                        <Image
+                          src={game.icon}
+                          alt={game.name}
+                          fill
+                          className="object-contain"
+                          onError={(e) => {
+                            // 如果圖片載入失敗，顯示emoji
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fallback) {
+                              fallback.style.display = 'block';
+                            }
+                          }}
+                        />
+                        <div 
+                          className="text-4xl text-center w-full h-full flex items-center justify-center hidden"
+                          style={{ display: 'none' }}
+                        >
+                          {game.emoji}
+                        </div>
                       </div>
                     </div>
+                    
+                    <h3 className="text-xl font-bold mb-2 text-center text-gray-800">{game.name}</h3>
+                    <p className="text-center text-gray-600">{game.description}</p>
+                    
+                    {/* 設施維護中標示 */}
+                    {!isGameOpen && (
+                      <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center rounded-xl">
+                        <div className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">
+                          設施維護中
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* 裝飾效果 */}
+                    {isGameOpen && (
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+                    )}
                   </div>
-                  
-                  <h3 className="text-xl font-bold mb-2 text-center text-gray-800">{game.name}</h3>
-                  <p className="text-center text-gray-600">{game.description}</p>
-                  
-                  {/* 裝飾效果 */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

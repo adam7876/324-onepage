@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../../../firebase/firebaseConfig';
 import { getGameStatus, setGameStatus, toggleGameStatus, GameStatus } from '../../../lib/game-status-service';
+import { getPasswordConfig, updatePassword, PasswordConfig } from '../../../lib/password-service';
+import { getGameSwitchConfig, updateGameSwitch, GameSwitchConfig } from '../../../lib/game-switch-service';
 
 export default function GameStatusPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -15,22 +17,34 @@ export default function GameStatusPage() {
   const [tempMessage, setTempMessage] = useState('');
   const [tempHint, setTempHint] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [passwordConfig, setPasswordConfig] = useState<PasswordConfig | null>(null);
+  const [gameSwitchConfig, setGameSwitchConfig] = useState<GameSwitchConfig | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordSaving, setPasswordSaving] = useState(false);
 
   // 檢查認證狀態並載入遊戲狀態
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        // 同時載入遊戲狀態
+        // 同時載入所有設定
         try {
-          const status = await getGameStatus();
+          const [status, passwordConfig, gameSwitchConfig] = await Promise.all([
+            getGameStatus(),
+            getPasswordConfig(),
+            getGameSwitchConfig()
+          ]);
+          
           setGameStatusState(status);
           setTempTitle(status.maintenanceTitle);
           setTempMessage(status.maintenanceMessage);
           setTempHint(status.maintenanceHint);
+          
+          setPasswordConfig(passwordConfig);
+          setGameSwitchConfig(gameSwitchConfig);
         } catch (error) {
-          console.error('載入遊戲狀態失敗:', error);
-          setMessage('載入遊戲狀態失敗');
+          console.error('載入設定失敗:', error);
+          setMessage('載入設定失敗');
         }
       }
       setLoading(false);
@@ -97,6 +111,52 @@ export default function GameStatusPage() {
     debouncedSave('maintenanceHint', value);
   };
 
+  // 更新密碼
+  const handlePasswordUpdate = async () => {
+    if (!newPassword.trim()) {
+      setMessage('請輸入新密碼');
+      return;
+    }
+
+    setPasswordSaving(true);
+    try {
+      await updatePassword(newPassword);
+      setMessage('密碼更新成功');
+      setNewPassword('');
+      // 重新載入密碼設定
+      const updatedConfig = await getPasswordConfig();
+      setPasswordConfig(updatedConfig);
+    } catch (error) {
+      console.error('更新密碼失敗:', error);
+      setMessage('密碼更新失敗');
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
+
+  // 更新遊戲開關
+  const handleGameSwitchToggle = async (gameType: keyof Omit<GameSwitchConfig, 'lastUpdated'>) => {
+    if (!gameSwitchConfig) return;
+
+    try {
+      const newValue = !gameSwitchConfig[gameType];
+      await updateGameSwitch(gameType, newValue);
+      
+      // 更新本地狀態
+      setGameSwitchConfig({
+        ...gameSwitchConfig,
+        [gameType]: newValue,
+        lastUpdated: new Date(),
+      });
+      
+      setMessage(`${gameType === 'wheel' ? '幸運轉盤' : 
+                   gameType === 'rockPaperScissors' ? '猜拳遊戲' : '骰子遊戲'} ${newValue ? '已開啟' : '已關閉'}`);
+    } catch (error) {
+      console.error('更新遊戲開關失敗:', error);
+      setMessage('更新遊戲開關失敗');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -160,6 +220,110 @@ export default function GameStatusPage() {
                   >
                     {saving ? '處理中...' : isEditing ? '編輯中...' : gameStatus.isOpen ? '關閉遊戲' : '開啟遊戲'}
                   </button>
+                </div>
+              </div>
+
+              {/* 密碼管理 */}
+              <div className="bg-blue-50 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">🔐 密碼管理</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      目前密碼
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={passwordConfig?.password || ''}
+                        readOnly
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                      />
+                      <span className="text-sm text-gray-500">
+                        最後更新：{passwordConfig?.lastUpdated.toLocaleString('zh-TW')}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      新密碼
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="輸入新密碼"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <button
+                        onClick={handlePasswordUpdate}
+                        disabled={passwordSaving || !newPassword.trim()}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {passwordSaving ? '更新中...' : '更新密碼'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 個別遊戲開關 */}
+              <div className="bg-green-50 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">🎮 個別遊戲開關</h2>
+                <div className="space-y-4">
+                  {/* 幸運轉盤 */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg">
+                    <div>
+                      <h3 className="font-semibold text-gray-800">🎡 幸運轉盤</h3>
+                      <p className="text-sm text-gray-600">轉動轉盤，停在綠色區域就能獲得獎品</p>
+                    </div>
+                    <button
+                      onClick={() => handleGameSwitchToggle('wheel')}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        gameSwitchConfig?.wheel
+                          ? 'bg-red-500 hover:bg-red-600 text-white'
+                          : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
+                    >
+                      {gameSwitchConfig?.wheel ? '關閉' : '開啟'}
+                    </button>
+                  </div>
+
+                  {/* 猜拳遊戲 */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg">
+                    <div>
+                      <h3 className="font-semibold text-gray-800">✂️ 猜拳遊戲</h3>
+                      <p className="text-sm text-gray-600">與電腦猜拳，贏了拿獎品</p>
+                    </div>
+                    <button
+                      onClick={() => handleGameSwitchToggle('rockPaperScissors')}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        gameSwitchConfig?.rockPaperScissors
+                          ? 'bg-red-500 hover:bg-red-600 text-white'
+                          : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
+                    >
+                      {gameSwitchConfig?.rockPaperScissors ? '關閉' : '開啟'}
+                    </button>
+                  </div>
+
+                  {/* 骰子遊戲 */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg">
+                    <div>
+                      <h3 className="font-semibold text-gray-800">🎲 骰子遊戲</h3>
+                      <p className="text-sm text-gray-600">擲骰子比大小，點數大就贏</p>
+                    </div>
+                    <button
+                      onClick={() => handleGameSwitchToggle('dice')}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        gameSwitchConfig?.dice
+                          ? 'bg-red-500 hover:bg-red-600 text-white'
+                          : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
+                    >
+                      {gameSwitchConfig?.dice ? '關閉' : '開啟'}
+                    </button>
+                  </div>
                 </div>
               </div>
 
