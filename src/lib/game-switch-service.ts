@@ -71,13 +71,16 @@ export async function setGameSwitchConfig(config: GameSwitchConfig): Promise<voi
  */
 export async function updateGameSwitch(gameType: keyof Omit<GameSwitchConfig, 'lastUpdated'>, isOpen: boolean): Promise<void> {
   try {
+    console.log('開始更新遊戲開關:', gameType, isOpen);
     const currentConfig = await getGameSwitchConfig();
     const newConfig = {
       ...currentConfig,
       [gameType]: isOpen,
       lastUpdated: new Date(),
     };
+    console.log('新的遊戲開關配置:', newConfig);
     await setGameSwitchConfig(newConfig);
+    console.log('遊戲開關更新成功');
   } catch (error) {
     console.error('更新遊戲開關失敗:', error);
     throw error;

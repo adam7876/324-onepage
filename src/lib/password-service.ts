@@ -63,11 +63,13 @@ export async function setPasswordConfig(config: PasswordConfig): Promise<void> {
  */
 export async function updatePassword(newPassword: string): Promise<void> {
   try {
+    console.log('開始更新密碼:', newPassword);
     const docRef = doc(db, 'gameSettings', 'password');
     await updateDoc(docRef, {
       password: newPassword,
       lastUpdated: new Date(),
     });
+    console.log('密碼更新成功');
   } catch (error) {
     console.error('更新密碼失敗:', error);
     throw error;
@@ -79,8 +81,12 @@ export async function updatePassword(newPassword: string): Promise<void> {
  */
 export async function verifyPassword(inputPassword: string): Promise<boolean> {
   try {
+    console.log('開始驗證密碼:', inputPassword);
     const config = await getPasswordConfig();
-    return config.password === inputPassword;
+    console.log('從資料庫獲取的密碼:', config.password);
+    const isValid = config.password === inputPassword;
+    console.log('密碼驗證結果:', isValid);
+    return isValid;
   } catch (error) {
     console.error('驗證密碼失敗:', error);
     return false;

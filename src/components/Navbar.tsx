@@ -24,7 +24,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="hover:text-gray-500 cursor-pointer">
-              <Link href="/games" className={`flex items-center gap-1 ${pathname === "/games" ? "text-purple-600 font-semibold" : ""}`}>
+              <Link href="/password-login" className={`flex items-center gap-1 ${pathname === "/games" || pathname === "/password-login" ? "text-purple-600 font-semibold" : ""}`}>
                 🎮 遊戲
               </Link>
             </li>

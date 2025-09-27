@@ -38,9 +38,12 @@ export default function GamesPage() {
         
         if (!isPasswordVerified) {
           // 如果沒有密碼驗證，跳轉到密碼登入頁面
-          window.location.href = '/password-login';
+          console.log('未通過密碼驗證，跳轉到登入頁面');
+          window.location.replace('/password-login');
           return;
         }
+        
+        console.log('密碼驗證通過，載入遊戲數據');
 
         // 載入遊戲狀態
         const status = await getGameStatus();
