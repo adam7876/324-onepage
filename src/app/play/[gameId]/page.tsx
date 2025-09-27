@@ -173,10 +173,22 @@ export default function PlayGamePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-gray-900 drop-shadow-lg">
-          <div className="text-4xl mb-4">🎮</div>
-          <div className="text-xl">載入遊戲中...</div>
+      <div 
+        className="min-h-screen relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          minHeight: '100dvh'
+        }}
+      >
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center text-gray-900 drop-shadow-lg">
+            <div className="text-4xl mb-4">🎮</div>
+            <div className="text-xl">載入遊戲中...</div>
+          </div>
         </div>
       </div>
     );
@@ -184,12 +196,24 @@ export default function PlayGamePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-red-900 drop-shadow-lg">
-          <div className="text-4xl mb-4">❌</div>
-          <div className="text-xl mb-4">{error}</div>
-          <div className="text-sm">
-            請返回遊戲中心重新開始
+      <div 
+        className="min-h-screen relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          minHeight: '100dvh'
+        }}
+      >
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center text-red-900 drop-shadow-lg">
+            <div className="text-4xl mb-4">❌</div>
+            <div className="text-xl mb-4">{error}</div>
+            <div className="text-sm">
+              請返回遊戲中心重新開始
+            </div>
           </div>
         </div>
       </div>
@@ -207,8 +231,19 @@ export default function PlayGamePage() {
     });
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="p-8 max-w-md w-full text-center">
+      <div 
+        className="min-h-screen relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          minHeight: '100dvh'
+        }}
+      >
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+          <div className="p-8 max-w-md w-full text-center">
           {gameResult.result === 'win' ? (
             <div>
               <div className="text-6xl mb-4">🎉</div>
@@ -261,17 +296,26 @@ export default function PlayGamePage() {
           <p className="text-xs text-gray-500 mt-4">
             遊戲結束，可以關閉此視窗了
           </p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      {/* 遊戲標題 - 已移除，讓遊戲組件自己處理 */}
-
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+        backgroundSize: '100% 100%',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+        minHeight: '100dvh'
+      }}
+    >
       {/* 遊戲內容 */}
-      <div className="container mx-auto px-4">
+      <div className="relative z-10 container mx-auto px-4">
         {renderGame()}
       </div>
     </div>
