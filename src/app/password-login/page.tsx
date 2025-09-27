@@ -50,7 +50,6 @@ export default function PasswordLoginPage() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
-        minHeight: '100vh',
         minHeight: '100dvh'
       }}
     >
