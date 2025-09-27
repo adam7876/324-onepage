@@ -1,13 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   // 判斷是否為商品詳情頁
   const isProductDetail = /^\/product\//.test(pathname);
+
+  // 處理遊戲連結點擊
+  const handleGameClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // 檢查密碼驗證狀態
+    const isPasswordVerified = sessionStorage.getItem('gamePasswordVerified') === 'true';
+    
+    if (!isPasswordVerified) {
+      // 如果沒有密碼驗證，直接跳轉到密碼登入頁面
+      router.push('/password-login');
+    } else {
+      // 如果已驗證，跳轉到遊戲頁面
+      router.push('/games');
+    }
+  };
 
   return (
     <nav className="w-full flex items-center justify-between py-4 px-8 border-b bg-white">
@@ -24,9 +41,12 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="hover:text-gray-500 cursor-pointer">
-              <Link href="/games" className={`flex items-center gap-1 ${pathname === "/games" || pathname === "/password-login" ? "text-purple-600 font-semibold" : ""}`}>
+              <button 
+                onClick={handleGameClick}
+                className={`flex items-center gap-1 ${pathname === "/games" || pathname === "/password-login" ? "text-purple-600 font-semibold" : ""}`}
+              >
                 🎮 遊戲
-              </Link>
+              </button>
             </li>
             <li className="hover:text-gray-500 cursor-pointer">
               <Link href="/cart" className={pathname === "/cart" ? "text-purple-600 font-semibold" : ""}>

@@ -226,8 +226,18 @@ export default function GamesPage() {
   // 載入中
   if (loadingStatus) {
     return (
-      <div className="min-h-screen relative py-12 pb-32 flex items-center justify-center" style={{ minHeight: '100dvh' }}>
-        <div className="text-center">
+      <div 
+        className="min-h-screen relative py-12 pb-32 flex items-center justify-center"
+        style={{
+          backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          minHeight: '100dvh'
+        }}
+      >
+        <div className="relative z-10 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-lg text-gray-600">載入中...</p>
         </div>
@@ -238,17 +248,17 @@ export default function GamesPage() {
   // 遊戲關閉時顯示休息日頁面
   if (gameStatus && !gameStatus.isOpen) {
     return (
-      <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100dvh' }}>
-        {/* 背景圖片 */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/backgrounds/games-bg.jpg"
-            alt="遊戲背景"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
+      <div 
+        className="min-h-screen relative py-12 pb-32"
+        style={{
+          backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          minHeight: '100dvh'
+        }}
+      >
         
         <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
           {/* 休息日標題 */}
@@ -289,18 +299,17 @@ export default function GamesPage() {
   }
 
   return (
-    <div className="min-h-screen relative py-12 pb-32" style={{ minHeight: '100dvh' }}>
-      {/* 背景圖片 */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/backgrounds/games-bg.jpg"
-          alt="遊戲背景"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* 移除背景遮罩，保持原圖色彩 */}
-      </div>
+    <div 
+      className="min-h-screen relative py-12 pb-32"
+      style={{
+        backgroundImage: 'url(/images/backgrounds/games-bg.jpg)',
+        backgroundSize: '100% 100%',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+        minHeight: '100dvh'
+      }}
+    >
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 pt-8">
         {/* 頁面標題 */}
