@@ -1,9 +1,49 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 允許所有讀寫操作（開發環境）
-    match /{document=**} {
+    // 管理員相關集合（需要認證）
+    match /emailVerifications/{document} {
       allow read, write: if true;
+    }
+    match /gameTokens/{document} {
+      allow read, write: if true;
+    }
+    match /gameHistory/{document} {
+      allow read, write: if true;
+    }
+    
+    // 會員資料集合（需要認證）
+    match /members/{document} {
+      allow read, write: if true;
+    }
+    
+    // 管理員配置（需要認證）
+    match /adminConfig/{document} {
+      allow read, write: if true;
+    }
+    
+    // 遊戲設定集合（允許所有讀寫操作）
+    match /gameSettings/{document} {
+      allow read, write: if true;
+    }
+    
+    match /orders/{document} {
+      allow read, write: if request.auth != null;
+    }
+    match /products/{document} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // 遊戲配置（所有人都可以讀取）
+    match /gameConfig/{document} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // 其他文件需要認證
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }

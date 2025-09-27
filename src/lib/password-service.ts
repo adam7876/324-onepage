@@ -22,22 +22,29 @@ const DEFAULT_PASSWORD_CONFIG: PasswordConfig = {
  */
 export async function getPasswordConfig(): Promise<PasswordConfig> {
   try {
+    console.log('開始獲取密碼設定...');
     const docRef = doc(db, 'gameSettings', 'password');
+    console.log('文檔引用:', docRef.path);
+    
     const docSnap = await getDoc(docRef);
+    console.log('文檔存在:', docSnap.exists());
     
     if (docSnap.exists()) {
       const data = docSnap.data();
+      console.log('文檔數據:', data);
       return {
         password: data.password,
         lastUpdated: data.lastUpdated.toDate(),
       };
     } else {
+      console.log('文檔不存在，創建默認配置');
       // 如果不存在，創建預設設定
       await setPasswordConfig(DEFAULT_PASSWORD_CONFIG);
       return DEFAULT_PASSWORD_CONFIG;
     }
   } catch (error) {
     console.error('獲取密碼設定失敗:', error);
+    console.error('錯誤詳情:', error);
     return DEFAULT_PASSWORD_CONFIG;
   }
 }
