@@ -33,29 +33,28 @@ export default function GamesPage() {
   useEffect(() => {
     const loadGameData = async () => {
       try {
-        // 先檢查密碼驗證狀態（同步檢查，不等待）
-        const isPasswordVerified = sessionStorage.getItem('gamePasswordVerified') === 'true';
-        
-        // 如果沒有密碼驗證，立即跳轉（不等待其他載入）
-        if (!isPasswordVerified) {
-          console.log('未通過密碼驗證，立即跳轉到登入頁面');
-          window.location.replace('/password-login');
-          return;
-        }
-        
-        console.log('密碼驗證通過，載入遊戲數據');
-        
-        // 載入遊戲狀態
+        // 先載入遊戲狀態
         const status = await getGameStatus();
         setGameStatus(status);
         console.log('遊戲狀態載入成功:', status);
         
-        // 如果遊戲關閉，直接顯示休息頁面
+        // 如果遊戲關閉，直接顯示休息頁面，不需要密碼驗證
         if (!status.isOpen) {
           console.log('遊戲關閉，顯示休息頁面');
           setLoadingStatus(false);
           return;
         }
+        
+        // 如果遊戲開啟，才檢查密碼驗證
+        const isPasswordVerified = sessionStorage.getItem('gamePasswordVerified') === 'true';
+        
+        if (!isPasswordVerified) {
+          console.log('未通過密碼驗證，跳轉到登入頁面');
+          window.location.replace('/password-login');
+          return;
+        }
+        
+        console.log('密碼驗證通過，載入遊戲數據');
 
         // 載入遊戲開關設定
         const switchConfig = await getGameSwitchConfig();

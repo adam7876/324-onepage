@@ -150,16 +150,6 @@ export default function RockPaperScissorsGame({ token, onComplete }: RockPaperSc
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4">
-      {/* 響應式背景圖片 */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/backgrounds/rps-bg.jpg"
-          alt="猜拳遊戲背景"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-      </div>
       <div className="relative z-10 p-8 max-w-md w-full text-center">
         <div className="flex flex-col items-center mb-8">
           <Image
