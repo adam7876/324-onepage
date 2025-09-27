@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { verifyPassword } from '../../lib/password-service';
 import { Button } from '../../components/ui/button';
