@@ -42,7 +42,15 @@ export default function PasswordLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 relative overflow-hidden">
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(/images/backgrounds/password-login-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* 背景裝飾 */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 text-6xl">🎠</div>
@@ -98,12 +106,6 @@ export default function PasswordLoginPage() {
             </form>
           </Card>
 
-          {/* 提示文字 */}
-          <div className="text-center mt-6">
-            <p className="text-sm text-gray-500">
-              需要密碼才能進入遊樂園遊玩
-            </p>
-          </div>
         </div>
       </div>
     </div>
