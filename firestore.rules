@@ -1,30 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 允許讀取所有文檔
+    // 允許所有讀寫操作（開發環境）
     match /{document=**} {
-      allow read: if true;
-    }
-    
-    // 允許寫入特定集合
-    match /gameSettings/{document} {
-      allow write: if true;
-    }
-    
-    match /gameHistory/{document} {
-      allow write: if true;
-    }
-    
-    match /gameTokens/{document} {
-      allow write: if true;
-    }
-    
-    match /members/{document} {
-      allow write: if true;
-    }
-    
-    match /emailVerifications/{document} {
-      allow write: if true;
+      allow read, write: if true;
     }
   }
 }

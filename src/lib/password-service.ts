@@ -65,13 +65,27 @@ export async function updatePassword(newPassword: string): Promise<void> {
   try {
     console.log('開始更新密碼:', newPassword);
     const docRef = doc(db, 'gameSettings', 'password');
-    await updateDoc(docRef, {
-      password: newPassword,
-      lastUpdated: new Date(),
-    });
-    console.log('密碼更新成功');
+    
+    // 先檢查文檔是否存在
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      // 文檔存在，使用 updateDoc
+      await updateDoc(docRef, {
+        password: newPassword,
+        lastUpdated: new Date(),
+      });
+      console.log('密碼更新成功 (updateDoc)');
+    } else {
+      // 文檔不存在，使用 setDoc
+      await setDoc(docRef, {
+        password: newPassword,
+        lastUpdated: new Date(),
+      });
+      console.log('密碼更新成功 (setDoc)');
+    }
   } catch (error) {
     console.error('更新密碼失敗:', error);
+    console.error('錯誤詳情:', error);
     throw error;
   }
 }

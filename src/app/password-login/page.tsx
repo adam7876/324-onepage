@@ -46,7 +46,7 @@ export default function PasswordLoginPage() {
       className="min-h-screen relative overflow-hidden"
       style={{
         backgroundImage: 'url(/images/backgrounds/password-login-bg.jpg)',
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}

@@ -79,10 +79,14 @@ export async function updateGameSwitch(gameType: keyof Omit<GameSwitchConfig, 'l
       lastUpdated: new Date(),
     };
     console.log('新的遊戲開關配置:', newConfig);
-    await setGameSwitchConfig(newConfig);
+    
+    // 使用 setDoc 而不是 setGameSwitchConfig 來確保更新
+    const docRef = doc(db, 'gameSettings', 'gameSwitch');
+    await setDoc(docRef, newConfig);
     console.log('遊戲開關更新成功');
   } catch (error) {
     console.error('更新遊戲開關失敗:', error);
+    console.error('錯誤詳情:', error);
     throw error;
   }
 }
