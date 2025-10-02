@@ -15,6 +15,9 @@ interface SyncResult {
   updated: number;
   error?: string;
   details: string[];
+  batches?: number;
+  batchSize?: number;
+  message?: string;
 }
 
 // 從 Google Sheets 獲取數據
