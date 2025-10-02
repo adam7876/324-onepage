@@ -20,23 +20,54 @@ interface SyncResult {
 // 從 Google Sheets 獲取數據
 async function fetchGoogleSheetsData(sheetsUrl: string): Promise<SheetsMember[]> {
   try {
-    // 將 Google Sheets 網址轉換為 CSV 格式
-    const csvUrl = sheetsUrl
-      .replace('/edit#gid=', '/export?format=csv&gid=')
-      .replace('/edit', '/export?format=csv');
+    // 處理不同的 Google Sheets 網址格式
+    let csvUrl = sheetsUrl;
     
-    console.log('📊 正在從 Google Sheets 獲取數據:', csvUrl);
+    // 如果是編輯模式，轉換為導出模式
+    if (sheetsUrl.includes('/edit')) {
+      csvUrl = sheetsUrl.replace('/edit', '/export?format=csv');
+    } else if (sheetsUrl.includes('/edit#gid=')) {
+      // 處理帶有 gid 的網址
+      const gidMatch = sheetsUrl.match(/\/edit#gid=(\d+)/);
+      if (gidMatch) {
+        const gid = gidMatch[1];
+        csvUrl = sheetsUrl.replace('/edit#gid=' + gid, `/export?format=csv&gid=${gid}`);
+      } else {
+        csvUrl = sheetsUrl.replace('/edit', '/export?format=csv');
+      }
+    } else if (!sheetsUrl.includes('/export')) {
+      // 如果沒有 export 參數，添加
+      csvUrl = sheetsUrl + (sheetsUrl.includes('?') ? '&' : '?') + 'format=csv';
+    }
     
-    const response = await fetch(csvUrl);
+    console.log('📊 原始網址:', sheetsUrl);
+    console.log('📊 轉換後網址:', csvUrl);
+    
+    const response = await fetch(csvUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.error('❌ HTTP 錯誤:', response.status, response.statusText);
+      throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
     }
     
     const csvText = await response.text();
     console.log('📄 CSV 數據長度:', csvText.length);
+    console.log('📄 CSV 前100字符:', csvText.substring(0, 100));
+    
+    // 檢查是否為 HTML 錯誤頁面
+    if (csvText.includes('<html') || csvText.includes('<!DOCTYPE')) {
+      console.error('❌ 收到 HTML 響應，可能是權限問題');
+      throw new Error('無法訪問 Google Sheets，請確認權限設定為「知道連結的任何人都可以檢視」');
+    }
     
     // 解析 CSV 數據
     const lines = csvText.split('\n').filter(line => line.trim());
+    console.log('📊 解析到行數:', lines.length);
+    
     if (lines.length < 2) {
       throw new Error('CSV 數據不足，至少需要標題行和一行數據');
     }
@@ -211,6 +242,7 @@ export async function POST(request: NextRequest) {
     }
     
     console.log('🔄 開始同步 Google Sheets 數據...');
+    console.log('📊 輸入網址:', sheetsUrl);
     
     // 獲取 Google Sheets 數據
     const sheetsMembers = await fetchGoogleSheetsData(sheetsUrl);

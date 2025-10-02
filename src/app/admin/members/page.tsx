@@ -161,6 +161,36 @@ export default function MembersPage() {
     }
   };
 
+  // 測試 Google Sheets 網址
+  const testSheetsUrl = async () => {
+    if (!sheetsUrl.trim()) {
+      setMessage('請輸入 Google Sheets 網址');
+      return;
+    }
+
+    try {
+      setMessage('正在測試網址...');
+      
+      // 直接測試網址是否可訪問
+      const testUrl = sheetsUrl.trim().replace('/edit', '/export?format=csv');
+      const response = await fetch(testUrl);
+      
+      if (response.ok) {
+        const text = await response.text();
+        if (text.includes('<html') || text.includes('<!DOCTYPE')) {
+          setMessage('❌ 網址無法訪問，請確認 Google Sheets 權限設定為「知道連結的任何人都可以檢視」');
+        } else {
+          setMessage('✅ 網址測試成功，可以進行同步');
+        }
+      } else {
+        setMessage(`❌ 網址測試失敗：HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('測試失敗:', error);
+      setMessage('❌ 網址測試失敗，請檢查網址格式');
+    }
+  };
+
   // 從 Google Sheets 同步數據
   const syncFromGoogleSheets = async () => {
     if (!sheetsUrl.trim()) {
@@ -258,6 +288,13 @@ export default function MembersPage() {
               </p>
             </div>
             <div className="flex space-x-4">
+              <Button
+                onClick={testSheetsUrl}
+                disabled={!sheetsUrl.trim()}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                🧪 測試網址
+              </Button>
               <Button
                 onClick={syncFromGoogleSheets}
                 disabled={syncingFromSheets || !sheetsUrl.trim()}
