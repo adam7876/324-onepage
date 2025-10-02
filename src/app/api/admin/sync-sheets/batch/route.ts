@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, setDoc, collection, getDocs, query, where, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../../firebase/firestore';
 
 interface SheetsMember {
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    let added = 0; let updated = 0;
+    const added = 0; let updated = 0;
 
     for (const m of slice) {
       const email = normalizeEmail(m.email);

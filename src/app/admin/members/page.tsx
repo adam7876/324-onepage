@@ -313,6 +313,13 @@ export default function MembersPage() {
               >
                 🧪 測試網址
               </Button>
+              <Input
+                placeholder="起始資料列（可留空，例：1001）"
+                type="number"
+                value={startRow}
+                onChange={(e) => setStartRow(e.target.value ? Number(e.target.value) : '')}
+                className="w-56"
+              />
               <Button
                 onClick={syncFromGoogleSheets}
                 disabled={syncingFromSheets}
