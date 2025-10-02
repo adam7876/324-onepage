@@ -95,7 +95,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             value: rewardConfig?.value || 0,
             code: `WHEEL-${Date.now()}`
           } : undefined,
-          message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.description || '回饋金'}！` : '很遺憾，這次沒有中獎。'
+          message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.description || '回饋金'}！` : '這次沒領到獎勵，期待下次更棒的結果 ❤️'
         };
         await onComplete(gameResult);
       }, 2000);

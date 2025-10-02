@@ -269,7 +269,7 @@ export default function DiceBattleGame({ token, onComplete }: DiceBattleGameProp
             {result === 'lose' && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                 <p className="text-red-800">
-                  😔 很遺憾，這次沒有獲得獎品
+                  這次沒領到獎勵，期待下次更棒的結果 ❤️
                 </p>
               </div>
             )}
