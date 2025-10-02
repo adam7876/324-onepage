@@ -52,7 +52,17 @@ async function fetchGoogleSheetsData(sheetsUrl: string): Promise<SheetsMember[]>
     
     if (!response.ok) {
       console.error('❌ HTTP 錯誤:', response.status, response.statusText);
-      throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+      console.error('❌ 請求網址:', csvUrl);
+      
+      if (response.status === 403) {
+        throw new Error('權限不足，請確認 Google Sheets 權限設定為「知道連結的任何人都可以檢視」');
+      } else if (response.status === 404) {
+        throw new Error('找不到 Google Sheets，請確認網址是否正確');
+      } else if (response.status === 400) {
+        throw new Error('請求格式錯誤，請確認 Google Sheets 網址格式');
+      } else {
+        throw new Error(`HTTP 錯誤 ${response.status}: ${response.statusText}`);
+      }
     }
     
     const csvText = await response.text();
@@ -174,10 +184,19 @@ async function syncMembers(sheetsMembers: SheetsMember[]): Promise<SyncResult> {
   try {
     const existingEmails = await getExistingEmails();
     
-    for (const member of sheetsMembers) {
+    const totalMembers = sheetsMembers.length;
+    console.log(`📊 開始處理 ${totalMembers} 個會員數據`);
+    
+    for (let i = 0; i < sheetsMembers.length; i++) {
+      const member = sheetsMembers[i];
       try {
         const email = member.email.toLowerCase();
         const memberId = `member_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // 每處理 50 個會員報告一次進度
+        if (i % 50 === 0) {
+          console.log(`📈 處理進度：${i + 1}/${totalMembers} (${Math.round(((i + 1) / totalMembers) * 100)}%)`);
+        }
         
         if (existingEmails.has(email)) {
           // 更新現有會員
@@ -259,8 +278,16 @@ export async function POST(request: NextRequest) {
     console.log('🔄 開始同步 Google Sheets 數據...');
     console.log('📊 輸入網址:', sheetsUrl);
     
+    // 設定超時處理（10分鐘）
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('同步超時，請重試')), 10 * 60 * 1000);
+    });
+    
     // 獲取 Google Sheets 數據
-    const sheetsMembers = await fetchGoogleSheetsData(sheetsUrl);
+    const sheetsMembers = await Promise.race([
+      fetchGoogleSheetsData(sheetsUrl),
+      timeoutPromise
+    ]) as SheetsMember[];
     
     if (sheetsMembers.length === 0) {
       return NextResponse.json({
