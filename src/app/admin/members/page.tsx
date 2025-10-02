@@ -36,7 +36,7 @@ export default function MembersPage() {
   const [message, setMessage] = useState('');
   const [updatingMember, setUpdatingMember] = useState<string | null>(null);
   const [syncingFromSheets, setSyncingFromSheets] = useState(false);
-  const [sheetsUrl, setSheetsUrl] = useState('');
+  const [sheetsUrl, setSheetsUrl] = useState('https://docs.google.com/spreadsheets/d/1lDbJBg8UDCJdN8TfX9-O07Bw5bsNjER2gBxol2re-4k/edit?usp=sharing');
   const router = useRouter();
 
   // 權限檢查
@@ -163,16 +163,16 @@ export default function MembersPage() {
 
   // 測試 Google Sheets 網址
   const testSheetsUrl = async () => {
-    if (!sheetsUrl.trim()) {
-      setMessage('請輸入 Google Sheets 網址');
-      return;
-    }
-
     try {
       setMessage('正在測試網址...');
       
-      // 直接測試網址是否可訪問
-      const testUrl = sheetsUrl.trim().replace('/edit', '/export?format=csv');
+      // 處理網址格式
+      let testUrl = sheetsUrl.trim();
+      if (testUrl.includes('/edit')) {
+        testUrl = testUrl.replace('?usp=sharing', '').replace('/edit', '/export?format=csv');
+      }
+      
+      console.log('🧪 測試網址:', testUrl);
       const response = await fetch(testUrl);
       
       if (response.ok) {
@@ -273,48 +273,32 @@ export default function MembersPage() {
         <Card className="p-6 mb-8 bg-blue-50 border-blue-200">
           <h2 className="text-xl font-bold mb-4 text-blue-800">📊 Google Sheets 同步</h2>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google Sheets 網址
-              </label>
-              <Input
-                placeholder="https://docs.google.com/spreadsheets/d/..."
-                value={sheetsUrl}
-                onChange={(e) => setSheetsUrl(e.target.value)}
-                className="w-full"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                請確保 Google Sheets 已設為「知道連結的任何人都可以檢視」
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>已設定 Google Sheets 網址：</strong><br/>
+                <span className="text-xs break-all">{sheetsUrl}</span>
               </p>
             </div>
             <div className="flex space-x-4">
               <Button
                 onClick={testSheetsUrl}
-                disabled={!sheetsUrl.trim()}
+                disabled={syncingFromSheets}
                 className="bg-green-600 hover:bg-green-700"
               >
                 🧪 測試網址
               </Button>
               <Button
                 onClick={syncFromGoogleSheets}
-                disabled={syncingFromSheets || !sheetsUrl.trim()}
+                disabled={syncingFromSheets}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 {syncingFromSheets ? '同步中...' : '🔄 同步數據'}
-              </Button>
-              <Button
-                onClick={() => setSheetsUrl('')}
-                variant="outline"
-                disabled={syncingFromSheets}
-              >
-                清除
               </Button>
             </div>
             <div className="text-sm text-blue-700 bg-blue-100 p-3 rounded-lg">
               <strong>📋 同步說明：</strong>
               <ul className="mt-2 space-y-1">
-                <li>• 第一行必須是標題：姓名, Email（電話和狀態為可選）</li>
-                <li>• 最少需要「姓名」和「Email」兩欄</li>
+                <li>• 已預設您的 Google Sheets 網址</li>
                 <li>• 系統會根據 Email 比對，避免重複新增</li>
                 <li>• 新會員會自動新增，現有會員會更新資料</li>
                 <li>• 建議先備份現有數據再進行同步</li>

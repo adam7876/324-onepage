@@ -25,7 +25,8 @@ async function fetchGoogleSheetsData(sheetsUrl: string): Promise<SheetsMember[]>
     
     // 如果是編輯模式，轉換為導出模式
     if (sheetsUrl.includes('/edit')) {
-      csvUrl = sheetsUrl.replace('/edit', '/export?format=csv');
+      // 移除 ?usp=sharing 參數
+      csvUrl = sheetsUrl.replace('?usp=sharing', '').replace('/edit', '/export?format=csv');
     } else if (sheetsUrl.includes('/edit#gid=')) {
       // 處理帶有 gid 的網址
       const gidMatch = sheetsUrl.match(/\/edit#gid=(\d+)/);
