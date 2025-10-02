@@ -187,16 +187,27 @@ async function syncMembers(sheetsMembers: SheetsMember[]): Promise<SyncResult> {
     const totalMembers = sheetsMembers.length;
     console.log(`📊 開始處理 ${totalMembers} 個會員數據`);
     
-    for (let i = 0; i < sheetsMembers.length; i++) {
-      const member = sheetsMembers[i];
-      try {
-        const email = member.email.toLowerCase();
-        const memberId = `member_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
-        // 每處理 50 個會員報告一次進度
-        if (i % 50 === 0) {
-          console.log(`📈 處理進度：${i + 1}/${totalMembers} (${Math.round(((i + 1) / totalMembers) * 100)}%)`);
-        }
+    // 分批處理，每批 100 個會員
+    const batchSize = 100;
+    const batches = Math.ceil(totalMembers / batchSize);
+    
+    for (let batchIndex = 0; batchIndex < batches; batchIndex++) {
+      const startIndex = batchIndex * batchSize;
+      const endIndex = Math.min(startIndex + batchSize, totalMembers);
+      const batchMembers = sheetsMembers.slice(startIndex, endIndex);
+      
+      console.log(`📦 處理批次 ${batchIndex + 1}/${batches} (${startIndex + 1}-${endIndex})`);
+      
+      for (let i = 0; i < batchMembers.length; i++) {
+        const member = batchMembers[i];
+        try {
+          const email = member.email.toLowerCase();
+          const memberId = `member_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
+          // 每處理 20 個會員報告一次進度
+          if (i % 20 === 0) {
+            console.log(`📈 批次進度：${i + 1}/${batchMembers.length} (${Math.round(((i + 1) / batchMembers.length) * 100)}%)`);
+          }
         
         if (existingEmails.has(email)) {
           // 更新現有會員
@@ -254,7 +265,20 @@ async function syncMembers(sheetsMembers: SheetsMember[]): Promise<SyncResult> {
       }
     }
     
+    // 批次間延遲，避免 Firebase 限制
+    if (batchIndex < batches - 1) {
+      console.log(`⏳ 批次 ${batchIndex + 1} 完成，等待 2 秒後處理下一批次...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+    
     console.log(`✅ 同步完成：新增 ${result.added} 個，更新 ${result.updated} 個`);
+    
+    // 添加批次處理結果
+    result.batches = batches;
+    result.batchSize = batchSize;
+    result.message = `成功處理 ${batches} 個批次，每批 ${batchSize} 個會員`;
+    
   } catch (error) {
     console.error('❌ 同步過程失敗:', error);
     result.success = false;

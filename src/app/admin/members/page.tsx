@@ -211,7 +211,8 @@ export default function MembersPage() {
       const result = await response.json();
       
       if (result.success) {
-        setMessage(`同步成功！新增 ${result.added} 個會員，更新 ${result.updated} 個會員`);
+        const batchInfo = result.batches ? ` (${result.batches} 個批次)` : '';
+        setMessage(`同步成功！新增 ${result.added} 個會員，更新 ${result.updated} 個會員${batchInfo}`);
         loadMembers(); // 重新載入會員列表
       } else {
         setMessage(`同步失敗：${result.error}`);
