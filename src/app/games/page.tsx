@@ -318,7 +318,7 @@ export default function GamesPage() {
             324遊樂園
           </h1>
           <p className="text-lg text-gray-800">
-            每天一次機會，玩遊戲領回饋金！
+            玩遊戲領獎勵🎁
           </p>
         </div>
 
@@ -331,15 +331,11 @@ export default function GamesPage() {
               <ul className="space-y-2 text-gray-900 ">
                 <li className="flex items-center">
                   <span className="text-green-500 mr-2">✅</span>
-                  每天限玩一次
+                  需要Email驗證，一個mail 限玩一次
                 </li>
                 <li className="flex items-center">
                   <span className="text-green-500 mr-2">✅</span>
-                  需要Email驗證
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✅</span>
-                  獲得折價券可用於購物
+                  獲得獎勵可用於購物
                 </li>
               </ul>
             </div>
