@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
 
 interface SheetsMember {
@@ -54,7 +54,7 @@ async function fetchGoogleSheetsData(sheetsUrl: string): Promise<SheetsMember[]>
           name: columns[0]?.trim() || '',
           email: columns[1]?.trim() || '',
           phone: columns[2]?.trim() || '',
-          status: (columns[3]?.trim() as any) || 'active'
+          status: (columns[3]?.trim() as 'active' | 'inactive' | 'vip' | 'suspended') || 'active'
         };
         
         if (member.name && member.email) {

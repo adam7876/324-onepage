@@ -236,12 +236,6 @@ export default function MembersPage() {
             >
               {addingMember ? '新增中...' : '新增會員'}
             </Button>
-            <Button
-              onClick={() => router.push('/admin/import-members')}
-              className="bg-blue-600 hover:bg-blue-700 ml-2"
-            >
-              📁 批量導入
-            </Button>
           </div>
         </Card>
 
