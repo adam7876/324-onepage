@@ -35,6 +35,8 @@ export default function MembersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
   const [updatingMember, setUpdatingMember] = useState<string | null>(null);
+  const [syncingFromSheets, setSyncingFromSheets] = useState(false);
+  const [sheetsUrl, setSheetsUrl] = useState('');
   const router = useRouter();
 
   // 權限檢查
@@ -159,6 +161,39 @@ export default function MembersPage() {
     }
   };
 
+  // 從 Google Sheets 同步數據
+  const syncFromGoogleSheets = async () => {
+    if (!sheetsUrl.trim()) {
+      setMessage('請輸入 Google Sheets 網址');
+      return;
+    }
+
+    setSyncingFromSheets(true);
+    try {
+      const response = await fetch('/api/admin/sync-sheets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sheetsUrl: sheetsUrl.trim() }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setMessage(`同步成功！新增 ${result.added} 個會員，更新 ${result.updated} 個會員`);
+        loadMembers(); // 重新載入會員列表
+      } else {
+        setMessage(`同步失敗：${result.error}`);
+      }
+    } catch (error) {
+      console.error('同步失敗:', error);
+      setMessage('同步失敗，請檢查網址是否正確');
+    } finally {
+      setSyncingFromSheets(false);
+    }
+  };
+
   // 搜尋會員
   const filteredMembers = members.filter(member => 
     member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -207,6 +242,52 @@ export default function MembersPage() {
             >
               📁 批量導入
             </Button>
+          </div>
+        </Card>
+
+        {/* Google Sheets 同步 */}
+        <Card className="p-6 mb-8 bg-blue-50 border-blue-200">
+          <h2 className="text-xl font-bold mb-4 text-blue-800">📊 Google Sheets 同步</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Sheets 網址
+              </label>
+              <Input
+                placeholder="https://docs.google.com/spreadsheets/d/..."
+                value={sheetsUrl}
+                onChange={(e) => setSheetsUrl(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                請確保 Google Sheets 已設為「知道連結的任何人都可以檢視」
+              </p>
+            </div>
+            <div className="flex space-x-4">
+              <Button
+                onClick={syncFromGoogleSheets}
+                disabled={syncingFromSheets || !sheetsUrl.trim()}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {syncingFromSheets ? '同步中...' : '🔄 同步數據'}
+              </Button>
+              <Button
+                onClick={() => setSheetsUrl('')}
+                variant="outline"
+                disabled={syncingFromSheets}
+              >
+                清除
+              </Button>
+            </div>
+            <div className="text-sm text-blue-700 bg-blue-100 p-3 rounded-lg">
+              <strong>📋 同步說明：</strong>
+              <ul className="mt-2 space-y-1">
+                <li>• 第一行必須是標題：姓名, Email, 電話, 狀態</li>
+                <li>• 系統會根據 Email 比對，避免重複新增</li>
+                <li>• 新會員會自動新增，現有會員會更新資料</li>
+                <li>• 建議先備份現有數據再進行同步</li>
+              </ul>
+            </div>
           </div>
         </Card>
 
