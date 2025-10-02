@@ -36,7 +36,7 @@ export default function MembersPage() {
   const [message, setMessage] = useState('');
   const [updatingMember, setUpdatingMember] = useState<string | null>(null);
   const [syncingFromSheets, setSyncingFromSheets] = useState(false);
-  const [sheetsUrl, setSheetsUrl] = useState('https://docs.google.com/spreadsheets/d/1lDbJBg8UDCJdN8TfX9-O07Bw5bsNjER2gBxol2re-4k/edit?usp=sharing');
+  const [sheetsUrl] = useState('https://docs.google.com/spreadsheets/d/1lDbJBg8UDCJdN8TfX9-O07Bw5bsNjER2gBxol2re-4k/edit?usp=sharing');
   const router = useRouter();
 
   // 權限檢查
