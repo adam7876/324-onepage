@@ -80,17 +80,24 @@ async function fetchGoogleSheetsData(sheetsUrl: string): Promise<SheetsMember[]>
       
       // 解析 CSV 行（處理逗號分隔和引號）
       const columns = parseCSVLine(line);
+      console.log(`📊 解析第 ${i} 行:`, columns);
+      
       if (columns.length >= 2) {
         const member: SheetsMember = {
           name: columns[0]?.trim() || '',
           email: columns[1]?.trim() || '',
-          phone: columns[2]?.trim() || '',
-          status: (columns[3]?.trim() as 'active' | 'inactive' | 'vip' | 'suspended') || 'active'
+          phone: columns[2]?.trim() || '', // 電話欄位可選
+          status: (columns[3]?.trim() as 'active' | 'inactive' | 'vip' | 'suspended') || 'active' // 狀態欄位可選
         };
         
         if (member.name && member.email) {
           members.push(member);
+          console.log(`✅ 解析會員: ${member.name} (${member.email})`);
+        } else {
+          console.log(`⚠️ 跳過無效行: 姓名=${member.name}, Email=${member.email}`);
         }
+      } else {
+        console.log(`⚠️ 跳過欄位不足的行: ${line}`);
       }
     }
     
@@ -114,15 +121,22 @@ function parseCSVLine(line: string): string[] {
     if (char === '"') {
       inQuotes = !inQuotes;
     } else if (char === ',' && !inQuotes) {
-      result.push(current);
+      result.push(current.trim());
       current = '';
     } else {
       current += char;
     }
   }
   
-  result.push(current);
-  return result;
+  result.push(current.trim());
+  
+  // 清理引號
+  return result.map(item => {
+    if (item.startsWith('"') && item.endsWith('"')) {
+      return item.slice(1, -1);
+    }
+    return item;
+  });
 }
 
 // 獲取現有會員 Email 列表

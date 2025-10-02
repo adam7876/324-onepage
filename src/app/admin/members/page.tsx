@@ -313,7 +313,8 @@ export default function MembersPage() {
             <div className="text-sm text-blue-700 bg-blue-100 p-3 rounded-lg">
               <strong>📋 同步說明：</strong>
               <ul className="mt-2 space-y-1">
-                <li>• 第一行必須是標題：姓名, Email, 電話, 狀態</li>
+                <li>• 第一行必須是標題：姓名, Email（電話和狀態為可選）</li>
+                <li>• 最少需要「姓名」和「Email」兩欄</li>
                 <li>• 系統會根據 Email 比對，避免重複新增</li>
                 <li>• 新會員會自動新增，現有會員會更新資料</li>
                 <li>• 建議先備份現有數據再進行同步</li>
