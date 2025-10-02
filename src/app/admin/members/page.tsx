@@ -37,6 +37,7 @@ export default function MembersPage() {
   const [updatingMember, setUpdatingMember] = useState<string | null>(null);
   const [syncingFromSheets, setSyncingFromSheets] = useState(false);
   const [sheetsUrl] = useState('https://docs.google.com/spreadsheets/d/1lDbJBg8UDCJdN8TfX9-O07Bw5bsNjER2gBxol2re-4k/edit?usp=sharing');
+  const [startRow, setStartRow] = useState<number | ''>('');
   const router = useRouter();
 
   // 權限檢查
@@ -204,7 +205,7 @@ export default function MembersPage() {
       const headResp = await fetch('/api/admin/sync-sheets/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset: 0, limit: 1 })
+        body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset: 0, limit: 1, ...(startRow ? { startRow } : {}) })
       });
       const head = await headResp.json();
       if (!head.success) {
@@ -226,7 +227,7 @@ export default function MembersPage() {
         const resp = await fetch('/api/admin/sync-sheets/batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset, limit })
+          body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset, limit, ...(startRow ? { startRow } : {}) })
         });
         const data = await resp.json();
         if (!data.success) {
@@ -236,7 +237,7 @@ export default function MembersPage() {
         added += data.added || 0;
         updated += data.updated || 0;
         setMessage(`同步中… ${Math.min(offset + limit, total)}/${total}，新增 ${added}，更新 ${updated}`);
-        await new Promise(r => setTimeout(r, 800));
+        await new Promise(r => setTimeout(r, 250));
       }
 
       setMessage(`同步完成！新增 ${added}，更新 ${updated}`);
