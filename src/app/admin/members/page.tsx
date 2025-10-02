@@ -200,26 +200,50 @@ export default function MembersPage() {
 
     setSyncingFromSheets(true);
     try {
-      const response = await fetch('/api/admin/sync-sheets', {
+      // 先取得總數（小批測試）
+      const headResp = await fetch('/api/admin/sync-sheets/batch', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sheetsUrl: sheetsUrl.trim() }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset: 0, limit: 1 })
       });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        const batchInfo = result.batches ? ` (${result.batches} 個批次)` : '';
-        setMessage(`同步成功！新增 ${result.added} 個會員，更新 ${result.updated} 個會員${batchInfo}`);
-        loadMembers(); // 重新載入會員列表
-      } else {
-        setMessage(`同步失敗：${result.error}`);
+      const head = await headResp.json();
+      if (!head.success) {
+        setMessage(`同步失敗：${head.error}`);
+        setSyncingFromSheets(false);
+        return;
       }
+
+      const total: number = head.total || 0;
+      if (total === 0) {
+        setMessage('Google Sheets 沒有可同步的會員');
+        setSyncingFromSheets(false);
+        return;
+      }
+
+      const limit = 200;
+      let added = 0; let updated = 0;
+      for (let offset = 0; offset < total; offset += limit) {
+        const resp = await fetch('/api/admin/sync-sheets/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset, limit })
+        });
+        const data = await resp.json();
+        if (!data.success) {
+          setMessage(`同步中斷：${data.error}`);
+          break;
+        }
+        added += data.added || 0;
+        updated += data.updated || 0;
+        setMessage(`同步中… ${Math.min(offset + limit, total)}/${total}，新增 ${added}，更新 ${updated}`);
+        await new Promise(r => setTimeout(r, 800));
+      }
+
+      setMessage(`同步完成！新增 ${added}，更新 ${updated}`);
+      loadMembers();
     } catch (error) {
       console.error('同步失敗:', error);
-      setMessage('同步失敗，請檢查網址是否正確');
+      setMessage('同步失敗，請稍後再試');
     } finally {
       setSyncingFromSheets(false);
     }
