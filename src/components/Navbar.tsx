@@ -9,6 +9,11 @@ export default function Navbar() {
 
   // 判斷是否為商品詳情頁
   const isProductDetail = /^\/product\//.test(pathname);
+  
+  // 判斷是否為遊戲相關頁面（需要隱藏導航列）
+  const isGamePage = pathname === '/games' || 
+                     pathname === '/password-login' || 
+                     /^\/play\//.test(pathname);
 
   // 處理遊戲連結點擊
   const handleGameClick = (e: React.MouseEvent) => {
@@ -25,6 +30,11 @@ export default function Navbar() {
       router.push('/games');
     }
   };
+
+  // 如果是遊戲相關頁面，不顯示導航列
+  if (isGamePage) {
+    return null;
+  }
 
   return (
     <nav className="w-full flex items-center justify-between py-4 px-8 border-b bg-white">
