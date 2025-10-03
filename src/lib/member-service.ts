@@ -36,17 +36,43 @@ export async function getMemberByEmail(email: string): Promise<Member | null> {
     // 正規化 email
     const normalizedEmail = email.toLowerCase().trim();
     
-    // 使用 email 作為文件 ID（移除特殊字元）
-    const docId = normalizedEmail.replace(/[.@]/g, '_');
+    console.log(`🔍 查詢會員: ${normalizedEmail}`);
     
-    console.log(`🔍 查詢會員: ${normalizedEmail} (docId: ${docId})`);
-    
-    const memberDoc = await getDoc(doc(db, 'members', docId));
+    // 先嘗試用 email 直接查詢（新格式）
+    let memberDoc = await getDoc(doc(db, 'members', normalizedEmail));
     
     if (memberDoc.exists()) {
       const memberData = memberDoc.data() as Omit<Member, 'id'>;
+      console.log(`✅ 找到會員 (新格式): ${normalizedEmail}`);
       return {
         id: memberDoc.id,
+        ...memberData
+      };
+    }
+    
+    // 如果找不到，嘗試舊格式（移除特殊字元）
+    const oldFormatDocId = normalizedEmail.replace(/[.@]/g, '_');
+    memberDoc = await getDoc(doc(db, 'members', oldFormatDocId));
+    
+    if (memberDoc.exists()) {
+      const memberData = memberDoc.data() as Omit<Member, 'id'>;
+      console.log(`✅ 找到會員 (舊格式): ${oldFormatDocId}`);
+      return {
+        id: memberDoc.id,
+        ...memberData
+      };
+    }
+    
+    // 如果還是找不到，用 query 搜尋 email 欄位
+    const membersRef = collection(db, 'members');
+    const q = query(membersRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const memberData = querySnapshot.docs[0].data() as Omit<Member, 'id'>;
+      console.log(`✅ 找到會員 (query 搜尋): ${email}`);
+      return {
+        id: querySnapshot.docs[0].id,
         ...memberData
       };
     }
