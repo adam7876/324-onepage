@@ -340,7 +340,7 @@ export default function MembersPage() {
                     } else {
                       setMessage(`清理失敗：${data.error}`);
                     }
-                  } catch (e) {
+                  } catch {
                     setMessage('清理失敗，請稍後再試');
                   }
                 }}

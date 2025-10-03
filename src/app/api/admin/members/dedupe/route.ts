@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../../firebase/firestore';
 
-type Member = {
+interface Member {
   id?: string;
   name?: string;
   email: string;
@@ -10,26 +10,26 @@ type Member = {
   status?: 'active' | 'inactive' | 'vip' | 'suspended';
   joinDate?: string;
   updatedAt?: string;
-  gameHistory?: { lastPlayed?: any; totalPlays?: number };
-  [key: string]: any;
-};
+  gameHistory?: { lastPlayed?: unknown; totalPlays?: number };
+  [key: string]: unknown;
+}
 
 function normalizeEmail(email: string): string {
   return (email || '').trim().toLowerCase();
 }
 
-function toDate(value: any): Date | null {
+function toDate(value: unknown): Date | null {
   try {
     if (!value) return null;
     if (typeof value === 'string') return new Date(value);
-    if (typeof value.toDate === 'function') return value.toDate();
+    if (typeof (value as { toDate?: () => Date }).toDate === 'function') return (value as { toDate: () => Date }).toDate();
     return null;
   } catch {
     return null;
   }
 }
 
-export async function POST(_req: NextRequest) {
+export async function POST(): Promise<NextResponse> {
   try {
     const snap = await getDocs(collection(db, 'members'));
     const groups = new Map<string, Array<{ id: string; data: Member }>>();
