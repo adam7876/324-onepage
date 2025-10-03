@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../../../firebase/firestore';
 
 interface SheetsMember {
@@ -126,30 +126,45 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const added = 0; let updated = 0;
+    let added = 0; let updated = 0;
 
     for (const m of slice) {
       const email = normalizeEmail(m.email);
       if (!email) continue;
-      // 以 emailLower 作為 docId，直接 upsert（可冪等、免查詢）
-      const docId = email;
-      await setDoc(doc(db, 'members', docId), {
-        id: docId,
-        name: m.name,
-        email: m.email,
-        phone: m.phone || '',
-        status: m.status || 'active',
-        joinDate: new Date().toISOString(),
-        gameHistory: { lastPlayed: null, totalPlays: 0 },
-        updatedAt: new Date().toISOString(),
-        addedBy: 'google-sheets-batch-sync',
-        addedAt: new Date().toISOString(),
-        syncedFromSheets: true,
-        syncedAt: new Date().toISOString()
-      }, { merge: true });
-      // whether new or update? 無法直接得知，這裡用簡單估算：第一次寫入視為新增
-      // 但為避免額外讀取，統計上以全部都當更新，僅第一批可接受
-      updated++;
+      // 先以 Email 查詢既有文件（舊資料可能是隨機 id）
+      const membersRef = collection(db, 'members');
+      const qy = query(membersRef, where('email', '==', m.email));
+      const qs = await getDocs(qy);
+      if (!qs.empty) {
+        const existingRef = qs.docs[0].ref;
+        await setDoc(existingRef, {
+          name: m.name,
+          phone: m.phone || '',
+          status: m.status || 'active',
+          updatedAt: new Date().toISOString(),
+          syncedFromSheets: true,
+          syncedAt: new Date().toISOString()
+        }, { merge: true });
+        updated++;
+      } else {
+        // 若未存在，改用 emailLower 作為 docId 新增（之後就走可冪等）
+        const docId = email;
+        await setDoc(doc(db, 'members', docId), {
+          id: docId,
+          name: m.name,
+          email: m.email,
+          phone: m.phone || '',
+          status: m.status || 'active',
+          joinDate: new Date().toISOString(),
+          gameHistory: { lastPlayed: null, totalPlays: 0 },
+          updatedAt: new Date().toISOString(),
+          addedBy: 'google-sheets-batch-sync',
+          addedAt: new Date().toISOString(),
+          syncedFromSheets: true,
+          syncedAt: new Date().toISOString()
+        }, { merge: true });
+        added++;
+      }
     }
 
     // 更新游標：此次處理到的最後 CSV 行
