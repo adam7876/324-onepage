@@ -280,7 +280,7 @@ export default function PlayGamePage() {
                 <div className="text-blue-700 text-sm">
                   請對此頁面進行截圖並保存<br/>
                   回傳截圖及會員序號可領取獎勵<br/>
-                  ※ 活動期間一組會員序號限領一份獎勵
+                  ※ 活動期間每組會員序號限領一份獎勵
                 </div>
               </div>
             </div>
