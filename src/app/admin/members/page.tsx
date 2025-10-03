@@ -327,6 +327,26 @@ export default function MembersPage() {
               >
                 {syncingFromSheets ? '同步中...' : '🔄 同步數據'}
               </Button>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  setMessage('清理重複中...');
+                  try {
+                    const resp = await fetch('/api/admin/members/dedupe', { method: 'POST' });
+                    const data = await resp.json();
+                    if (data.success) {
+                      setMessage(`清理完成：合併 ${data.merged} 筆，刪除 ${data.removed} 筆`);
+                      loadMembers();
+                    } else {
+                      setMessage(`清理失敗：${data.error}`);
+                    }
+                  } catch (e) {
+                    setMessage('清理失敗，請稍後再試');
+                  }
+                }}
+              >
+                🧹 清理重複
+              </Button>
             </div>
             <div className="text-sm text-blue-700 bg-blue-100 p-3 rounded-lg">
               <strong>📋 同步說明：</strong>
