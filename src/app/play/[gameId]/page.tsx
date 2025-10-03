@@ -263,6 +263,9 @@ export default function PlayGamePage() {
                   恭喜獲得獎品！
                 </div>
                 <div className="border-t border-orange-300 pt-3">
+                  <div className="text-orange-600 text-sm mb-1">
+                    中獎會員：{gameData?.email || '未知'}
+                  </div>
                   <div className="text-orange-600 text-sm">
                     中獎時間：{currentDateTime}
                   </div>
@@ -276,7 +279,7 @@ export default function PlayGamePage() {
                 </div>
                 <div className="text-blue-700 text-sm">
                   請對此頁面進行截圖並保存<br/>
-                  購物時出示截圖即可享有優惠<br/>
+                  回傳截圖及會員序號可領取獎勵<br/>
                   ※ 每張截圖僅限使用一次
                 </div>
               </div>
