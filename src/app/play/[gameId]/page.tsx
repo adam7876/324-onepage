@@ -286,9 +286,9 @@ export default function PlayGamePage() {
             </div>
           ) : (
             <div>
-              <div className="text-6xl mb-4">😢</div>
+              <div className="text-6xl mb-4">🥹</div>
               <h2 className="text-2xl font-bold text-gray-700 mb-4 drop-shadow-md">
-                很遺憾！
+                很可惜！
               </h2>
               <p className="text-gray-600 mb-6">
                 這次沒領到獎勵，期待下次更棒的結果 ❤️
