@@ -37,6 +37,16 @@ export function drawReward(): RewardType {
   }
 }
 
+// 將獎勵型別與數值格式化為易讀描述
+export function formatRewardDescription(
+  type: 'coupon' | 'discount' | 'freeShipping',
+  value: number
+): string {
+  if (type === 'coupon') return `回饋金 ${value} 元`;
+  if (type === 'freeShipping') return `${value} 張免運券`;
+  return `${value}折優惠`;
+}
+
 // 驗證email格式（基本檢查，真實性由 email 發送驗證）
 export function isValidEmail(email: string): boolean {
   // 基本格式檢查

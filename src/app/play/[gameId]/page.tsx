@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { GAME_CONFIG } from '../../../lib/game-config';
+import { formatRewardDescription } from '../../../lib/game-utils';
 import WheelGame from '../../../modules/frontend/WheelGame';
 import DiceGame from '../../../components/games/DiceGame';
 import ScratchGame from '../../../components/games/ScratchGame';
@@ -32,7 +33,7 @@ export default function PlayGamePage() {
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          const data = docSnap.data() as {type: 'coupon' | 'discount'; value: number; description: string};
+          const data = docSnap.data() as {type: 'coupon' | 'discount' | 'freeShipping'; value: number; description: string};
           console.log('🎁 從 Firestore 載入獎品配置:', data);
           setRewardConfig(data);
         } else {
@@ -257,7 +258,7 @@ export default function PlayGamePage() {
                   324遊樂園🎠 中獎證明
                 </div>
                 <div className="text-orange-900 font-bold text-xl mb-3">
-                  {gameResult.reward?.name || '回饋金'}
+                  {gameResult.reward?.name || formatRewardDescription(rewardConfig.type, rewardConfig.value)}
                 </div>
                 <div className="text-orange-700 text-lg font-semibold mb-3">
                   恭喜獲得獎品！

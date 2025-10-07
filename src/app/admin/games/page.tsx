@@ -8,6 +8,7 @@ import { db } from "@/firebase/firestore";
 import { app } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatRewardDescription } from "@/lib/game-utils";
 import { Card } from "@/components/ui/card";
 import type { User } from "firebase/auth";
 
@@ -118,11 +119,7 @@ export default function GameManagement() {
     setRewardConfig(prev => ({
       ...prev,
       type,
-      description: type === 'coupon'
-        ? `回饋金 ${prev.value} 元`
-        : type === 'freeShipping'
-          ? `${prev.value} 張免運券`
-          : `${prev.value}折優惠`
+      description: formatRewardDescription(type, prev.value)
     }));
   };
 
@@ -130,11 +127,7 @@ export default function GameManagement() {
     setRewardConfig(prev => ({
       ...prev,
       value,
-      description: prev.type === 'coupon'
-        ? `回饋金 ${value} 元`
-        : prev.type === 'freeShipping'
-          ? `${value} 張免運券`
-          : `${value}折優惠`
+      description: formatRewardDescription(prev.type, value)
     }));
   };
 
