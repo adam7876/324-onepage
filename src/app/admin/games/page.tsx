@@ -218,26 +218,42 @@ export default function GameManagement() {
                   >
                     📊 折扣優惠
                   </button>
+                  <button
+                    onClick={() => handleTypeChange('freeShipping')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      rewardConfig.type === 'freeShipping'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    🚚 免運券
+                  </button>
                 </div>
               </div>
 
               {/* 數值設定 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {rewardConfig.type === 'coupon' ? '折價金額 (元)' : '折扣 (折)'}
+                  {rewardConfig.type === 'coupon' 
+                    ? '折價金額 (元)'
+                    : rewardConfig.type === 'freeShipping'
+                      ? '免運券張數 (張)'
+                      : '折扣 (折)'}
                 </label>
                 <Input
                   type="number"
                   value={rewardConfig.value}
                   onChange={(e) => handleValueChange(Number(e.target.value))}
-                  placeholder={rewardConfig.type === 'coupon' ? '請輸入金額' : '請輸入折數'}
-                  min={rewardConfig.type === 'coupon' ? 1 : 1}
+                  placeholder={rewardConfig.type === 'coupon' ? '請輸入金額' : rewardConfig.type === 'freeShipping' ? '請輸入張數' : '請輸入折數'}
+                  min={1}
                   max={rewardConfig.type === 'coupon' ? 1000 : 99}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   {rewardConfig.type === 'coupon' 
                     ? '建議範圍：1-1000元' 
-                    : '建議範圍：1-99折 (例如：85代表85折)'
+                    : rewardConfig.type === 'freeShipping'
+                      ? '建議範圍：1-99張'
+                      : '建議範圍：1-99折 (例如：85代表85折)'
                   }
                 </p>
               </div>
