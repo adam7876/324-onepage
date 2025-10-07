@@ -10,7 +10,7 @@ import { getGameStatus, GameStatus } from '../../lib/game-status-service';
 import { getGameSwitchConfig, GameSwitchConfig } from '../../lib/game-switch-service';
 
 interface GameRewardConfig {
-  type: 'coupon' | 'discount';
+  type: 'coupon' | 'discount' | 'freeShipping';
   value: number;
   description: string;
 }
@@ -23,7 +23,7 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [rewardConfig, setRewardConfig] = useState<GameRewardConfig>(GAME_CONFIG.reward);
+  const [rewardConfig, setRewardConfig] = useState<GameRewardConfig>(GAME_CONFIG.reward as GameRewardConfig);
   const [isPWA, setIsPWA] = useState(false);
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);

@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import type { User } from "firebase/auth";
 
 interface GameRewardConfig {
-  type: 'coupon' | 'discount';
+  type: 'coupon' | 'discount' | 'freeShipping';
   value: number;
   description: string;
 }
@@ -114,13 +114,15 @@ export default function GameManagement() {
     }
   };
 
-  const handleTypeChange = (type: 'coupon' | 'discount') => {
+  const handleTypeChange = (type: 'coupon' | 'discount' | 'freeShipping') => {
     setRewardConfig(prev => ({
       ...prev,
       type,
-      description: type === 'coupon' 
-        ? `回饋金 ${prev.value} 元` 
-        : `${prev.value}折優惠`
+      description: type === 'coupon'
+        ? `回饋金 ${prev.value} 元`
+        : type === 'freeShipping'
+          ? `${prev.value} 張免運券`
+          : `${prev.value}折優惠`
     }));
   };
 
@@ -128,9 +130,11 @@ export default function GameManagement() {
     setRewardConfig(prev => ({
       ...prev,
       value,
-      description: prev.type === 'coupon' 
-        ? `回饋金 ${value} 元` 
-        : `${value}折優惠`
+      description: prev.type === 'coupon'
+        ? `回饋金 ${value} 元`
+        : prev.type === 'freeShipping'
+          ? `${value} 張免運券`
+          : `${value}折優惠`
     }));
   };
 
