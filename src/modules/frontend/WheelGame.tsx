@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface WheelGameProps {
-  onComplete: (result: { success: boolean; result: 'win' | 'lose'; reward?: { type: 'coupon'; name: string; value: number; code: string }; message: string }) => Promise<void>;
+  onComplete: (result: { success: boolean; result: 'win' | 'lose'; reward?: { type: 'coupon' | 'discount' | 'freeShipping'; name: string; value: number; code: string }; message: string }) => Promise<void>;
   rewardConfig?: {
     type: 'coupon' | 'discount' | 'freeShipping';
     value: number;
@@ -90,7 +90,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           success: true,
           result,
           reward: result === 'win' ? {
-            type: (rewardConfig?.type || 'coupon') as const,
+            type: (rewardConfig?.type ?? 'coupon') as 'coupon' | 'discount' | 'freeShipping',
             name: rewardConfig?.type === 'freeShipping' ? `${rewardConfig?.value || 1} 張免運券` : (rewardConfig?.description || '回饋金'),
             value: rewardConfig?.value || 0,
             code: `WHEEL-${Date.now()}`
