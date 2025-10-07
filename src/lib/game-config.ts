@@ -71,7 +71,7 @@ export const GAME_CONFIG = {
 
   // 獎品配置 - 簡化為管理者可設定的單一獎品
   reward: {
-    type: 'discount' as 'coupon' | 'discount',
+    type: 'discount' as 'coupon' | 'discount' | 'freeShipping',
     value: 75,
     description: '75折優惠',
   },

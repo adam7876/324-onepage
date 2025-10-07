@@ -52,10 +52,10 @@ export async function POST(request: NextRequest) {
       playedAt: Timestamp.fromDate(now),
     };
 
-    // 如果中獎，生成優惠券代碼
+    // 如果中獎，生成獎勵代碼（含免運券）
     if (result.result === 'win' && result.reward) {
       gameRecord.reward = {
-        type: 'coupon',
+        type: result.reward.type || 'coupon',
         name: result.reward.name,
         value: result.reward.value,
         code: generateCouponCode(),

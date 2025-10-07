@@ -22,7 +22,7 @@ export default function PlayGamePage() {
   const [error, setError] = useState('');
   const [gameData, setGameData] = useState<{email: string; gameType: string; createdAt: Date; expiresAt: Date} | null>(null);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
-  const [rewardConfig, setRewardConfig] = useState<{type: 'coupon' | 'discount'; value: number; description: string}>(GAME_CONFIG.reward);
+  const [rewardConfig, setRewardConfig] = useState<{type: 'coupon' | 'discount' | 'freeShipping'; value: number; description: string}>(GAME_CONFIG.reward);
 
   // 載入獎品配置
   useEffect(() => {

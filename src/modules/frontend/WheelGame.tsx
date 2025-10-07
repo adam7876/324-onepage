@@ -5,7 +5,7 @@ import { useState } from 'react';
 interface WheelGameProps {
   onComplete: (result: { success: boolean; result: 'win' | 'lose'; reward?: { type: 'coupon'; name: string; value: number; code: string }; message: string }) => Promise<void>;
   rewardConfig?: {
-    type: 'coupon' | 'discount';
+    type: 'coupon' | 'discount' | 'freeShipping';
     value: number;
     description: string;
   };
@@ -90,12 +90,12 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           success: true,
           result,
           reward: result === 'win' ? {
-            type: 'coupon' as const,
-            name: rewardConfig?.description || '回饋金',
+            type: (rewardConfig?.type || 'coupon') as const,
+            name: rewardConfig?.type === 'freeShipping' ? `${rewardConfig?.value || 1} 張免運券` : (rewardConfig?.description || '回饋金'),
             value: rewardConfig?.value || 0,
             code: `WHEEL-${Date.now()}`
           } : undefined,
-          message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.description || '回饋金'}！` : '這次沒領到獎勵，期待下次更棒的結果 ❤️'
+          message: result === 'win' ? `恭喜中獎！獲得 ${rewardConfig?.type === 'freeShipping' ? `${rewardConfig?.value || 1} 張免運券` : (rewardConfig?.description || '回饋金')}！` : '這次沒領到獎勵，期待下次更棒的結果 ❤️'
         };
         await onComplete(gameResult);
       }, 2000);

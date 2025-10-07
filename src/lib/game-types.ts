@@ -7,7 +7,7 @@ export interface GameRecord {
   gameType: string;
   result: 'win' | 'lose';
   reward?: {
-    type: 'coupon';
+    type: 'coupon' | 'freeShipping' | 'discount';
     name: string;
     value: number;
     code: string;
@@ -42,7 +42,7 @@ export interface GameResult {
   success: boolean;
   result: 'win' | 'lose';
   reward?: {
-    type: 'coupon';
+    type: 'coupon' | 'freeShipping' | 'discount';
     name: string;
     value: number;
     code: string;
