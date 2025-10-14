@@ -14,7 +14,6 @@ interface WheelGameProps {
 
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
   // 三戰兩勝狀態
   const [playerWins, setPlayerWins] = useState(0);
   const [aixiWins, setAixiWins] = useState(0);
@@ -86,7 +85,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     
     // 7 秒後動畫完成 - 與 CSS 動畫完全同步
     setTimeout(() => {
-      setAnimationComplete(true);
       setIsSpinning(false);
       
       // 使用預先計算的結果
