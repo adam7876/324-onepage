@@ -67,9 +67,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     setIsSpinning(true);
     
     // 隨機選擇指針角度
-    const randomAngle = Math.random() * 360;
-    const extraSpins = 5 + Math.random() * 5; // 5-10 圈
+    const randomAngle = Math.random() * 360; // 0~360 隨機停點
+    const extraSpins = 5 + Math.floor(Math.random() * 6); // 5~10 整數圈，避免分數圈視覺誤差
     const finalAngle = (extraSpins * 360) + randomAngle;
+    console.log('🎡 extraSpins(whole):', extraSpins, 'randomAngle:', randomAngle.toFixed(2), 'finalAngle:', finalAngle.toFixed(2), 'finalAngle%360:', (finalAngle % 360).toFixed(2));
     
     // 根據最終角度判斷結果
     const resultSection = getResultByAngle(finalAngle);
@@ -248,9 +249,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         @keyframes spin {
           0% {
             transform: translate(-50%, -50%) rotate(0deg);
-          }
-          85% {
-            transform: translate(-50%, -50%) rotate(calc(var(--final-rotation, 1800deg) * 0.9));
           }
           100% {
             transform: translate(-50%, -50%) rotate(var(--final-rotation, 1800deg));
