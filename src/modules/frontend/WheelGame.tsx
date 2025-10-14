@@ -23,13 +23,13 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   // 固定轉盤配置 - 8格，交替成功失敗
   const sections = [
     { angle: 0, type: 'win', color: '#FF8C00' },     // 12點方向 - 玩家勝
-    { angle: 45, type: 'lose', color: '#800020' },   // 1:30方向 - 艾希勝（酒紅色）
+    { angle: 45, type: 'lose', color: '#801815' },   // 1:30方向 - 艾希勝（酒紅色）
     { angle: 90, type: 'win', color: '#FF8C00' },    // 3點方向 - 玩家勝
-    { angle: 135, type: 'lose', color: '#800020' },  // 4:30方向 - 艾希勝
+    { angle: 135, type: 'lose', color: '#801815' },  // 4:30方向 - 艾希勝
     { angle: 180, type: 'win', color: '#FF8C00' },   // 6點方向 - 玩家勝
-    { angle: 225, type: 'lose', color: '#800020' },  // 7:30方向 - 艾希勝
+    { angle: 225, type: 'lose', color: '#801815' },  // 7:30方向 - 艾希勝
     { angle: 270, type: 'win', color: '#FF8C00' },   // 9點方向 - 玩家勝
-    { angle: 315, type: 'lose', color: '#800020' },  // 10:30方向 - 艾希勝
+    { angle: 315, type: 'lose', color: '#801815' },  // 10:30方向 - 艾希勝
   ];
 
   // 根據指針角度判斷結果
@@ -231,7 +231,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             <span className="text-sm font-medium text-gray-700">橙色 = 你勝 (50%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#800020' }}></div>
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#801815' }}></div>
             <span className="text-sm font-medium text-gray-700">酒紅 = 艾希勝 (50%)</span>
           </div>
         </div>
