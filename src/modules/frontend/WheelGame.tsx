@@ -15,17 +15,21 @@ interface WheelGameProps {
 export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  // 三戰兩勝狀態
+  const [playerWins, setPlayerWins] = useState(0);
+  const [aixiWins, setAixiWins] = useState(0);
+  const [round, setRound] = useState(1);
 
   // 固定轉盤配置 - 8格，交替成功失敗
   const sections = [
-    { angle: 0, type: 'win', color: '#FF8C00' },     // 12點方向 - 成功
-    { angle: 45, type: 'lose', color: '#FF69B4' },   // 1:30方向 - 失敗
-    { angle: 90, type: 'win', color: '#FF8C00' },    // 3點方向 - 成功
-    { angle: 135, type: 'lose', color: '#FF69B4' },  // 4:30方向 - 失敗
-    { angle: 180, type: 'win', color: '#FF8C00' },   // 6點方向 - 成功
-    { angle: 225, type: 'lose', color: '#FF69B4' },  // 7:30方向 - 失敗
-    { angle: 270, type: 'win', color: '#FF8C00' },   // 9點方向 - 成功
-    { angle: 315, type: 'lose', color: '#FF69B4' },  // 10:30方向 - 失敗
+    { angle: 0, type: 'win', color: '#FF8C00' },     // 12點方向 - 玩家勝
+    { angle: 45, type: 'lose', color: '#4F46E5' },   // 1:30方向 - 艾希勝（以品牌藍/紫表示）
+    { angle: 90, type: 'win', color: '#FF8C00' },    // 3點方向 - 玩家勝
+    { angle: 135, type: 'lose', color: '#4F46E5' },  // 4:30方向 - 艾希勝
+    { angle: 180, type: 'win', color: '#FF8C00' },   // 6點方向 - 玩家勝
+    { angle: 225, type: 'lose', color: '#4F46E5' },  // 7:30方向 - 艾希勝
+    { angle: 270, type: 'win', color: '#FF8C00' },   // 9點方向 - 玩家勝
+    { angle: 315, type: 'lose', color: '#4F46E5' },  // 10:30方向 - 艾希勝
   ];
 
   // 根據指針角度判斷結果
@@ -56,6 +60,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
 
   const startSpin = () => {
     if (isSpinning) return;
+    // 若系列賽已結束則不再旋轉
+    if (playerWins >= 2 || aixiWins >= 2) return;
     
     console.log('🎡 開始旋轉指針');
     setIsSpinning(true);
@@ -85,20 +91,36 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       // 使用預先計算的結果
       const result = resultSection.type as 'win' | 'lose';
       
-      // 延遲 2 秒後顯示結果
+      // 更新局數比分
+      if (result === 'win') {
+        setPlayerWins(prev => prev + 1);
+      } else {
+        setAixiWins(prev => prev + 1);
+      }
+      setRound(prev => prev + 1);
+
+      const playerWillWinSeries = result === 'win' && playerWins + 1 >= 2;
+      const aixiWillWinSeries = result === 'lose' && aixiWins + 1 >= 2;
+
+      // 延遲 2 秒後在系列賽結束時回傳最終結果
       setTimeout(async () => {
-        const gameResult = {
-          success: true,
-          result,
-          reward: result === 'win' ? {
-            type: (rewardConfig?.type ?? 'coupon') as 'coupon' | 'discount' | 'freeShipping',
-            name: formatRewardDescription(rewardConfig?.type ?? 'coupon', rewardConfig?.value || 0),
-            value: rewardConfig?.value || 0,
-            code: `WHEEL-${Date.now()}`
-          } : undefined,
-          message: result === 'win' ? `恭喜中獎！獲得 ${formatRewardDescription(rewardConfig?.type ?? 'coupon', rewardConfig?.value || 0)}！` : '這次沒領到獎勵，期待下次更棒的結果 ❤️'
-        };
-        await onComplete(gameResult);
+        if (playerWillWinSeries || aixiWillWinSeries) {
+          const finalIsWin = playerWillWinSeries;
+          const gameResult = {
+            success: true,
+            result: finalIsWin ? 'win' as const : 'lose' as const,
+            reward: finalIsWin ? {
+              type: (rewardConfig?.type ?? 'coupon') as 'coupon' | 'discount' | 'freeShipping',
+              name: formatRewardDescription(rewardConfig?.type ?? 'coupon', rewardConfig?.value || 0),
+              value: rewardConfig?.value || 0,
+              code: `WHEEL-${Date.now()}`
+            } : undefined,
+            message: finalIsWin
+              ? `系列賽結束：你 2 勝，獲得 ${formatRewardDescription(rewardConfig?.type ?? 'coupon', rewardConfig?.value || 0)}！`
+              : '系列賽結束：艾希 2 勝，這次沒領到獎勵，期待下次更棒的結果 ❤️'
+          };
+          await onComplete(gameResult);
+        }
       }, 2000);
     }, 7000);
   };
@@ -106,7 +128,12 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">🎡 幸運轉盤</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">🎡 幸運轉盤</h2>
+        <div className="mb-6 text-gray-700">
+          <div className="font-semibold">對戰規則：三戰兩勝</div>
+          <div className="mt-1">回合數：第 {round} 局</div>
+          <div className="mt-1">比分：你 {playerWins} - {aixiWins} 艾希</div>
+        </div>
         
         <div className="relative flex justify-center">
           {/* 固定轉盤 */}
@@ -171,7 +198,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
               disabled={isSpinning}
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-full text-lg hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              🎯 開始轉動
+              🎯 開始下一局
             </button>
           )}
         </div>
@@ -180,11 +207,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         <div className="mt-6 flex justify-center gap-8">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FF8C00' }}></div>
-            <span className="text-sm font-medium text-gray-700">橙色 = 成功 (50%)</span>
+            <span className="text-sm font-medium text-gray-700">橙色 = 你勝 (50%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#FF69B4' }}></div>
-            <span className="text-sm font-medium text-gray-700">亮粉色 = 失敗 (50%)</span>
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#4F46E5' }}></div>
+            <span className="text-sm font-medium text-gray-700">靛紫 = 艾希勝 (50%)</span>
           </div>
         </div>
       </div>
