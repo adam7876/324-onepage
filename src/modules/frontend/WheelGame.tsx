@@ -23,13 +23,13 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   // 固定轉盤配置 - 8格，交替成功失敗
   const sections = [
     { angle: 0, type: 'win', color: '#FF8C00' },     // 12點方向 - 玩家勝
-    { angle: 45, type: 'lose', color: '#4F46E5' },   // 1:30方向 - 艾希勝（以品牌藍/紫表示）
+    { angle: 45, type: 'lose', color: '#800020' },   // 1:30方向 - 艾希勝（酒紅色）
     { angle: 90, type: 'win', color: '#FF8C00' },    // 3點方向 - 玩家勝
-    { angle: 135, type: 'lose', color: '#4F46E5' },  // 4:30方向 - 艾希勝
+    { angle: 135, type: 'lose', color: '#800020' },  // 4:30方向 - 艾希勝
     { angle: 180, type: 'win', color: '#FF8C00' },   // 6點方向 - 玩家勝
-    { angle: 225, type: 'lose', color: '#4F46E5' },  // 7:30方向 - 艾希勝
+    { angle: 225, type: 'lose', color: '#800020' },  // 7:30方向 - 艾希勝
     { angle: 270, type: 'win', color: '#FF8C00' },   // 9點方向 - 玩家勝
-    { angle: 315, type: 'lose', color: '#4F46E5' },  // 10:30方向 - 艾希勝
+    { angle: 315, type: 'lose', color: '#800020' },  // 10:30方向 - 艾希勝
   ];
 
   // 根據指針角度判斷結果
@@ -129,10 +129,18 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">🎡 幸運轉盤</h2>
-        <div className="mb-6 text-gray-700">
-          <div className="font-semibold">對戰規則：三戰兩勝</div>
-          <div className="mt-1">回合數：第 {round} 局</div>
-          <div className="mt-1">比分：你 {playerWins} - {aixiWins} 艾希</div>
+        <div className="mb-6 p-4 bg-white/80 rounded-lg shadow-lg">
+          <p className="text-lg font-bold text-gray-800 mb-2">第 {round} 回合</p>
+          <div className="flex justify-center space-x-8">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">你</p>
+              <p className="text-2xl font-bold text-blue-600">{playerWins}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-600">艾希</p>
+              <p className="text-2xl font-bold text-red-600">{aixiWins}</p>
+            </div>
+          </div>
         </div>
         
         <div className="relative flex justify-center">
@@ -210,8 +218,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             <span className="text-sm font-medium text-gray-700">橙色 = 你勝 (50%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#4F46E5' }}></div>
-            <span className="text-sm font-medium text-gray-700">靛紫 = 艾希勝 (50%)</span>
+            <div className="w-5 h-5 rounded shadow-md" style={{ backgroundColor: '#800020' }}></div>
+            <span className="text-sm font-medium text-gray-700">酒紅 = 艾希勝 (50%)</span>
           </div>
         </div>
       </div>
@@ -224,9 +232,8 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
         }
         
         .pointer-finished {
-          /* 動畫完成後，保持最終位置，不額外轉動 */
+          /* 動畫完成後，保持最終位置（由動畫 forwards 維持），避免再次套用 transform 造成二次旋轉視覺 */
           animation: none;
-          transform: translate(-50%, -50%) rotate(var(--final-rotation, 0deg));
         }
         
         @keyframes spin {
