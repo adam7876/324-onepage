@@ -19,6 +19,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const [playerWins, setPlayerWins] = useState(0);
   const [aixiWins, setAixiWins] = useState(0);
   const [round, setRound] = useState(1);
+  const [finalMessage, setFinalMessage] = useState<string | null>(null);
 
   // 固定轉盤配置 - 8格，交替成功失敗
   const sections = [
@@ -102,10 +103,14 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
       const playerWillWinSeries = result === 'win' && playerWins + 1 >= 2;
       const aixiWillWinSeries = result === 'lose' && aixiWins + 1 >= 2;
 
-      // 延遲 2 秒後在系列賽結束時回傳最終結果
-      setTimeout(async () => {
-        if (playerWillWinSeries || aixiWillWinSeries) {
-          const finalIsWin = playerWillWinSeries;
+      // 系列賽結束時顯示結果並延遲約 2.5 秒再跳轉
+      if (playerWillWinSeries || aixiWillWinSeries) {
+        const finalIsWin = playerWillWinSeries;
+        const message = finalIsWin
+          ? `系列賽結束：你 2 勝，獲得 ${formatRewardDescription(rewardConfig?.type ?? 'coupon', rewardConfig?.value || 0)}！`
+          : '系列賽結束：艾希 2 勝，這次沒領到獎勵，期待下次更棒的結果 ❤️';
+        setFinalMessage(message);
+        setTimeout(async () => {
           const gameResult = {
             success: true,
             result: finalIsWin ? 'win' as const : 'lose' as const,
@@ -115,13 +120,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
               value: rewardConfig?.value || 0,
               code: `WHEEL-${Date.now()}`
             } : undefined,
-            message: finalIsWin
-              ? `系列賽結束：你 2 勝，獲得 ${formatRewardDescription(rewardConfig?.type ?? 'coupon', rewardConfig?.value || 0)}！`
-              : '系列賽結束：艾希 2 勝，這次沒領到獎勵，期待下次更棒的結果 ❤️'
+            message
           };
           await onComplete(gameResult);
-        }
-      }, 2000);
+        }, 2500);
+      }
     }, 7000);
   };
 
@@ -170,9 +173,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             
             {/* 旋轉指針 - 從中心向外 */}
             <div 
-              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : animationComplete ? 'pointer-finished' : ''}`}
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none ${isSpinning ? 'pointer-spinning' : ''}`}
               style={{
-                transformOrigin: 'center center'
+                transformOrigin: 'center center',
+                transform: 'translate(-50%, -50%) rotate(var(--final-rotation, 0deg))'
               }}
             >
               <div className="relative">
@@ -210,6 +214,10 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             </button>
           )}
         </div>
+
+        {finalMessage && (
+          <div className="mt-4 text-gray-800 font-semibold">{finalMessage}</div>
+        )}
         
         {/* 圖例 - 適中大小 */}
         <div className="mt-6 flex justify-center gap-8">
@@ -231,10 +239,7 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
           animation-iteration-count: 1;
         }
         
-        .pointer-finished {
-          /* 動畫完成後，保持最終位置（由動畫 forwards 維持），避免再次套用 transform 造成二次旋轉視覺 */
-          animation: none;
-        }
+        /* 移除 finished 類別以避免二次套用 transform 造成跳動 */
         
         @keyframes spin {
           0% {
