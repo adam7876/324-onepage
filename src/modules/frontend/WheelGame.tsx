@@ -85,7 +85,6 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
     
     // 7 秒後動畫完成 - 與 CSS 動畫完全同步
     setTimeout(() => {
-      setIsSpinning(false);
       
       // 使用預先計算的結果
       const result = resultSection.type as 'win' | 'lose';
@@ -121,7 +120,14 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
             message
           };
           await onComplete(gameResult);
+          // 在跳轉前最後一刻移除動畫 class，避免視覺跳動
+          setIsSpinning(false);
         }, 2500);
+      } else {
+        // 非系列賽結束：稍後再移除動畫 class，避免動畫結束瞬間的來源切換造成「再轉一下」視覺
+        setTimeout(() => {
+          setIsSpinning(false);
+        }, 400);
       }
     }, 7000);
   };
