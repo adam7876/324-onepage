@@ -28,6 +28,8 @@ interface Product {
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  // 控制是否顯示外部下單按鈕（預設關閉，保留程式碼供未來啟用）
+  const SHOW_EXTERNAL_ORDER = false;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -137,8 +139,8 @@ export default function ProductDetail() {
               </button>
             </div>
           )}
-          {/* 324官網按鈕 */}
-          {product.externalOrderUrl && (
+          {/* 324官網按鈕（暫時關閉：以 SHOW_EXTERNAL_ORDER 控制） */}
+          {SHOW_EXTERNAL_ORDER && product.externalOrderUrl && (
             <a
               href={product.externalOrderUrl}
               target="_blank"
