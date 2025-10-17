@@ -24,11 +24,11 @@ export default function WheelGame({ onComplete, rewardConfig }: WheelGameProps) 
   const sections = [
     { angle: 0, type: 'win', color: '#F5F5DC' },     // 12點方向 - 玩家勝（米色）
     { angle: 45, type: 'lose', color: '#801815' },   // 1:30方向 - 艾希勝（酒紅色）
-    { angle: 90, type: 'win', color: '#F5F5DC' },    // 3點方向 - 玩家勝
+    { angle: 90, type: 'win', color: '#F5F5DC' },    // 3點方向 - 玩家勝（米色）
     { angle: 135, type: 'lose', color: '#801815' },  // 4:30方向 - 艾希勝
-    { angle: 180, type: 'win', color: '#F5F5DC' },   // 6點方向 - 玩家勝
+    { angle: 180, type: 'win', color: '#F5F5DC' },   // 6點方向 - 玩家勝（米色）
     { angle: 225, type: 'lose', color: '#801815' },  // 7:30方向 - 艾希勝
-    { angle: 270, type: 'win', color: '#F5F5DC' },   // 9點方向 - 玩家勝
+    { angle: 270, type: 'win', color: '#F5F5DC' },   // 9點方向 - 玩家勝（米色）
     { angle: 315, type: 'lose', color: '#801815' },  // 10:30方向 - 艾希勝
   ];
 
