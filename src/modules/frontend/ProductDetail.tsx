@@ -10,8 +10,9 @@ import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 // ===== 以下為購物功能相關 import，暫時隱藏，日後可直接解除註解恢復 =====
-// import { Button } from "../../components/ui/button";
-// import CartInline from "../../components/CartInline";
+import { Button } from "../../components/ui/button";
+import CartInline from "../../components/CartInline";
+import { useCart } from "../../components/CartContext";
 
 interface Product {
   id: string;
@@ -29,17 +30,16 @@ export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  // ===== 以下為購物功能相關 useState，暫時隱藏，日後可直接解除註解恢復 =====
-  // const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1);
   // 商品選項
-  // const [size, setSize] = useState("");
-  // const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
+  const [color, setColor] = useState("");
   // 多圖主圖 index
   const [mainImgIdx, setMainImgIdx] = useState(0);
   const swiperRef = useRef<SwiperType | null>(null);
 
   // ===== 以下為購物功能相關 hook，暫時隱藏，日後可直接解除註解恢復 =====
-  // const { addToCart } = useCart();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function fetchProduct() {
@@ -51,14 +51,14 @@ export default function ProductDetail() {
         // 預設選第一個尺寸/顏色
         const data = docSnap.data();
         if (data.sizes && Array.isArray(data.sizes) && data.sizes.length > 0) {
-          // const [size, setSize] = useState(data.sizes[0]);
+          setSize(data.sizes[0]);
         } else {
-          // const [size, setSize] = useState("");
+          setSize("");
         }
         if (data.colors && Array.isArray(data.colors) && data.colors.length > 0) {
-          // const [color, setColor] = useState(data.colors[0]);
+          setColor(data.colors[0]);
         } else {
-          // const [color, setColor] = useState("");
+          setColor("");
         }
         setMainImgIdx(0); // 切換商品時重設主圖
       }
@@ -149,17 +149,71 @@ export default function ProductDetail() {
             </a>
           )}
         </div>
-        {/*
         <div className="flex-1 flex flex-col justify-center">
           <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
           <div className="text-xl font-bold text-gray-900 mb-4">NT$ {product.price.toLocaleString()}</div>
           <div className="text-gray-700 mb-6 min-h-[3em]">{product.description || "—"}</div>
-          商品選項、購物車、已選購內容等區塊暫時隱藏
+          <div className="space-y-4">
+            {Array.isArray(product.sizes) && product.sizes.length > 0 && (
+              <div>
+                <label className="block mb-1">尺寸</label>
+                <select
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  {product.sizes.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {Array.isArray(product.colors) && product.colors.length > 0 && (
+              <div>
+                <label className="block mb-1">顏色</label>
+                <select
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  {product.colors.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div>
+              <label className="block mb-1">數量</label>
+              <input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                className="w-24 border rounded px-3 py-2"
+              />
+            </div>
+            <Button
+              className="w-full py-3 text-lg font-bold"
+              onClick={() => {
+                if (!product) return;
+                addToCart({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  imageUrl: Array.isArray(product.images) && product.images[0] ? product.images[0] : product.imageUrl,
+                  size: size || undefined,
+                  color: color || undefined,
+                  quantity,
+                });
+              }}
+            >
+              加入購物車
+            </Button>
+          </div>
+          <div className="mt-6">
+            <CartInline />
+          </div>
         </div>
-        <div className="my-8 bg-gray-100 rounded p-4">...</div>
-        <div className="mt-4 max-w-lg mx-auto">...</div>
-        <CartInline />
-        */}
       </div>
     </section>
   );
