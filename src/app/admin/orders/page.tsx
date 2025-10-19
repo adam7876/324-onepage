@@ -150,7 +150,7 @@ export default function AdminOrders() {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <input
           type="text"
-          placeholder="搜尋 Email、電話、訂單編號或新編號"
+          placeholder="搜尋 Email、電話、訂單編號"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2 w-full md:w-80"
@@ -189,11 +189,11 @@ export default function AdminOrders() {
               </div>
             </div>
             <div>
-              <label className="block text-xs mb-1">新訂單編號</label>
+              <label className="block text-xs mb-1">訂單編號</label>
               <input className="border rounded px-2 py-1 w-full" value={filterOrderNumber} onChange={e => setFilterOrderNumber(e.target.value)} />
             </div>
             <div>
-              <label className="block text-xs mb-1">訂單編號</label>
+              <label className="block text-xs mb-1">文件ID</label>
               <input className="border rounded px-2 py-1 w-full" value={filterId} onChange={e => setFilterId(e.target.value)} />
             </div>
             <div>
@@ -234,8 +234,8 @@ export default function AdminOrders() {
           <table className="min-w-full border text-sm">
             <thead className="bg-gray-100">
               <tr>
+                <th className="border px-4 py-2">文件ID</th>
                 <th className="border px-4 py-2">訂單編號</th>
-                <th className="border px-4 py-2">新編號</th>
                 <th className="border px-4 py-2">收件人</th>
                 <th className="border px-4 py-2">Email</th>
                 <th className="border px-4 py-2">電話</th>
