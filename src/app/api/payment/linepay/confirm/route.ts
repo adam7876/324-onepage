@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { confirmLinePayPayment } from '@/lib/linepay-service';
+import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { db } from '@/firebase/firestore';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { transactionId, amount, orderNumber } = await request.json();
+
+    // 安全驗證
+    if (!transactionId || !amount || !orderNumber) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required parameters' },
+        { status: 400 }
+      );
+    }
+
+    // 從 Firestore 取得訂單資料
+    const orderRef = doc(db, 'orders', orderNumber);
+    const orderSnap = await getDoc(orderRef);
+
+    if (!orderSnap.exists()) {
+      return NextResponse.json(
+        { success: false, error: 'Order not found' },
+        { status: 404 }
+      );
+    }
+
+    const orderData = orderSnap.data();
+
+    // 安全驗證：檢查訂單狀態
+    if (orderData.paymentStatus !== '已請款') {
+      return NextResponse.json(
+        { success: false, error: 'Order not in correct state for confirmation' },
+        { status: 400 }
+      );
+    }
+
+    // 安全驗證：金額比對
+    if (orderData.amountExpected !== amount) {
+      console.error(`Amount mismatch for order ${orderNumber}: expected ${orderData.amountExpected}, got ${amount}`);
+      return NextResponse.json(
+        { success: false, error: 'Amount mismatch' },
+        { status: 400 }
+      );
+    }
+
+    // 確認 LINE Pay 付款
+    const result = await confirmLinePayPayment(transactionId, amount, orderNumber);
+
+    if (result.success) {
+      // 更新訂單狀態為「已付款」
+      await updateDoc(orderRef, {
+        paymentStatus: '已付款',
+        paidAt: Timestamp.now(),
+        tradeNo: transactionId,
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Payment confirmed successfully',
+      });
+    } else {
+      // 更新訂單狀態為「付款失敗」
+      await updateDoc(orderRef, {
+        paymentStatus: '付款失敗',
+      });
+
+      return NextResponse.json(
+        { success: false, error: result.error || 'Payment confirmation failed' },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error('LINE Pay confirm API error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -130,7 +130,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         paymentRequestedAt: null as unknown as Timestamp | null,
         paidAt: null as unknown as Timestamp | null,
         tradeNo: "",
-        status: payment === "銀行匯款" ? "待匯款" : "待付款",
+        status: payment === "銀行匯款" ? "待匯款" : payment === "LINE Pay" ? "待付款" : "待付款",
         createdAt: Timestamp.now(),
       };
       
@@ -138,6 +138,34 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       
       const orderRef = await addDoc(collection(db, "orders"), orderData);
       console.log("訂單建立成功！ID:", orderRef.id);
+      
+      // 如果是 LINE Pay，重導向到付款頁面
+      if (payment === "LINE Pay") {
+        try {
+          const response = await fetch('/api/payment/linepay/request', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderNumber }),
+          });
+          
+          const result = await response.json();
+          
+          if (result.success && result.paymentUrl) {
+            // 重導向到 LINE Pay 付款頁面
+            window.location.href = result.paymentUrl;
+            return;
+          } else {
+            setError(`LINE Pay 付款請求失敗：${result.error || '未知錯誤'}`);
+            return;
+          }
+        } catch (linePayError) {
+          console.error("LINE Pay 請求失敗:", linePayError);
+          setError("LINE Pay 付款請求失敗，請稍後再試");
+          return;
+        }
+      }
       
       setOrderId(orderNumber);
       setSuccess(true);
@@ -256,6 +284,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           className="w-full border rounded px-3 py-2"
         >
           <option value="銀行匯款">銀行匯款</option>
+          <option value="LINE Pay">LINE Pay</option>
           <option value="模擬付款">模擬付款</option>
         </select>
       </div>
