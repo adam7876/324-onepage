@@ -20,14 +20,6 @@ export default function CheckoutSuccessPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (orderNumber) {
-      fetchOrderData();
-    } else {
-      setLoading(false);
-    }
-  }, [orderNumber, fetchOrderData]);
-
   const fetchOrderData = useCallback(async () => {
     try {
       // 根據訂單編號查詢訂單（需要遍歷所有訂單找到對應的）
@@ -45,6 +37,14 @@ export default function CheckoutSuccessPage() {
       setLoading(false);
     }
   }, [orderNumber]);
+
+  useEffect(() => {
+    if (orderNumber) {
+      fetchOrderData();
+    } else {
+      setLoading(false);
+    }
+  }, [orderNumber, fetchOrderData]);
 
   if (loading) {
     return (
