@@ -29,7 +29,16 @@ export default function CheckoutSuccessPage() {
       
       if (!querySnapshot.empty) {
         const orderDoc = querySnapshot.docs[0];
-        setOrderData({ id: orderDoc.id, ...orderDoc.data() });
+        const data = orderDoc.data();
+        setOrderData({
+          id: orderDoc.id,
+          orderNumber: data.orderNumber || '',
+          total: data.total || 0,
+          name: data.name || '',
+          phone: data.phone || '',
+          address: data.address || '',
+          customerNotes: data.customerNotes || '',
+        });
       }
     } catch (error) {
       console.error('取得訂單資料失敗:', error);
