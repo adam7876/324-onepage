@@ -19,12 +19,14 @@ interface OrderItem {
 
 interface Order {
   id: string;
+  orderNumber?: string;
   name: string;
   email: string;
   phone: string;
   address: string;
   shipping: string;
   payment: string;
+  customerNotes?: string;
   items: OrderItem[];
   total: number;
   status: string;
@@ -58,6 +60,7 @@ export default function AdminOrders() {
   const [statusError, setStatusError] = useState<string | null>(null);
   const [statusSuccess, setStatusSuccess] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string[]>([]);
+  const [filterOrderNumber, setFilterOrderNumber] = useState("");
   const [filterId, setFilterId] = useState("");
   const [filterEmail, setFilterEmail] = useState("");
   const [filterPhone, setFilterPhone] = useState("");
@@ -100,11 +103,14 @@ export default function AdminOrders() {
     const keyword = search.trim().toLowerCase();
     if (keyword && !(
       o.id.toLowerCase().includes(keyword) ||
+      (o.orderNumber || '').toLowerCase().includes(keyword) ||
       o.email?.toLowerCase().includes(keyword) ||
       o.phone?.toLowerCase().includes(keyword)
     )) return false;
     // 狀態
     if (filterStatus.length > 0 && !filterStatus.includes(o.status)) return false;
+    // 新的訂單編號
+    if (filterOrderNumber && !(o.orderNumber || '').toLowerCase().includes(filterOrderNumber.trim().toLowerCase())) return false;
     // 訂單編號
     if (filterId && !o.id.toLowerCase().includes(filterId.trim().toLowerCase())) return false;
     // Email
@@ -144,7 +150,7 @@ export default function AdminOrders() {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <input
           type="text"
-          placeholder="搜尋 Email、電話或訂單編號"
+          placeholder="搜尋 Email、電話、訂單編號或新編號"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2 w-full md:w-80"
@@ -181,6 +187,10 @@ export default function AdminOrders() {
                   >清除</button>
                 )}
               </div>
+            </div>
+            <div>
+              <label className="block text-xs mb-1">新訂單編號</label>
+              <input className="border rounded px-2 py-1 w-full" value={filterOrderNumber} onChange={e => setFilterOrderNumber(e.target.value)} />
             </div>
             <div>
               <label className="block text-xs mb-1">訂單編號</label>
@@ -225,6 +235,7 @@ export default function AdminOrders() {
             <thead className="bg-gray-100">
               <tr>
                 <th className="border px-4 py-2">訂單編號</th>
+                <th className="border px-4 py-2">新編號</th>
                 <th className="border px-4 py-2">收件人</th>
                 <th className="border px-4 py-2">Email</th>
                 <th className="border px-4 py-2">電話</th>
@@ -244,6 +255,7 @@ export default function AdminOrders() {
                 <>
                   <tr key={o.id} className="hover:bg-gray-50">
                     <td className="border px-2 py-1 font-mono text-xs">{o.id}</td>
+                    <td className="border px-2 py-1 font-mono text-xs">{o.orderNumber || '-'}</td>
                     <td className="border px-2 py-1">{o.name}</td>
                     <td className="border px-2 py-1">{o.email}</td>
                     <td className="border px-2 py-1">{o.phone}</td>
@@ -301,9 +313,11 @@ export default function AdminOrders() {
                             </li>
                           ))}
                         </ul>
+                        <div className="mb-2">新訂單編號：{o.orderNumber || '-'}</div>
                         <div className="mb-2">收件地址：{o.address}</div>
                         <div className="mb-2">物流方式：{o.shipping}</div>
                         <div className="mb-2">付款方式：{o.payment}</div>
+                        <div className="mb-2">顧客備註：{o.customerNotes || '-'}</div>
                         {/* 預留金流、物流、狀態欄位 */}
                         <div className="mb-2">金流狀態：{o.paymentStatus ?? "-"}</div>
                         <div className="mb-2">物流狀態：{o.logisticsStatus ?? "-"}</div>

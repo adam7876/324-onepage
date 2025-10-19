@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { db } from "../firebase/firestore";
-import { collection, addDoc, Timestamp, getDocs, limit, query } from "firebase/firestore";
+import { collection, addDoc, Timestamp, getDocs, limit, query, runTransaction, doc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
 import type { CartItem } from "./CartInline";
@@ -17,6 +17,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [customerNotes, setCustomerNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -26,6 +27,30 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [firebaseReady, setFirebaseReady] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // 產生數字訂單編號：YYYYMMDD + 三位數遞增序號
+  const generateOrderNumber = async (): Promise<string> => {
+    const now = new Date();
+    const yyyy = String(now.getFullYear());
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const dateKey = `${yyyy}${mm}${dd}`;
+
+    const seqRef = doc(db, 'counters', `order-${dateKey}`);
+    const seq = await runTransaction(db, async (tx) => {
+      const snap = await tx.get(seqRef);
+      const current = snap.exists() ? (snap.data().seq as number) : 0;
+      const next = current + 1;
+      if (snap.exists()) {
+        tx.update(seqRef, { seq: next });
+      } else {
+        tx.set(seqRef, { seq: next, date: dateKey });
+      }
+      return next;
+    });
+
+    return `${dateKey}${String(seq).padStart(3, '0')}`;
+  };
 
   useEffect(() => {
     console.log("CheckoutForm 已載入，檢查 Firebase 狀態...");
@@ -80,6 +105,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     
     try {
       console.log("準備建立訂單...");
+      const orderNumber = await generateOrderNumber();
       // 將 cart 內每個商品的 undefined 欄位補成空字串或預設值
       const cleanCart = cart.map(item => ({
         ...item,
@@ -89,12 +115,14 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         imageUrl: item.imageUrl ?? "",
       }));
       const orderData = {
+        orderNumber,
         name: name ?? "",
         email: email ?? "",
         phone: phone ?? "",
         address: address ?? "",
         shipping: shipping ?? "",
         payment: payment ?? "",
+        customerNotes: customerNotes ?? "",
         items: cleanCart,
         total: total ?? 0,
         status: payment === "銀行匯款" ? "待匯款" : "待付款",
@@ -106,7 +134,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       const orderRef = await addDoc(collection(db, "orders"), orderData);
       console.log("訂單建立成功！ID:", orderRef.id);
       
-      setOrderId(orderRef.id);
+      setOrderId(orderNumber);
       setSuccess(true);
       localStorage.removeItem("cart");
       if (onSuccess) onSuccess({ orderId: orderRef.id, shipping, payment });
@@ -225,6 +253,16 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           <option value="銀行匯款">銀行匯款</option>
           <option value="模擬付款">模擬付款</option>
         </select>
+      </div>
+      <div>
+        <label className="block mb-1">其他備註（選填）</label>
+        <textarea
+          value={customerNotes}
+          onChange={(e) => setCustomerNotes(e.target.value)}
+          className="w-full border rounded px-3 py-2"
+          rows={3}
+          placeholder="如有尺寸備註、送禮需求、收件時段等可填寫"
+        />
       </div>
       {error && (
         <div className="text-red-500 text-sm mb-2 p-2 bg-red-50 border border-red-200 rounded">
