@@ -1,8 +1,9 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 
-export default function CheckoutCancelledPage() {
+function CheckoutCancelledContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('orderNumber');
 
@@ -43,5 +44,20 @@ export default function CheckoutCancelledPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutCancelledPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p>載入中...</p>
+        </div>
+      </div>
+    }>
+      <CheckoutCancelledContent />
+    </Suspense>
   );
 }
