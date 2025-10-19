@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 export async function GET(request: NextRequest) {
@@ -14,11 +14,13 @@ export async function GET(request: NextRequest) {
     }
 
     // 更新訂單狀態為「已取消」
-    const orderRef = doc(db, 'orders', orderNumber);
-    const orderSnap = await getDoc(orderRef);
+    const ordersRef = collection(db, 'orders');
+    const q = query(ordersRef, where('orderNumber', '==', orderNumber));
+    const querySnapshot = await getDocs(q);
 
-    if (orderSnap.exists()) {
-      await updateDoc(orderRef, {
+    if (!querySnapshot.empty) {
+      const orderDoc = querySnapshot.docs[0];
+      await updateDoc(orderDoc.ref, {
         paymentStatus: '已取消',
         cancelledAt: Timestamp.now(),
       });

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLinePayRequest } from '@/lib/linepay-service';
 import { validateLinePayConfig } from '@/lib/linepay-config';
-import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 export async function POST(request: NextRequest) {
@@ -18,18 +18,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 從 Firestore 取得訂單資料
-    const orderRef = doc(db, 'orders', orderNumber);
-    const orderSnap = await getDoc(orderRef);
+    // 從 Firestore 取得訂單資料（根據 orderNumber 查詢）
+    const ordersRef = collection(db, 'orders');
+    const q = query(ordersRef, where('orderNumber', '==', orderNumber));
+    const querySnapshot = await getDocs(q);
 
-    if (!orderSnap.exists()) {
+    if (querySnapshot.empty) {
       return NextResponse.json(
         { success: false, error: 'Order not found' },
         { status: 404 }
       );
     }
 
-    const orderData = orderSnap.data();
+    const orderDoc = querySnapshot.docs[0];
+    const orderData = orderDoc.data();
 
     // 安全驗證：檢查訂單狀態
     if (orderData.paymentStatus !== '未請款') {
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     if (result.success && result.paymentUrl) {
       // 更新訂單狀態為「已請款」
-      await updateDoc(orderRef, {
+      await updateDoc(orderDoc.ref, {
         paymentStatus: '已請款',
         paymentRequestedAt: Timestamp.now(),
       });
@@ -73,6 +75,11 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('LINE Pay request API error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      orderNumber,
+    });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

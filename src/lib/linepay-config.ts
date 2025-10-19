@@ -35,7 +35,8 @@ export function validateLinePayConfig() {
 
 // 金額驗證（防止竄改）
 export function validateAmount(amount: number, expectedAmount: number): boolean {
-  return amount === expectedAmount && amount > 0 && amount <= 1000000; // 最大100萬
+  // LINE Pay 最低交易金額通常是 NT$ 1，但建議至少 NT$ 10
+  return amount === expectedAmount && amount >= 10 && amount <= 1000000; // 最低10元，最大100萬
 }
 
 // 訂單編號驗證

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { confirmLinePayPayment } from '@/lib/linepay-service';
-import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 export async function POST(request: NextRequest) {
@@ -15,18 +15,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 從 Firestore 取得訂單資料
-    const orderRef = doc(db, 'orders', orderNumber);
-    const orderSnap = await getDoc(orderRef);
+    // 從 Firestore 取得訂單資料（根據 orderNumber 查詢）
+    const ordersRef = collection(db, 'orders');
+    const q = query(ordersRef, where('orderNumber', '==', orderNumber));
+    const querySnapshot = await getDocs(q);
 
-    if (!orderSnap.exists()) {
+    if (querySnapshot.empty) {
       return NextResponse.json(
         { success: false, error: 'Order not found' },
         { status: 404 }
       );
     }
 
-    const orderData = orderSnap.data();
+    const orderDoc = querySnapshot.docs[0];
+    const orderData = orderDoc.data();
 
     // 安全驗證：檢查訂單狀態
     if (orderData.paymentStatus !== '已請款') {
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     if (result.success) {
       // 更新訂單狀態為「已付款」
-      await updateDoc(orderRef, {
+      await updateDoc(orderDoc.ref, {
         paymentStatus: '已付款',
         paidAt: Timestamp.now(),
         tradeNo: transactionId,
@@ -62,7 +64,7 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // 更新訂單狀態為「付款失敗」
-      await updateDoc(orderRef, {
+      await updateDoc(orderDoc.ref, {
         paymentStatus: '付款失敗',
       });
 
