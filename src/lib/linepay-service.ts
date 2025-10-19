@@ -128,8 +128,7 @@ export async function createLinePayRequest(orderData: {
 // 確認 LINE Pay 付款
 export async function confirmLinePayPayment(
   transactionId: string,
-  amount: number,
-  orderNumber: string
+  amount: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // 安全驗證

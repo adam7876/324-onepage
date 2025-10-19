@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const linePayData = {
       orderNumber: orderData.orderNumber,
       amount: orderData.amountExpected,
-      items: orderData.items.map((item: any) => ({
+      items: orderData.items.map((item: { name: string; quantity: number; price: number }) => ({
         name: item.name,
         quantity: item.quantity,
         price: item.price,

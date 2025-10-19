@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 確認 LINE Pay 付款
-    const result = await confirmLinePayPayment(transactionId, amount, orderNumber);
+    const result = await confirmLinePayPayment(transactionId, amount);
 
     if (result.success) {
       // 更新訂單狀態為「已付款」

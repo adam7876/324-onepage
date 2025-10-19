@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
@@ -9,7 +9,15 @@ export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('orderNumber');
   const transactionId = searchParams.get('transactionId');
-  const [orderData, setOrderData] = useState<any>(null);
+  const [orderData, setOrderData] = useState<{
+    id: string;
+    orderNumber: string;
+    total: number;
+    name: string;
+    phone: string;
+    address: string;
+    customerNotes?: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,9 +26,9 @@ export default function CheckoutSuccessPage() {
     } else {
       setLoading(false);
     }
-  }, [orderNumber]);
+  }, [orderNumber, fetchOrderData]);
 
-  const fetchOrderData = async () => {
+  const fetchOrderData = useCallback(async () => {
     try {
       // 根據訂單編號查詢訂單（需要遍歷所有訂單找到對應的）
       const ordersRef = collection(db, 'orders');
@@ -36,7 +44,7 @@ export default function CheckoutSuccessPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderNumber]);
 
   if (loading) {
     return (
