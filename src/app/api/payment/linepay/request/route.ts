@@ -5,11 +5,14 @@ import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebas
 import { db } from '@/firebase/firestore';
 
 export async function POST(request: NextRequest) {
+  let orderNumber: string | undefined;
+  
   try {
     // 安全驗證配置
     validateLinePayConfig();
 
-    const { orderNumber } = await request.json();
+    const body = await request.json();
+    orderNumber = body.orderNumber;
 
     if (!orderNumber) {
       return NextResponse.json(
@@ -78,7 +81,7 @@ export async function POST(request: NextRequest) {
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      orderNumber,
+      orderNumber: orderNumber || 'unknown',
     });
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
