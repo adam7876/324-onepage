@@ -77,8 +77,9 @@ export default function ProductDetail() {
 
   return (
     <section className="max-w-3xl mx-auto px-4 py-12">
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="flex flex-col gap-8">
+        {/* 商品圖片區 */}
+        <div className="flex flex-col items-center justify-center">
           {/* 主圖區（使用 Swiper 輪播） */}
           {hasImages ? (
             <div className="w-full flex justify-center items-center">
@@ -139,22 +140,15 @@ export default function ProductDetail() {
               </button>
             </div>
           )}
-          {/* 324官網按鈕（暫時關閉：以 SHOW_EXTERNAL_ORDER 控制） */}
-          {SHOW_EXTERNAL_ORDER && product.externalOrderUrl && (
-            <a
-              href={product.externalOrderUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mt-8 px-8 py-3 rounded-full bg-[#880000] text-white text-lg font-bold shadow-lg hover:scale-105 transition-all text-center tracking-widest"
-            >
-              編號官網下單
-            </a>
-          )}
         </div>
-        <div className="flex-1 flex flex-col justify-center">
+
+        {/* 商品資訊與購買選項 */}
+        <div className="flex flex-col justify-center">
           <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
           <div className="text-xl font-bold text-gray-900 mb-4">NT$ {product.price.toLocaleString()}</div>
           <div className="text-gray-700 mb-6 min-h-[3em]">{product.description || "—"}</div>
+          
+          {/* 購買選項 */}
           <div className="space-y-4">
             {Array.isArray(product.sizes) && product.sizes.length > 0 && (
               <div>
@@ -212,6 +206,20 @@ export default function ProductDetail() {
               加入購物車
             </Button>
           </div>
+
+          {/* 324官網按鈕（暫時關閉：以 SHOW_EXTERNAL_ORDER 控制） */}
+          {SHOW_EXTERNAL_ORDER && product.externalOrderUrl && (
+            <a
+              href={product.externalOrderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block mt-8 px-8 py-3 rounded-full bg-[#880000] text-white text-lg font-bold shadow-lg hover:scale-105 transition-all text-center tracking-widest"
+            >
+              編號官網下單
+            </a>
+          )}
+
+          {/* 購物車內容 */}
           <div className="mt-6">
             <CartInline />
           </div>
