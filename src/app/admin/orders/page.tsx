@@ -29,10 +29,14 @@ interface Order {
   customerNotes?: string;
   items: OrderItem[];
   total: number;
+  amountExpected?: number;
+  paymentStatus?: string;
+  paymentRequestedAt?: { seconds: number; nanoseconds: number } | null;
+  paidAt?: { seconds: number; nanoseconds: number } | null;
+  tradeNo?: string;
   status: string;
   createdAt: { seconds: number; nanoseconds: number };
   // 預留欄位
-  paymentStatus?: string;
   logisticsStatus?: string;
   logisticsNo?: string;
 }
@@ -320,6 +324,9 @@ export default function AdminOrders() {
                         <div className="mb-2">顧客備註：{o.customerNotes || '-'}</div>
                         {/* 預留金流、物流、狀態欄位 */}
                         <div className="mb-2">金流狀態：{o.paymentStatus ?? "-"}</div>
+                        <div className="mb-2">請款時間：{o.paymentRequestedAt ? new Date(o.paymentRequestedAt.seconds * 1000).toLocaleString() : '-'}</div>
+                        <div className="mb-2">付款時間：{o.paidAt ? new Date(o.paidAt.seconds * 1000).toLocaleString() : '-'}</div>
+                        <div className="mb-2">金流交易編號：{o.tradeNo || '-'}</div>
                         <div className="mb-2">物流狀態：{o.logisticsStatus ?? "-"}</div>
                         <div className="mb-2">物流單號：{o.logisticsNo ?? "-"}</div>
                       </td>

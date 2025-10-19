@@ -125,6 +125,11 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         customerNotes: customerNotes ?? "",
         items: cleanCart,
         total: total ?? 0,
+        amountExpected: total ?? 0,
+        paymentStatus: "未請款", // 未請款 | 已請款 | 已付款 | 付款失敗 | 已退款
+        paymentRequestedAt: null as unknown as Timestamp | null,
+        paidAt: null as unknown as Timestamp | null,
+        tradeNo: "",
         status: payment === "銀行匯款" ? "待匯款" : "待付款",
         createdAt: Timestamp.now(),
       };
