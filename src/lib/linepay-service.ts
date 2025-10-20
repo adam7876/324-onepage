@@ -67,15 +67,28 @@ export async function createLinePayRequest(orderData: {
   items: Array<{ name: string; quantity: number; price: number }>;
   customerName: string;
 }): Promise<{ success: boolean; paymentUrl?: string; error?: string }> {
+  console.log('🚀 LINE Pay request started:', {
+    orderNumber: orderData.orderNumber,
+    amount: orderData.amount,
+    itemsCount: orderData.items.length,
+    customerName: orderData.customerName,
+  });
+
   try {
     // 安全驗證
+    console.log('🔍 Validating order number...');
     if (!validateOrderNumber(orderData.orderNumber)) {
+      console.error('❌ Invalid order number format:', orderData.orderNumber);
       throw new Error('Invalid order number format');
     }
     
+    console.log('🔍 Validating amount...');
     if (!validateAmount(orderData.amount, orderData.amount)) {
+      console.error('❌ Invalid amount:', orderData.amount);
       throw new Error('Invalid amount');
     }
+    
+    console.log('✅ Validation passed');
 
     // 建立請求資料
     const requestData = {
@@ -104,6 +117,7 @@ export async function createLinePayRequest(orderData: {
     const headers = generateLinePayHeaders(body);
 
     // 發送請求到 LINE Pay API
+    console.log('📤 Sending request to LINE Pay API...');
     console.log('LINE Pay request data:', {
       url: `${LINE_PAY_CONFIG.apiUrl}/v3/payments/request`,
       headers,
@@ -116,25 +130,39 @@ export async function createLinePayRequest(orderData: {
       body,
     });
 
-    console.log('LINE Pay response status:', response.status);
-    console.log('LINE Pay response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('📥 LINE Pay response received:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
 
     const result: LinePayResponse = await response.json();
-    console.log('LINE Pay response data:', result);
+    console.log('📋 LINE Pay response data:', result);
 
     if (result.returnCode === '0000' && result.info?.paymentUrl) {
+      console.log('✅ LINE Pay request successful:', {
+        returnCode: result.returnCode,
+        paymentUrl: result.info.paymentUrl.web,
+      });
       return {
         success: true,
         paymentUrl: result.info.paymentUrl.web,
       };
     } else {
+      console.error('❌ LINE Pay request failed:', {
+        returnCode: result.returnCode,
+        returnMessage: result.returnMessage,
+      });
       return {
         success: false,
         error: result.returnMessage || 'LINE Pay request failed',
       };
     }
   } catch (error) {
-    console.error('LINE Pay request error:', error);
+    console.error('💥 LINE Pay request error:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
