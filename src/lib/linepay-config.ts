@@ -5,8 +5,8 @@ export const LINE_PAY_CONFIG = {
   channelSecret: process.env.LINE_PAY_CHANNEL_SECRET || '',
   merchantId: process.env.LINE_PAY_MERCHANT_ID || 'KHHCR.41318699.QR',
   
-  // API 端點 - 暫時使用測試環境
-  apiUrl: 'https://sandbox-api-pay.line.me',
+  // API 端點 - 使用正式環境（因為有正式帳號）
+  apiUrl: 'https://api-pay.line.me',
   
   // 回傳網址
   returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/linepay/return`,
