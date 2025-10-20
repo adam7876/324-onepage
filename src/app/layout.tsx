@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
@@ -18,8 +18,6 @@ export const metadata: Metadata = {
   title: "324遊樂園🎠",
   description: "每天一次機會，玩遊戲領回饋金！",
   manifest: "/manifest.json",
-  themeColor: "#8b5cf6",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   other: {
     'cache-version': 'v2.2.0', // 強制清除快取
   },
@@ -37,6 +35,14 @@ export const metadata: Metadata = {
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#8b5cf6",
 };
 
 export default function RootLayout({
