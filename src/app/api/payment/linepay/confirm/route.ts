@@ -3,6 +3,61 @@ import { confirmLinePayPayment } from '@/lib/linepay-service';
 import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
+// 處理 GET 請求（LINE Pay 重定向）
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const transactionId = searchParams.get('transactionId');
+    const orderNumber = searchParams.get('orderId');
+
+    if (!orderNumber || !transactionId) {
+      return NextResponse.redirect(
+        new URL('/checkout/failed?reason=missing_params', request.url)
+      );
+    }
+
+    // 查詢訂單
+    const ordersRef = collection(db, 'orders');
+    const q = query(ordersRef, where('orderNumber', '==', orderNumber));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return NextResponse.redirect(
+        new URL('/checkout/failed?reason=order_not_found', request.url)
+      );
+    }
+
+    const orderDoc = querySnapshot.docs[0];
+    const orderData = orderDoc.data();
+
+    // 確認付款
+    const result = await confirmLinePayPayment(transactionId, orderData.total, orderNumber);
+    
+    if (result.success) {
+      // 更新訂單狀態
+      await updateDoc(orderDoc.ref, {
+        paymentStatus: '已付款',
+        paidAt: Timestamp.now(),
+        tradeNo: transactionId,
+      });
+
+      return NextResponse.redirect(
+        new URL(`/checkout/success?orderNumber=${orderNumber}&transactionId=${transactionId}`, request.url)
+      );
+    } else {
+      return NextResponse.redirect(
+        new URL('/checkout/failed?reason=payment_failed', request.url)
+      );
+    }
+  } catch (error) {
+    console.error('LINE Pay confirm API error:', error);
+    return NextResponse.redirect(
+      new URL('/checkout/failed?reason=internal_error', request.url)
+    );
+  }
+}
+
+// 處理 POST 請求（API 呼叫）
 export async function POST(request: NextRequest) {
   try {
     const { transactionId, amount, orderNumber } = await request.json();
