@@ -1,26 +1,7 @@
 import crypto from 'crypto';
 import { LINE_PAY_CONFIG, validateAmount, validateOrderNumber } from './linepay-config';
 
-// LINE Pay 請求介面
-interface LinePayRequest {
-  amount: number;
-  currency: string;
-  orderId: string;
-  packages: Array<{
-    id: string;
-    amount: number;
-    name: string;
-    products: Array<{
-      name: string;
-      quantity: number;
-      price: number;
-    }>;
-  }>;
-  redirectUrls: {
-    confirmUrl: string;
-    cancelUrl: string;
-  };
-}
+// LINE Pay 請求介面（已移除，使用直接物件）
 
 // LINE Pay 回應介面
 interface LinePayResponse {
