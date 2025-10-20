@@ -6,7 +6,7 @@ export const LINE_PAY_CONFIG = {
   merchantId: process.env.LINE_PAY_MERCHANT_ID || 'KHHCR.41318699.QR',
   
   // API 端點 - 使用正式環境（因為有正式帳號）
-  apiUrl: 'https://api-pay.line.me',
+  apiUrl: 'http://198.13.49.191:3000',
   
   // 回傳網址
   returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/linepay/return`,
