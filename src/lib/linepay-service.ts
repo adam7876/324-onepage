@@ -20,6 +20,12 @@ interface LinePayResponse {
 // 安全簽名生成
 export function generateLinePaySignature(body: string, nonce: string): string {
   const message = LINE_PAY_CONFIG.channelSecret + body + nonce;
+  console.log('LINE Pay signature debug:', {
+    channelSecret: LINE_PAY_CONFIG.channelSecret.substring(0, 8) + '...',
+    bodyLength: body.length,
+    nonce,
+    messageLength: message.length,
+  });
   return crypto.createHmac('sha256', LINE_PAY_CONFIG.channelSecret).update(message).digest('base64');
 }
 
@@ -73,6 +79,8 @@ export async function createLinePayRequest(orderData: {
         cancelUrl: LINE_PAY_CONFIG.cancelUrl,
       },
     };
+
+    console.log('LINE Pay request data structure:', JSON.stringify(requestData, null, 2));
 
     const body = JSON.stringify(requestData);
     const headers = generateLinePayHeaders(body);
