@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const orderData = orderDoc.data();
 
     // 確認付款
-    const result = await confirmLinePayPayment(transactionId, orderData.total, orderNumber);
+    const result = await confirmLinePayPayment(transactionId, orderData.total);
     
     if (result.success) {
       // 更新訂單狀態
