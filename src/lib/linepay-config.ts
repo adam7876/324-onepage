@@ -24,6 +24,8 @@ export function validateLinePayConfig() {
     channelId: LINE_PAY_CONFIG.channelId,
     merchantId: LINE_PAY_CONFIG.merchantId,
     hasChannelSecret: !!LINE_PAY_CONFIG.channelSecret,
+    channelSecretLength: LINE_PAY_CONFIG.channelSecret.length,
+    channelSecretStart: LINE_PAY_CONFIG.channelSecret.substring(0, 8),
     apiUrl: LINE_PAY_CONFIG.apiUrl,
   });
 
