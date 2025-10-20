@@ -29,7 +29,11 @@ export function generateLinePaySignature(body: string, nonce: string): string {
     messagePreview: message.substring(0, 50) + '...',
   });
   
-  const signature = crypto.createHmac('sha256', LINE_PAY_CONFIG.channelSecret).update(message).digest('base64');
+  // 使用 Buffer 確保正確的編碼
+  const signature = crypto.createHmac('sha256', Buffer.from(LINE_PAY_CONFIG.channelSecret, 'utf8'))
+    .update(Buffer.from(message, 'utf8'))
+    .digest('base64');
+  
   console.log('Generated signature:', signature);
   return signature;
 }
