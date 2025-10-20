@@ -21,20 +21,21 @@ interface LinePayResponse {
 export function generateLinePaySignature(body: string, nonce: string): string {
   // LINE Pay 簽名格式：HMAC-SHA256(channelSecret + requestBody + nonce)
   const message = LINE_PAY_CONFIG.channelSecret + body + nonce;
-  console.log('LINE Pay signature debug:', {
-    channelSecret: LINE_PAY_CONFIG.channelSecret.substring(0, 8) + '...',
-    bodyLength: body.length,
-    nonce,
-    messageLength: message.length,
-    messagePreview: message.substring(0, 50) + '...',
-  });
+  // 暫時移除詳細日誌以避免部署超時
+  // console.log('LINE Pay signature debug:', {
+  //   channelSecret: LINE_PAY_CONFIG.channelSecret.substring(0, 8) + '...',
+  //   bodyLength: body.length,
+  //   nonce,
+  //   messageLength: message.length,
+  //   messagePreview: message.substring(0, 50) + '...',
+  // });
   
   // 使用正確的編碼方式
   const signature = crypto.createHmac('sha256', LINE_PAY_CONFIG.channelSecret)
     .update(message)
     .digest('base64');
   
-  console.log('Generated signature:', signature);
+  // console.log('Generated signature:', signature);
   return signature;
 }
 
@@ -50,12 +51,13 @@ export function generateLinePayHeaders(body: string): Record<string, string> {
     'X-LINE-Authorization-Nonce': nonce,
   };
   
-  console.log('LINE Pay headers:', {
-    'Content-Type': headers['Content-Type'],
-    'X-LINE-ChannelId': headers['X-LINE-ChannelId'],
-    'X-LINE-Authorization': signature.substring(0, 20) + '...',
-    'X-LINE-Authorization-Nonce': nonce,
-  });
+  // 暫時移除詳細日誌以避免部署超時
+  // console.log('LINE Pay headers:', {
+  //   'Content-Type': headers['Content-Type'],
+  //   'X-LINE-ChannelId': headers['X-LINE-ChannelId'],
+  //   'X-LINE-Authorization': signature.substring(0, 20) + '...',
+  //   'X-LINE-Authorization-Nonce': nonce,
+  // });
   
   return headers;
 }
@@ -67,12 +69,13 @@ export async function createLinePayRequest(orderData: {
   items: Array<{ name: string; quantity: number; price: number }>;
   customerName: string;
 }): Promise<{ success: boolean; paymentUrl?: string; error?: string }> {
-  console.log('🚀 LINE Pay request started:', {
-    orderNumber: orderData.orderNumber,
-    amount: orderData.amount,
-    itemsCount: orderData.items.length,
-    customerName: orderData.customerName,
-  });
+  // 暫時移除詳細日誌以避免部署超時
+  // console.log('🚀 LINE Pay request started:', {
+  //   orderNumber: orderData.orderNumber,
+  //   amount: orderData.amount,
+  //   itemsCount: orderData.items.length,
+  //   customerName: orderData.customerName,
+  // });
 
   try {
     // 安全驗證
