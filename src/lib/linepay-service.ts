@@ -19,14 +19,19 @@ interface LinePayResponse {
 
 // 安全簽名生成
 export function generateLinePaySignature(body: string, nonce: string): string {
+  // LINE Pay 簽名格式：HMAC-SHA256(channelSecret + requestBody + nonce)
   const message = LINE_PAY_CONFIG.channelSecret + body + nonce;
   console.log('LINE Pay signature debug:', {
     channelSecret: LINE_PAY_CONFIG.channelSecret.substring(0, 8) + '...',
     bodyLength: body.length,
     nonce,
     messageLength: message.length,
+    messagePreview: message.substring(0, 50) + '...',
   });
-  return crypto.createHmac('sha256', LINE_PAY_CONFIG.channelSecret).update(message).digest('base64');
+  
+  const signature = crypto.createHmac('sha256', LINE_PAY_CONFIG.channelSecret).update(message).digest('base64');
+  console.log('Generated signature:', signature);
+  return signature;
 }
 
 // 安全請求標頭
@@ -34,12 +39,21 @@ export function generateLinePayHeaders(body: string): Record<string, string> {
   const nonce = crypto.randomBytes(16).toString('hex');
   const signature = generateLinePaySignature(body, nonce);
   
-  return {
+  const headers = {
     'Content-Type': 'application/json',
     'X-LINE-ChannelId': LINE_PAY_CONFIG.channelId,
     'X-LINE-Authorization': signature,
     'X-LINE-Authorization-Nonce': nonce,
   };
+  
+  console.log('LINE Pay headers:', {
+    'Content-Type': headers['Content-Type'],
+    'X-LINE-ChannelId': headers['X-LINE-ChannelId'],
+    'X-LINE-Authorization': signature.substring(0, 20) + '...',
+    'X-LINE-Authorization-Nonce': nonce,
+  });
+  
+  return headers;
 }
 
 // 建立 LINE Pay 付款請求
