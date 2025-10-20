@@ -73,7 +73,7 @@ export async function createLinePayRequest(orderData: {
     }
 
     // 建立請求資料
-    const requestData: LinePayRequest = {
+    const requestData = {
       amount: orderData.amount,
       currency: 'TWD',
       orderId: orderData.orderNumber,
@@ -97,13 +97,23 @@ export async function createLinePayRequest(orderData: {
     const headers = generateLinePayHeaders(body);
 
     // 發送請求到 LINE Pay API
+    console.log('LINE Pay request data:', {
+      url: `${LINE_PAY_CONFIG.apiUrl}/v3/payments/request`,
+      headers,
+      body: requestData,
+    });
+
     const response = await fetch(`${LINE_PAY_CONFIG.apiUrl}/v3/payments/request`, {
       method: 'POST',
       headers,
       body,
     });
 
+    console.log('LINE Pay response status:', response.status);
+    console.log('LINE Pay response headers:', Object.fromEntries(response.headers.entries()));
+
     const result: LinePayResponse = await response.json();
+    console.log('LINE Pay response data:', result);
 
     if (result.returnCode === '0000' && result.info?.paymentUrl) {
       return {

@@ -22,6 +22,13 @@ export const LINE_PAY_CONFIG = {
 
 // 安全驗證函數
 export function validateLinePayConfig() {
+  console.log('Validating LINE Pay config:', {
+    channelId: LINE_PAY_CONFIG.channelId,
+    merchantId: LINE_PAY_CONFIG.merchantId,
+    hasChannelSecret: !!LINE_PAY_CONFIG.channelSecret,
+    apiUrl: LINE_PAY_CONFIG.apiUrl,
+  });
+
   if (!LINE_PAY_CONFIG.channelSecret) {
     throw new Error('LINE_PAY_CHANNEL_SECRET is required');
   }
