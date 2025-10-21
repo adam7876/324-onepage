@@ -66,7 +66,7 @@ const getStatusColor = (status: string) => {
     case "已出貨":
       return "bg-purple-100 text-purple-800 border-purple-200";
     case "已完成":
-      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      return "bg-teal-100 text-teal-800 border-teal-200";
     case "已取消":
       return "bg-gray-100 text-gray-800 border-gray-200";
     case "退款中":
