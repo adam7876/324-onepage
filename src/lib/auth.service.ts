@@ -5,7 +5,7 @@
 
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '../firebase/firebaseConfig';
-import { securityService } from './security.service';
+import { securityService } from '../services/security.service';
 
 export interface AuthService {
   signIn(email: string, password: string): Promise<boolean>;

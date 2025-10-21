@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { securityService } from './security.service';
+import { securityService } from '../services/security.service';
 
 export interface ApiAuthResult {
   success: boolean;
