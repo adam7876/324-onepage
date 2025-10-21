@@ -88,8 +88,9 @@ class AuthServiceImpl implements AuthService {
     if (!this.currentUser?.email) return false;
     
     const adminEmails = [
-      'admin@324.com',
-      'axikorea@gmail.com'
+      'adam11341@gmail.com',
+      'axikorea@gmail.com',
+      'sy771001@gmail.com'
     ];
     
     return adminEmails.includes(this.currentUser.email);
