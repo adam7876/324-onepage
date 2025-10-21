@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/firebase/firebaseConfig";
@@ -98,6 +98,8 @@ export default function AdminOrders() {
   const [filterAmountMin, setFilterAmountMin] = useState("");
   const [filterAmountMax, setFilterAmountMax] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [batchDeleting, setBatchDeleting] = useState(false);
   const router = useRouter();
 
   // 權限驗證
@@ -164,6 +166,38 @@ export default function AdminOrders() {
     return true;
   });
 
+  // 批次刪除函數
+  const handleBatchDelete = async () => {
+    if (selectedOrders.length === 0) return;
+    
+    setBatchDeleting(true);
+    try {
+      const deletePromises = selectedOrders.map(orderId => 
+        deleteDoc(doc(db, "orders", orderId))
+      );
+      await Promise.all(deletePromises);
+      
+      // 更新本地狀態
+      setOrders(prev => prev.filter(order => !selectedOrders.includes(order.id)));
+      setSelectedOrders([]);
+      alert(`成功刪除 ${selectedOrders.length} 筆訂單`);
+    } catch (error) {
+      console.error("批次刪除失敗:", error);
+      alert("刪除失敗，請稍後再試");
+    } finally {
+      setBatchDeleting(false);
+    }
+  };
+
+  // 全選/取消全選
+  const handleSelectAll = () => {
+    if (selectedOrders.length === filtered.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(filtered.map(order => order.id));
+    }
+  };
+
   if (!authChecked) {
     return <div className="text-center py-24 text-lg">權限驗證中...</div>;
   }
@@ -183,7 +217,18 @@ export default function AdminOrders() {
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2 w-full md:w-80"
         />
-        <Button onClick={() => router.push("/admin/products")} className="bg-gray-100 text-black font-bold">商品管理</Button>
+        <div className="flex gap-2">
+          {selectedOrders.length > 0 && (
+            <Button 
+              onClick={handleBatchDelete} 
+              disabled={batchDeleting}
+              className="bg-red-500 text-white font-bold hover:bg-red-600"
+            >
+              {batchDeleting ? "刪除中..." : `刪除選中 (${selectedOrders.length})`}
+            </Button>
+          )}
+          <Button onClick={() => router.push("/admin/products")} className="bg-gray-100 text-black font-bold">商品管理</Button>
+        </div>
       </div>
       {/* 多條件搜尋表單 */}
       <div className="mb-4">
@@ -262,7 +307,15 @@ export default function AdminOrders() {
           <table className="min-w-full border text-sm">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border px-4 py-2">文件ID</th>
+                <th className="border px-4 py-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedOrders.length === filtered.length && filtered.length > 0}
+                    onChange={handleSelectAll}
+                    className="mr-2"
+                  />
+                  選擇
+                </th>
                 <th className="border px-4 py-2">訂單編號</th>
                 <th className="border px-4 py-2">收件人</th>
                 <th className="border px-4 py-2">Email</th>
@@ -277,12 +330,24 @@ export default function AdminOrders() {
             </thead>
             <tbody>
               {filtered.length === 0 && (
-                <tr><td colSpan={10} className="text-center py-8 text-gray-400">查無訂單</td></tr>
+                <tr><td colSpan={9} className="text-center py-8 text-gray-400">查無訂單</td></tr>
               )}
               {filtered.map((o) => (
                 <>
                   <tr key={o.id} className="hover:bg-gray-50">
-                    <td className="border px-2 py-1 font-mono text-xs">{o.id}</td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedOrders.includes(o.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrders(prev => [...prev, o.id]);
+                          } else {
+                            setSelectedOrders(prev => prev.filter(id => id !== o.id));
+                          }
+                        }}
+                      />
+                    </td>
                     <td className="border px-2 py-1 font-mono text-xs">{o.orderNumber || '-'}</td>
                     <td className="border px-2 py-1">{o.name}</td>
                     <td className="border px-2 py-1">{o.email}</td>

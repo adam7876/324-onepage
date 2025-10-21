@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLinePayRequest } from '@/lib/linepay-service';
 import { validateLinePayConfig } from '@/lib/linepay-config';
-import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 export async function POST(request: NextRequest) {
@@ -13,28 +13,26 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     orderNumber = body.orderNumber;
+    const orderData = body.orderData; // 從前端傳來的訂單資料
 
-    if (!orderNumber) {
+    if (!orderNumber || !orderData) {
       return NextResponse.json(
-        { success: false, error: 'Order number is required' },
+        { success: false, error: 'Order number and data are required' },
         { status: 400 }
       );
     }
 
-    // 從 Firestore 取得訂單資料（根據 orderNumber 查詢）
+    // 檢查是否已存在相同訂單編號
     const ordersRef = collection(db, 'orders');
     const q = query(ordersRef, where('orderNumber', '==', orderNumber));
     const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
+    if (!querySnapshot.empty) {
       return NextResponse.json(
-        { success: false, error: 'Order not found' },
-        { status: 404 }
+        { success: false, error: 'Order number already exists' },
+        { status: 400 }
       );
     }
-
-    const orderDoc = querySnapshot.docs[0];
-    const orderData = orderDoc.data();
 
     // 安全驗證：檢查訂單狀態
     if (orderData.paymentStatus !== '未請款') {

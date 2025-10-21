@@ -135,12 +135,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         createdAt: Timestamp.now(),
       };
       
-      console.log("正在送出訂單到 Firebase:", orderData);
-      
-      const orderRef = await addDoc(collection(db, "orders"), orderData);
-      console.log("訂單建立成功！ID:", orderRef.id);
-      
-      // 如果是 LINE Pay，重導向到付款頁面
+      // 如果是 LINE Pay，先請求付款，成功後才建立訂單
       if (payment === "LINE Pay") {
         try {
           const response = await fetch('/api/payment/linepay/request', {
@@ -148,7 +143,10 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ orderNumber: newOrderNumber }),
+            body: JSON.stringify({ 
+              orderNumber: newOrderNumber,
+              orderData: orderData // 傳送訂單資料
+            }),
           });
           
           const result = await response.json();
@@ -166,13 +164,22 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           setError("LINE Pay 付款請求失敗，請稍後再試");
           return;
         }
+      } else {
+        // 銀行匯款：立即建立訂單
+        console.log("正在送出訂單到 Firebase:", orderData);
+        
+        const orderRef = await addDoc(collection(db, "orders"), orderData);
+        console.log("訂單建立成功！ID:", orderRef.id);
       }
       
-      setOrderId(newOrderNumber);
-      setOrderNumber(newOrderNumber);
-      setSuccess(true);
-      localStorage.removeItem("cart");
-      if (onSuccess) onSuccess({ orderId: newOrderNumber, shipping, payment });
+      // 只有銀行匯款才顯示成功訊息
+      if (payment !== "LINE Pay") {
+        setOrderId(newOrderNumber);
+        setOrderNumber(newOrderNumber);
+        setSuccess(true);
+        localStorage.removeItem("cart");
+        if (onSuccess) onSuccess({ orderId: newOrderNumber, shipping, payment });
+      }
       
     } catch (err) {
       console.error("訂單送出失敗，詳細錯誤:", err);
