@@ -3,12 +3,12 @@
  * 將「待匯款」狀態統一為「待付款」
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 import { securityService } from '@/services/security.service';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     securityService.logApiCall('/api/admin/migrate-order-status', 'POST');
     
