@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
     if (result.success) {
       // 更新訂單狀態
       await updateDoc(orderDoc.ref, {
+        status: '已付款',
         paymentStatus: '已付款',
         paidAt: Timestamp.now(),
         tradeNo: transactionId,
@@ -108,6 +109,7 @@ export async function POST(request: NextRequest) {
     if (result.success) {
       // 更新訂單狀態為「已付款」
       await updateDoc(orderDoc.ref, {
+        status: '已付款',
         paymentStatus: '已付款',
         paidAt: Timestamp.now(),
         tradeNo: transactionId,

@@ -203,10 +203,10 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
               <div className="text-blue-600 mt-2 font-bold">匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
             </div>
           )}
-          {payment !== "銀行匯款" && (
+          {payment === "LINE Pay" && (
             <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
               <div className="font-bold mb-2">付款說明</div>
-              <div>此為模擬付款，請等待後台通知。</div>
+              <div>LINE Pay 付款已完成，商品將於 1-3 個工作天內出貨。</div>
             </div>
           )}
           <Button className="w-full mt-4" onClick={() => { setSuccess(false); if (onSuccess) onSuccess({ orderId, shipping, payment }); }}>
@@ -274,9 +274,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           className="w-full border rounded px-3 py-2"
         >
           <option value="7-11 超商取貨">7-11 超商取貨</option>
-          <option value="全家超商取貨">全家超商取貨</option>
-          <option value="宅配到府">宅配到府</option>
-          <option value="店到店">店到店</option>
+          <option value="324 店取">324 店取</option>
         </select>
       </div>
       <div>
@@ -288,7 +286,6 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         >
           <option value="銀行匯款">銀行匯款</option>
           <option value="LINE Pay">LINE Pay</option>
-          <option value="模擬付款">模擬付款</option>
         </select>
       </div>
       <div>

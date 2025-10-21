@@ -17,6 +17,7 @@ function CheckoutSuccessContent() {
     name: string;
     phone: string;
     address: string;
+    shipping: string;
     customerNotes?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ function CheckoutSuccessContent() {
           name: data.name || '',
           phone: data.phone || '',
           address: data.address || '',
+          shipping: data.shipping || '',
           customerNotes: data.customerNotes || '',
         });
       }
@@ -82,7 +84,9 @@ function CheckoutSuccessContent() {
             <p><strong>總金額：</strong>NT$ {orderData.total?.toLocaleString()}</p>
             <p><strong>收件人：</strong>{orderData.name}</p>
             <p><strong>聯絡電話：</strong>{orderData.phone}</p>
-            <p><strong>收件地址：</strong>{orderData.address}</p>
+            {orderData.shipping !== '7-11 超商取貨' && orderData.shipping !== '324 店取' && (
+              <p><strong>收件地址：</strong>{orderData.address}</p>
+            )}
             {orderData.customerNotes && (
               <p><strong>備註：</strong>{orderData.customerNotes}</p>
             )}
