@@ -201,6 +201,8 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
               <div>帳號：123-456-789012</div>
               <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
               <div className="text-blue-600 mt-2 font-bold">匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
+              {/* 調試資訊 */}
+              <div className="text-xs text-gray-500 mt-2">DEBUG: payment = {payment}</div>
             </div>
           )}
           {payment === "LINE Pay" && (
