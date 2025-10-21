@@ -131,7 +131,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         paymentRequestedAt: null as unknown as Timestamp | null,
         paidAt: null as unknown as Timestamp | null,
         tradeNo: "",
-        status: payment === "銀行匯款" ? "待匯款" : payment === "LINE Pay" ? "待付款" : "待付款",
+        status: "待付款", // 統一所有付款方式的初始狀態
         createdAt: Timestamp.now(),
       };
       
