@@ -64,7 +64,10 @@ export default function CartInline() {
       <div className="flex justify-between items-center mt-4">
         <div className="text-xl font-bold">總金額：NT$ {total.toLocaleString()}</div>
       </div>
-      <CheckoutForm cart={cart} onSuccess={() => clearCart()} />
+      <CheckoutForm cart={cart} onSuccess={(info) => {
+        // 訂單成功後清除購物車
+        clearCart();
+      }} />
     </div>
   );
 } 
