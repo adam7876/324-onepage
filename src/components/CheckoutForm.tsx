@@ -24,6 +24,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [shipping, setShipping] = useState("7-11 超商取貨");
   const [payment, setPayment] = useState("銀行匯款");
   const [orderId, setOrderId] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [firebaseReady, setFirebaseReady] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -168,6 +169,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       }
       
       setOrderId(orderNumber);
+      setOrderNumber(orderNumber);
       setSuccess(true);
       localStorage.removeItem("cart");
       if (onSuccess) onSuccess({ orderId: orderRef.id, shipping, payment });
