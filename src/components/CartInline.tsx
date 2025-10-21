@@ -3,7 +3,6 @@ import { Button } from "./ui/button";
 import Image from "next/image";
 import CheckoutForm from "./CheckoutForm";
 import { useCart } from "./CartContext";
-import { useState } from "react";
 
 export interface CartItem {
   id: string;
