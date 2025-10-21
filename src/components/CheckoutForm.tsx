@@ -187,7 +187,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           <div className="text-green-600 text-5xl mb-4">✓</div>
           <div className="text-2xl font-bold mb-4 text-green-700">訂單成立</div>
           <div className="mb-2 text-lg">感謝您的訂購！</div>
-          <div className="mb-2">訂單編號：<span className="font-mono text-pink-600">{orderId}</span></div>
+          <div className="mb-2">訂單編號：<span className="font-mono text-pink-600">{orderNumber}</span></div>
           <div className="mb-2">物流方式：<span className="font-bold">{shipping}</span></div>
           <div className="mb-2">付款方式：<span className="font-bold">{payment}</span></div>
           {payment === "銀行匯款" && (
@@ -198,6 +198,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
               <div>戶名：王小明</div>
               <div>帳號：123-456-789012</div>
               <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
+              <div className="text-blue-600 mt-2 font-bold">匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
             </div>
           )}
           {payment !== "銀行匯款" && (
