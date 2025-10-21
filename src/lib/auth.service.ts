@@ -42,7 +42,7 @@ class AuthServiceImpl implements AuthService {
       this.currentUser = userCredential.user;
       
       // 檢查是否為管理員
-      const isAdmin = await this.checkAdminStatus(userCredential.user);
+      const isAdmin = await this.checkAdminStatus();
       
       securityService.logSecurityEvent('sign_in_success', {
         uid: userCredential.user.uid,
@@ -99,7 +99,7 @@ class AuthServiceImpl implements AuthService {
     return onAuthStateChanged(this.auth, callback);
   }
 
-  private async checkAdminStatus(_user: User): Promise<boolean> {
+  private async checkAdminStatus(): Promise<boolean> {
     // 這裡可以從 Firestore 檢查用戶的 admin 狀態
     // 目前簡化為檢查 email
     return this.isAdmin();
