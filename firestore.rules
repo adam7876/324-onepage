@@ -12,8 +12,8 @@ service cloud.firestore {
     match /orders/{document} {
       // 允許任何人建立訂單，LINE Pay API 可以讀取和更新，管理員可以讀取和更新
       allow create: if true; // 任何人都可以建立訂單
-      allow read: if request.auth != null && isAdmin() || isLinePayApi(); // 只有 LINE Pay API 和管理員可以讀取
-      allow update: if request.auth != null && isAdmin() || isLinePayApi(); // 只有 LINE Pay API 和管理員可以更新
+      allow read: if (request.auth != null && isAdmin()) || isLinePayApi(); // 只有 LINE Pay API 和管理員可以讀取
+      allow update: if (request.auth != null && isAdmin()) || isLinePayApi(); // 只有 LINE Pay API 和管理員可以更新
       allow delete: if request.auth != null && isAdmin();
     }
     
