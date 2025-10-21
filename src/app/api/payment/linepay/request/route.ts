@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLinePayRequest } from '@/lib/linepay-service';
 import { validateLinePayConfig } from '@/lib/linepay-config';
-import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 export async function POST(request: NextRequest) {
@@ -58,12 +58,6 @@ export async function POST(request: NextRequest) {
     const result = await createLinePayRequest(linePayData);
 
     if (result.success && result.paymentUrl) {
-      // 更新訂單狀態為「已請款」
-      await updateDoc(orderDoc.ref, {
-        paymentStatus: '已請款',
-        paymentRequestedAt: Timestamp.now(),
-      });
-
       return NextResponse.json({
         success: true,
         paymentUrl: result.paymentUrl,
