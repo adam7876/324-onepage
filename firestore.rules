@@ -10,9 +10,10 @@ service cloud.firestore {
     
     // 訂單集合 - 允許匿名用戶建立訂單
     match /orders/{document} {
-      // 允許任何人建立訂單，管理員可以讀取和更新
+      // 允許任何人建立訂單，API 端點可以讀取，管理員可以讀取和更新
       allow create: if true; // 任何人都可以建立訂單
-      allow read, update: if request.auth != null && isAdmin();
+      allow read: if request.auth != null && isAdmin() || isApiRequest(); // API 端點可以讀取
+      allow update: if request.auth != null && isAdmin() || isApiRequest(); // API 端點可以更新
       allow delete: if request.auth != null && isAdmin();
     }
     
