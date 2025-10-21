@@ -4,7 +4,7 @@
  */
 
 import { db } from '../firebase/firestore';
-import { collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, doc, Timestamp, runTransaction } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 import { CartItem } from './cart.service';
 
 export interface Order {
@@ -21,11 +21,11 @@ export interface Order {
   total: number;
   amountExpected: number;
   paymentStatus: '未請款' | '已請款' | '已付款' | '付款失敗' | '已退款';
-  paymentRequestedAt?: any;
-  paidAt?: any;
+  paymentRequestedAt?: Timestamp;
+  paidAt?: Timestamp;
   tradeNo?: string;
   status: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export interface OrderService {
@@ -149,7 +149,7 @@ class OrderServiceImpl implements OrderService {
     }
   }
 
-  private logOrderAction(action: string, data: any): void {
+  private logOrderAction(action: string, data: unknown): void {
     console.log(`Order ${action}:`, {
       action,
       data,

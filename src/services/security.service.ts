@@ -9,7 +9,7 @@ export interface SecurityEvent {
   type: 'api_call' | 'error' | 'security' | 'payment' | 'order';
   level: 'info' | 'warn' | 'error' | 'critical';
   message: string;
-  data?: any;
+  data?: unknown;
   timestamp: string;
   userId?: string;
   ip?: string;
@@ -18,11 +18,11 @@ export interface SecurityEvent {
 
 export interface SecurityService {
   logEvent(event: Omit<SecurityEvent, 'timestamp'>): void;
-  logApiCall(endpoint: string, method: string, data?: any): void;
-  logError(error: Error, context?: any): void;
-  logSecurityEvent(event: string, data?: any): void;
-  logPaymentEvent(event: string, data?: any): void;
-  logOrderEvent(event: string, data?: any): void;
+  logApiCall(endpoint: string, method: string, data?: unknown): void;
+  logError(error: Error, context?: unknown): void;
+  logSecurityEvent(event: string, data?: unknown): void;
+  logPaymentEvent(event: string, data?: unknown): void;
+  logOrderEvent(event: string, data?: unknown): void;
 }
 
 class SecurityServiceImpl implements SecurityService {
@@ -43,7 +43,7 @@ class SecurityServiceImpl implements SecurityService {
     }
   }
 
-  logApiCall(endpoint: string, method: string, data?: any): void {
+  logApiCall(endpoint: string, method: string, data?: unknown): void {
     this.logEvent({
       type: 'api_call',
       level: 'info',
@@ -56,7 +56,7 @@ class SecurityServiceImpl implements SecurityService {
     });
   }
 
-  logError(error: Error, context?: any): void {
+  logError(error: Error, context?: unknown): void {
     this.logEvent({
       type: 'error',
       level: 'error',
@@ -72,7 +72,7 @@ class SecurityServiceImpl implements SecurityService {
     });
   }
 
-  logSecurityEvent(event: string, data?: any): void {
+  logSecurityEvent(event: string, data?: unknown): void {
     this.logEvent({
       type: 'security',
       level: 'warn',
@@ -81,7 +81,7 @@ class SecurityServiceImpl implements SecurityService {
     });
   }
 
-  logPaymentEvent(event: string, data?: any): void {
+  logPaymentEvent(event: string, data?: unknown): void {
     this.logEvent({
       type: 'payment',
       level: 'info',
@@ -90,7 +90,7 @@ class SecurityServiceImpl implements SecurityService {
     });
   }
 
-  logOrderEvent(event: string, data?: any): void {
+  logOrderEvent(event: string, data?: unknown): void {
     this.logEvent({
       type: 'order',
       level: 'info',
@@ -99,7 +99,7 @@ class SecurityServiceImpl implements SecurityService {
     });
   }
 
-  private sanitizeData(data: any): any {
+  private sanitizeData(data: unknown): unknown {
     if (!data) return data;
     
     // 移除敏感資料

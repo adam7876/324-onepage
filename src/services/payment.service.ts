@@ -91,7 +91,7 @@ class PaymentServiceImpl implements PaymentService {
     }
   }
 
-  private logPaymentAction(action: string, data: any): void {
+  private logPaymentAction(action: string, data: unknown): void {
     console.log(`Payment ${action}:`, {
       action,
       data,
