@@ -12,8 +12,8 @@ service cloud.firestore {
     match /orders/{document} {
       // 允許任何人建立訂單，LINE Pay API 可以讀取和更新，管理員可以讀取和更新
       allow create: if true; // 任何人都可以建立訂單
-      allow read: if request.auth != null && isAdmin(); // 只有管理員可以讀取
-      allow update: if request.auth != null && isAdmin(); // 只有管理員可以更新
+      allow read: if (request.auth != null && isAdmin()) || isApiRequest(); // 管理員或 API 可以讀取
+      allow update: if (request.auth != null && isAdmin()) || isApiRequest(); // 管理員或 API 可以更新
       allow delete: if request.auth != null && isAdmin();
     }
     
@@ -70,10 +70,9 @@ service cloud.firestore {
   }
   
   function isApiRequest() {
-    // 檢查是否來自 API 端點（通過 User-Agent 或其他標識）
+    // 簡化 API 識別：檢查是否來自 Vercel 環境
     return request.headers['user-agent'] != null &&
-           (request.headers['user-agent'].contains('vercel') ||
-            request.headers['user-agent'].contains('next'));
+           request.headers['user-agent'].contains('vercel');
   }
   
   function isLinePayApi() {
