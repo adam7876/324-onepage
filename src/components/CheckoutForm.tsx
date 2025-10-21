@@ -203,6 +203,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
               <div className="text-blue-600 mt-2 font-bold">匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
               {/* 調試資訊 */}
               <div className="text-xs text-gray-500 mt-2">DEBUG: payment = {payment}</div>
+              <div className="text-red-600 mt-2 font-bold text-lg">🔥 這是測試訊息 - 如果你看到這行，表示快取已清除！</div>
             </div>
           )}
           {payment === "LINE Pay" && (
