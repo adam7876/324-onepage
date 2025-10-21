@@ -105,8 +105,8 @@ class SecurityServiceImpl implements SecurityService {
     // 移除敏感資料
     const sensitiveFields = ['password', 'secret', 'token', 'key', 'creditCard', 'ssn'];
     
-    if (typeof data === 'object') {
-      const sanitized = { ...data };
+    if (typeof data === 'object' && data !== null) {
+      const sanitized = { ...data } as Record<string, unknown>;
       for (const field of sensitiveFields) {
         if (sanitized[field]) {
           sanitized[field] = '[REDACTED]';
