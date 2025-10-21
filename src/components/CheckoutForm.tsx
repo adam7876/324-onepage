@@ -195,15 +195,12 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           {payment === "銀行匯款" && (
             <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
               <div className="font-bold mb-2">匯款資訊</div>
-              <div>銀行名稱：🔥 測試銀行</div>
-              <div>分行：🔥 測試分行</div>
-              <div>戶名：🔥 測試用戶</div>
-              <div>帳號：🔥 測試帳號</div>
+              <div>銀行名稱：台灣銀行</div>
+              <div>分行：台北分行</div>
+              <div>戶名：王小明</div>
+              <div>帳號：123-456-789012</div>
               <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
-              <div className="text-blue-600 mt-2 font-bold">🔥 修改測試：匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
-              {/* 調試資訊 */}
-              <div className="text-xs text-gray-500 mt-2">DEBUG: payment = {payment}</div>
-              <div className="text-red-600 mt-2 font-bold text-lg">🔥 這是測試訊息 - 如果你看到這行，表示快取已清除！</div>
+              <div className="text-blue-600 mt-2 font-bold">匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
             </div>
           )}
           {payment === "LINE Pay" && (
