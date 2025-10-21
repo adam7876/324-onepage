@@ -8,17 +8,17 @@ service cloud.firestore {
       allow write: if request.auth != null && isAdmin(); // 只有管理員可以寫入
     }
     
-    // 訂單集合 - 需要身份驗證
+    // 訂單集合 - 允許匿名用戶建立訂單
     match /orders/{document} {
-      // 允許 LINE Pay API 建立和更新訂單（通過 API 端點保護）
-      allow create: if request.auth != null || isApiRequest();
+      // 允許任何人建立訂單，管理員可以讀取和更新
+      allow create: if true; // 任何人都可以建立訂單
       allow read, update: if request.auth != null && isAdmin();
       allow delete: if request.auth != null && isAdmin();
     }
     
-    // 訂單編號計數器 - 允許 API 存取
+    // 訂單編號計數器 - 允許匿名用戶存取
     match /counters/{document} {
-      allow read, write: if request.auth != null || isApiRequest();
+      allow read, write: if true; // 任何人都可以存取計數器
     }
     
     // 遊戲相關集合 - 公開讀取，管理員寫入
