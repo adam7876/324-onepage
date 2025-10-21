@@ -10,6 +10,11 @@ export async function POST(request: NextRequest) {
   try {
     // 安全驗證配置
     validateLinePayConfig();
+    
+    // 添加 API 認證標頭
+    const headers = new Headers();
+    headers.set('x-api-key', process.env.INTERNAL_API_KEY || 'linepay-internal');
+    headers.set('authorization', `Bearer ${process.env.INTERNAL_API_KEY || 'linepay-internal'}`);
 
     const body = await request.json();
     orderNumber = body.orderNumber;

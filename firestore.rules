@@ -10,10 +10,10 @@ service cloud.firestore {
     
     // 訂單集合 - 允許匿名用戶建立訂單
     match /orders/{document} {
-      // 允許任何人建立訂單，API 端點可以讀取，管理員可以讀取和更新
+      // 允許任何人建立訂單，LINE Pay API 可以讀取和更新，管理員可以讀取和更新
       allow create: if true; // 任何人都可以建立訂單
-      allow read: if request.auth != null && isAdmin() || isApiRequest(); // API 端點可以讀取
-      allow update: if request.auth != null && isAdmin() || isApiRequest(); // API 端點可以更新
+      allow read: if request.auth != null && isAdmin() || isLinePayApi(); // 只有 LINE Pay API 和管理員可以讀取
+      allow update: if request.auth != null && isAdmin() || isLinePayApi(); // 只有 LINE Pay API 和管理員可以更新
       allow delete: if request.auth != null && isAdmin();
     }
     
@@ -74,5 +74,13 @@ service cloud.firestore {
     return request.headers['user-agent'] != null &&
            (request.headers['user-agent'].contains('vercel') ||
             request.headers['user-agent'].contains('next'));
+  }
+  
+  function isLinePayApi() {
+    // 檢查是否來自 LINE Pay API 端點
+    return request.headers['user-agent'] != null &&
+           request.headers['user-agent'].contains('vercel') &&
+           (request.headers['x-api-key'] != null ||
+            request.headers['authorization'] != null);
   }
 }
