@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('orderNumber');
-  const transactionId = searchParams.get('transactionId');
   const [orderData, setOrderData] = useState<{
     id: string;
     orderNumber: string;
