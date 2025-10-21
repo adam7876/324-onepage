@@ -20,6 +20,22 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
+// 激活時清除舊快取
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
 // 攔截請求
 self.addEventListener('fetch', (event) => {
   // 對於 HTML 頁面，優先檢查網路更新
