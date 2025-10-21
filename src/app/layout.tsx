@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: "每天一次機會，玩遊戲領回饋金！",
   manifest: "/manifest.json",
   other: {
-    'cache-version': 'v2.2.0', // 強制清除快取
+    'cache-version': 'v2.3.0', // 強制清除快取
   },
   appleWebApp: {
     capable: true,
