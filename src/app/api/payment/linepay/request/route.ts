@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLinePayRequest } from '@/lib/linepay-service';
 import { validateLinePayConfig } from '@/lib/linepay-config';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 export async function POST(request: NextRequest) {
@@ -34,7 +34,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 不在此時建立訂單，只有付款成功才建立
+    // 建立待付款訂單
+    const pendingOrderData = {
+      ...orderData,
+      status: '待付款',
+      paymentStatus: '未請款',
+      createdAt: Timestamp.now(),
+    };
+    
+    await addDoc(collection(db, 'orders'), pendingOrderData);
 
     // 安全驗證：檢查訂單狀態
     if (orderData.paymentStatus !== '未請款') {
