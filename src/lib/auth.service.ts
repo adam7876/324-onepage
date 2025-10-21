@@ -99,7 +99,7 @@ class AuthServiceImpl implements AuthService {
     return onAuthStateChanged(this.auth, callback);
   }
 
-  private async checkAdminStatus(user: User): Promise<boolean> {
+  private async checkAdminStatus(_user: User): Promise<boolean> {
     // 這裡可以從 Firestore 檢查用戶的 admin 狀態
     // 目前簡化為檢查 email
     return this.isAdmin();

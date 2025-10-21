@@ -81,9 +81,8 @@ export class ApiAuth {
    */
   static async verifyLinePayApi(request: NextRequest): Promise<ApiAuthResult> {
     try {
-      // 檢查 User-Agent 和 Referer
+      // 檢查 User-Agent
       const userAgent = request.headers.get('user-agent');
-      const referer = request.headers.get('referer');
       
       // LINE Pay 請求應該來自 LINE Pay 服務器
       if (!userAgent || !userAgent.includes('LINE')) {
