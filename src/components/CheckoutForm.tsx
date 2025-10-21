@@ -172,7 +172,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       setOrderNumber(newOrderNumber);
       setSuccess(true);
       localStorage.removeItem("cart");
-      if (onSuccess) onSuccess({ orderId: orderRef.id, shipping, payment });
+      if (onSuccess) onSuccess({ orderId: newOrderNumber, shipping, payment });
       
     } catch (err) {
       console.error("訂單送出失敗，詳細錯誤:", err);

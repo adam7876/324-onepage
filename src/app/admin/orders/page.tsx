@@ -54,6 +54,30 @@ const ORDER_STATUS = [
 ] as const;
 type OrderStatus = typeof ORDER_STATUS[number];
 
+// 狀態顏色配置
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "待付款":
+      return "bg-amber-100 text-amber-800 border-amber-200";
+    case "已付款":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "待出貨":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "已出貨":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    case "已完成":
+      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    case "已取消":
+      return "bg-gray-100 text-gray-800 border-gray-200";
+    case "退款中":
+      return "bg-orange-100 text-orange-800 border-orange-200";
+    case "已退款":
+      return "bg-red-100 text-red-800 border-red-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
+  }
+};
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -265,31 +289,36 @@ export default function AdminOrders() {
                     <td className="border px-2 py-1">{o.phone}</td>
                     <td className="border px-2 py-1">NT$ {o.total?.toLocaleString()}</td>
                     <td className="border px-2 py-1">
-                      <select
-                        className="border rounded px-2 py-1 bg-white"
-                        value={o.status}
-                        onChange={async (e) => {
-                          const newStatus = e.target.value as OrderStatus;
-                          setStatusSaving(o.id);
-                          setStatusError(null);
-                          setStatusSuccess(null);
-                          try {
-                            await updateDoc(doc(db, "orders", o.id), { status: newStatus });
-                            setOrders((prev) => prev.map((ord) => ord.id === o.id ? { ...ord, status: newStatus } : ord));
-                            setStatusSuccess(o.id);
-                            setTimeout(() => setStatusSuccess(null), 1200);
-                          } catch {
-                            setStatusError(o.id);
-                            setTimeout(() => setStatusError(null), 2000);
-                          } finally {
-                            setStatusSaving(null);
-                          }
-                        }}
-                      >
-                        {ORDER_STATUS.map((s) => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(o.status)}`}>
+                          {o.status}
+                        </span>
+                        <select
+                          className="border rounded px-2 py-1 bg-white text-sm"
+                          value={o.status}
+                          onChange={async (e) => {
+                            const newStatus = e.target.value as OrderStatus;
+                            setStatusSaving(o.id);
+                            setStatusError(null);
+                            setStatusSuccess(null);
+                            try {
+                              await updateDoc(doc(db, "orders", o.id), { status: newStatus });
+                              setOrders((prev) => prev.map((ord) => ord.id === o.id ? { ...ord, status: newStatus } : ord));
+                              setStatusSuccess(o.id);
+                              setTimeout(() => setStatusSuccess(null), 1200);
+                            } catch {
+                              setStatusError(o.id);
+                              setTimeout(() => setStatusError(null), 2000);
+                            } finally {
+                              setStatusSaving(null);
+                            }
+                          }}
+                        >
+                          {ORDER_STATUS.map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      </div>
                       {statusSaving === o.id && <span className="ml-2 text-xs text-blue-500">儲存中...</span>}
                       {statusSuccess === o.id && <span className="ml-2 text-xs text-green-600">✔</span>}
                       {statusError === o.id && <span className="ml-2 text-xs text-red-500">儲存失敗</span>}
