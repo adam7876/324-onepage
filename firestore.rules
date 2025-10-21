@@ -1,54 +1,77 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 管理員相關集合（需要認證）
-    match /emailVerifications/{document} {
-      allow read, write: if true;
-    }
-    match /gameTokens/{document} {
-      allow read, write: if true;
-    }
-    match /gameHistory/{document} {
-      allow read, write: if true;
-    }
     
-    // 會員資料集合（需要認證）
-    match /members/{document} {
-      allow read, write: if true;
-    }
-    
-    // 管理員配置（需要認證）
-    match /adminConfig/{document} {
-      allow read, write: if true;
-    }
-    
-    // 遊戲設定集合（允許所有讀寫操作）
-    match /gameSettings/{document} {
-      allow read, write: if true;
-    }
-    
-    match /orders/{document} {
-      allow read, write: if true; // 允許 LINE Pay API 存取訂單
-    }
-    
-    // 訂單編號計數器（允許 LINE Pay API 存取）
-    match /counters/{document} {
-      allow read, write: if true;
-    }
+    // 商品集合 - 公開讀取，管理員寫入
     match /products/{document} {
-      allow read: if true;
-      allow write: if request.auth != null;
+      allow read: if true; // 任何人都可以讀取商品
+      allow write: if request.auth != null && isAdmin(); // 只有管理員可以寫入
     }
     
-    // 遊戲配置（所有人都可以讀取）
+    // 訂單集合 - 需要身份驗證
+    match /orders/{document} {
+      // 允許 LINE Pay API 建立和更新訂單（通過 API 端點保護）
+      allow create: if request.auth != null || isApiRequest();
+      allow read, update: if request.auth != null && isAdmin();
+      allow delete: if request.auth != null && isAdmin();
+    }
+    
+    // 訂單編號計數器 - 允許 API 存取
+    match /counters/{document} {
+      allow read, write: if request.auth != null || isApiRequest();
+    }
+    
+    // 遊戲相關集合 - 公開讀取，管理員寫入
+    match /gameSettings/{document} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+    
     match /gameConfig/{document} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null && isAdmin();
     }
     
-    // 其他文件需要認證
+    // 遊戲歷史和令牌 - 需要身份驗證
+    match /gameHistory/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    match /gameTokens/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // 會員資料 - 需要身份驗證
+    match /members/{document} {
+      allow read, write: if request.auth != null && isAdmin();
+    }
+    
+    // 管理員配置 - 只有管理員可以存取
+    match /adminConfig/{document} {
+      allow read, write: if request.auth != null && isAdmin();
+    }
+    
+    // 郵件驗證 - 需要身份驗證
+    match /emailVerifications/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // 其他文件 - 需要身份驗證
     match /{document=**} {
       allow read, write: if request.auth != null;
     }
+  }
+  
+  // 輔助函數
+  function isAdmin() {
+    return request.auth != null && 
+           request.auth.token.admin == true;
+  }
+  
+  function isApiRequest() {
+    // 檢查是否來自 API 端點（通過 User-Agent 或其他標識）
+    return request.headers['user-agent'] != null &&
+           (request.headers['user-agent'].contains('vercel') ||
+            request.headers['user-agent'].contains('next'));
   }
 }

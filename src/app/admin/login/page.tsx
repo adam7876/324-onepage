@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { app } from "@/firebase/firebaseConfig"; // 你的 firebase 初始化
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { authService } from "@/lib/auth.service";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -14,11 +13,20 @@ export default function AdminLogin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const auth = getAuth(app);
+    
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("登入成功！");
-      router.push("/admin");
+      const success = await authService.signIn(email, password);
+      if (success) {
+        if (authService.isAdmin()) {
+          alert("管理員登入成功！");
+          router.push("/admin");
+        } else {
+          setError("您沒有管理員權限");
+          await authService.signOut();
+        }
+      } else {
+        setError("登入失敗：帳號或密碼錯誤");
+      }
     } catch (err) {
       setError("登入失敗：" + (err instanceof Error ? err.message : String(err)));
     }
