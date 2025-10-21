@@ -106,7 +106,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     
     try {
       console.log("準備建立訂單...");
-      const orderNumber = await generateOrderNumber();
+      const newOrderNumber = await generateOrderNumber();
       // 將 cart 內每個商品的 undefined 欄位補成空字串或預設值
       const cleanCart = cart.map(item => ({
         ...item,
@@ -116,7 +116,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         imageUrl: item.imageUrl ?? "",
       }));
       const orderData = {
-        orderNumber,
+        orderNumber: newOrderNumber,
         name: name ?? "",
         email: email ?? "",
         phone: phone ?? "",
@@ -148,7 +148,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ orderNumber }),
+            body: JSON.stringify({ orderNumber: newOrderNumber }),
           });
           
           const result = await response.json();
@@ -168,8 +168,8 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
         }
       }
       
-      setOrderId(orderNumber);
-      setOrderNumber(orderNumber);
+      setOrderId(newOrderNumber);
+      setOrderNumber(newOrderNumber);
       setSuccess(true);
       localStorage.removeItem("cart");
       if (onSuccess) onSuccess({ orderId: orderRef.id, shipping, payment });
