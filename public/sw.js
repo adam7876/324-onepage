@@ -1,4 +1,4 @@
-const CACHE_NAME = '324-games-v2.1.0';
+const CACHE_NAME = '324-games-v2.3.0';
 const urlsToCache = [
   '/games',
   '/manifest.json',
