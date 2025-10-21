@@ -38,10 +38,10 @@ export default function CartInline() {
           {orderInfo.payment === "銀行匯款" && (
             <div className="bg-gray-50 p-4 rounded border mb-4 text-left inline-block mt-4">
               <div className="font-bold mb-2">匯款資訊</div>
-              <div>銀行名稱：🔥 測試銀行</div>
-              <div>分行：🔥 測試分行</div>
-              <div>戶名：🔥 測試用戶</div>
-              <div>帳號：🔥 測試帳號</div>
+              <div>銀行名稱：台灣銀行</div>
+              <div>分行：台北分行</div>
+              <div>戶名：王小明</div>
+              <div>帳號：123-456-789012</div>
               <div className="text-red-500 mt-2">請於 3 日內完成匯款，並保留收據以利對帳。</div>
               <div className="text-blue-600 mt-2 font-bold">匯款後請回傳匯款帳號後五碼至 axikorea@gmail.com</div>
             </div>
