@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { confirmLinePayPayment } from '@/lib/linepay-service';
-import { collection, query, where, getDocs, updateDoc, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 // 處理 GET 請求（LINE Pay 重定向）
