@@ -79,7 +79,6 @@ function CheckoutSuccessContent() {
           <div className="text-left bg-gray-50 p-4 rounded-lg mb-6">
             <h3 className="font-bold mb-2">訂單資訊</h3>
             <p><strong>訂單編號：</strong>{orderData.orderNumber}</p>
-            <p><strong>交易編號：</strong>{transactionId || '處理中'}</p>
             <p><strong>付款狀態：</strong>已付款</p>
             <p><strong>總金額：</strong>NT$ {orderData.total?.toLocaleString()}</p>
             <p><strong>收件人：</strong>{orderData.name}</p>
@@ -109,7 +108,11 @@ function CheckoutSuccessContent() {
             回到首頁
           </Button>
           <Button 
-            onClick={() => window.location.href = '/cart'}
+            onClick={() => {
+              // 清空購物車
+              localStorage.removeItem('cart');
+              window.location.href = '/cart';
+            }}
             variant="outline"
             className="w-full"
           >

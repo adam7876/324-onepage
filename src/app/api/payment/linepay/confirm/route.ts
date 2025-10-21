@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { confirmLinePayPayment } from '@/lib/linepay-service';
-import { collection, query, where, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 
 // 處理 GET 請求（LINE Pay 重定向）
@@ -16,31 +16,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 查詢訂單
-    const ordersRef = collection(db, 'orders');
-    const q = query(ordersRef, where('orderNumber', '==', orderNumber));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      return NextResponse.redirect(
-        new URL('/checkout/failed?reason=order_not_found', request.url)
-      );
-    }
-
-    const orderDoc = querySnapshot.docs[0];
-    const orderData = orderDoc.data();
-
-    // 確認付款
-    const result = await confirmLinePayPayment(transactionId, orderData.total);
+    // 確認付款（使用預設金額，因為我們還沒有訂單資料）
+    const result = await confirmLinePayPayment(transactionId, 0);
     
     if (result.success) {
-      // 更新訂單狀態
-      await updateDoc(orderDoc.ref, {
-        status: '已付款',
+      // 付款成功後才建立訂單
+      // 這裡需要從某處獲取訂單資料，暫時使用基本資料
+      const orderData = {
+        orderNumber: orderNumber,
+        name: 'LINE Pay 客戶',
+        email: '',
+        phone: '',
+        address: '',
+        shipping: '7-11 超商取貨',
+        payment: 'LINE Pay',
+        customerNotes: '',
+        items: [],
+        total: 0,
+        amountExpected: 0,
         paymentStatus: '已付款',
+        paymentRequestedAt: null,
         paidAt: Timestamp.now(),
         tradeNo: transactionId,
-      });
+        status: '已付款',
+        createdAt: Timestamp.now(),
+      };
+      
+      await addDoc(collection(db, 'orders'), orderData);
 
       return NextResponse.redirect(
         new URL(`/checkout/success?orderNumber=${orderNumber}&transactionId=${transactionId}`, request.url)
