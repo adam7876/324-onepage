@@ -28,7 +28,7 @@ export async function POST() {
     }
     
     // 批量更新訂單狀態
-    const updatePromises = [];
+    const updatePromises: Promise<void>[] = [];
     querySnapshot.forEach((orderDoc) => {
       console.log(`更新訂單 ${orderDoc.id}: 待匯款 → 待付款`);
       updatePromises.push(
