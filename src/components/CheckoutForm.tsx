@@ -7,6 +7,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
 import type { CartItem } from "./CartInline";
 import { orderService } from "../services/order.service";
+import { cartService } from "../services/cart.service";
 
 interface CheckoutFormProps {
   cart: CartItem[];
@@ -28,7 +29,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [orderNumber, setOrderNumber] = useState("");
   const [firebaseReady, setFirebaseReady] = useState(false);
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cartService.getTotal();
 
   useEffect(() => {
     console.log("CheckoutForm 已載入，檢查 Firebase 狀態...");
