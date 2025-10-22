@@ -29,7 +29,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [orderNumber, setOrderNumber] = useState("");
   const [firebaseReady, setFirebaseReady] = useState(false);
 
-  const total = cartService.getTotal();
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
     console.log("CheckoutForm 已載入，檢查 Firebase 狀態...");
