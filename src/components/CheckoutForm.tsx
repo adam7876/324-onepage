@@ -6,6 +6,7 @@ import { collection, addDoc, Timestamp, getDocs, limit, query, runTransaction, d
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
 import type { CartItem } from "./CartInline";
+import { orderService } from "../services/order.service";
 
 interface CheckoutFormProps {
   cart: CartItem[];
@@ -28,30 +29,6 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [firebaseReady, setFirebaseReady] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  // 產生數字訂單編號：YYYYMMDD + 三位數遞增序號
-  const generateOrderNumber = async (): Promise<string> => {
-    const now = new Date();
-    const yyyy = String(now.getFullYear());
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const dateKey = `${yyyy}${mm}${dd}`;
-
-    const seqRef = doc(db, 'counters', `order-${dateKey}`);
-    const seq = await runTransaction(db, async (tx) => {
-      const snap = await tx.get(seqRef);
-      const current = snap.exists() ? (snap.data().seq as number) : 0;
-      const next = current + 1;
-      if (snap.exists()) {
-        tx.update(seqRef, { seq: next });
-      } else {
-        tx.set(seqRef, { seq: next, date: dateKey });
-      }
-      return next;
-    });
-
-    return `${dateKey}${String(seq).padStart(3, '0')}`;
-  };
 
   useEffect(() => {
     console.log("CheckoutForm 已載入，檢查 Firebase 狀態...");
@@ -106,34 +83,14 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
     
     try {
       console.log("準備建立訂單...");
-      const newOrderNumber = await generateOrderNumber();
-      // 將 cart 內每個商品的 undefined 欄位補成空字串或預設值
-      const cleanCart = cart.map(item => ({
-        ...item,
-        name: item.name ?? "",
-        price: item.price ?? 0,
-        quantity: item.quantity ?? 1,
-        imageUrl: item.imageUrl ?? "",
-      }));
-      const orderData = {
-        orderNumber: newOrderNumber,
-        name: name ?? "",
-        email: email ?? "",
-        phone: phone ?? "",
-        address: address ?? "",
-        shipping: shipping ?? "",
-        payment: payment ?? "",
-        customerNotes: customerNotes ?? "",
-        items: cleanCart,
-        total: total ?? 0,
-        amountExpected: total ?? 0,
-        paymentStatus: "未請款", // 未請款 | 已請款 | 已付款 | 付款失敗 | 已退款
-        paymentRequestedAt: null as unknown as Timestamp | null,
-        paidAt: null as unknown as Timestamp | null,
-        tradeNo: "",
-        status: "待付款", // 統一所有付款方式的初始狀態
-        createdAt: Timestamp.now(),
+      const newOrderNumber = await orderService.generateOrderNumber();
+      
+      // 使用服務層處理訂單資料
+      const formData = {
+        name, email, phone, address, shipping, payment, customerNotes
       };
+      const orderData = orderService.processOrderData(formData, cart);
+      orderData.orderNumber = newOrderNumber;
       
       // 如果是 LINE Pay，先請求付款，成功後才建立訂單
       if (payment === "LINE Pay") {

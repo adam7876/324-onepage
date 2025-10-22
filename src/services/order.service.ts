@@ -35,6 +35,7 @@ export interface OrderService {
   deleteOrder(orderId: string): Promise<void>;
   batchDeleteOrders(orderIds: string[]): Promise<void>;
   generateOrderNumber(): Promise<string>;
+  processOrderData(formData: any, cart: CartItem[]): Order;
 }
 
 class OrderServiceImpl implements OrderService {
@@ -123,28 +124,76 @@ class OrderServiceImpl implements OrderService {
     try {
       this.logOrderAction('generate_order_number_start', {});
       
-      const today = new Date();
-      const dateStr = today.getFullYear().toString() + 
-                     (today.getMonth() + 1).toString().padStart(2, '0') + 
-                     today.getDate().toString().padStart(2, '0');
-      
-      const ordersRef = collection(db, 'orders');
-      const q = query(ordersRef, where('orderNumber', '>=', dateStr + '000'));
-      const querySnapshot = await getDocs(q);
-      
-      const existingNumbers = querySnapshot.docs
-        .map(doc => doc.data().orderNumber)
-        .filter(num => num.startsWith(dateStr))
-        .map(num => parseInt(num.slice(8)))
-        .sort((a, b) => b - a);
-      
-      const nextSequence = (existingNumbers[0] || 0) + 1;
-      const orderNumber = dateStr + nextSequence.toString().padStart(3, '0');
+      const now = new Date();
+      const yyyy = String(now.getFullYear());
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const dateKey = `${yyyy}${mm}${dd}`;
+
+      // 使用 Firestore 交易來確保原子性
+      const { runTransaction, doc } = await import('firebase/firestore');
+      const seqRef = doc(db, 'counters', `order-${dateKey}`);
+      const seq = await runTransaction(db, async (tx) => {
+        const snap = await tx.get(seqRef);
+        const current = snap.exists() ? (snap.data().seq as number) : 0;
+        const next = current + 1;
+        if (snap.exists()) {
+          tx.update(seqRef, { seq: next });
+        } else {
+          tx.set(seqRef, { seq: next, date: dateKey });
+        }
+        return next;
+      });
+
+      const orderNumber = `${dateKey}${String(seq).padStart(3, '0')}`;
       
       this.logOrderAction('generate_order_number_success', { orderNumber });
       return orderNumber;
     } catch (error) {
       this.logOrderAction('generate_order_number_error', { error: error instanceof Error ? error.message : 'Unknown error' });
+      throw error;
+    }
+  }
+
+  processOrderData(formData: any, cart: CartItem[]): Order {
+    try {
+      this.logOrderAction('process_order_data_start', { formData, cart });
+      
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      
+      // 清理購物車資料
+      const cleanCart = cart.map(item => ({
+        ...item,
+        name: item.name ?? "",
+        price: item.price ?? 0,
+        quantity: item.quantity ?? 1,
+        imageUrl: item.imageUrl ?? "",
+      }));
+      
+      const orderData: Order = {
+        orderNumber: "", // 將由 generateOrderNumber 設定
+        name: formData.name ?? "",
+        email: formData.email ?? "",
+        phone: formData.phone ?? "",
+        address: formData.address ?? "",
+        shipping: formData.shipping ?? "7-11 超商取貨",
+        payment: formData.payment ?? "銀行匯款",
+        customerNotes: formData.customerNotes ?? "",
+        items: cleanCart,
+        total: total,
+        amountExpected: total,
+        paymentStatus: "未請款",
+        paymentRequestedAt: undefined,
+        paidAt: undefined,
+        tradeNo: "",
+        status: "待付款",
+        createdAt: Timestamp.now(),
+      };
+      
+      this.logOrderAction('process_order_data_success', { orderData });
+      return orderData;
+    } catch (error) {
+      this.logOrderAction('process_order_data_error', { error: error instanceof Error ? error.message : 'Unknown error' });
       throw error;
     }
   }
