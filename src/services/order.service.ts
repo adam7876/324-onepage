@@ -21,8 +21,6 @@ export interface Order {
   total: number;
   amountExpected: number;
   paymentStatus: '未請款' | '已請款' | '已付款' | '付款失敗' | '已退款';
-  paymentRequestedAt?: Timestamp;
-  paidAt?: Timestamp;
   tradeNo?: string;
   status: string;
   createdAt: Timestamp;
@@ -199,8 +197,6 @@ class OrderServiceImpl implements OrderService {
         total: total,
         amountExpected: total,
         paymentStatus: "未請款",
-        paymentRequestedAt: undefined,
-        paidAt: undefined,
         tradeNo: "",
         status: "待付款",
         createdAt: Timestamp.now(),
