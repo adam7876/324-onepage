@@ -35,7 +35,15 @@ export interface OrderService {
   deleteOrder(orderId: string): Promise<void>;
   batchDeleteOrders(orderIds: string[]): Promise<void>;
   generateOrderNumber(): Promise<string>;
-  processOrderData(formData: any, cart: CartItem[]): Order;
+  processOrderData(formData: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    shipping: string;
+    payment: string;
+    customerNotes: string;
+  }, cart: CartItem[]): Order;
 }
 
 class OrderServiceImpl implements OrderService {
