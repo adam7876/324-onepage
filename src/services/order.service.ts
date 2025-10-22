@@ -155,9 +155,17 @@ class OrderServiceImpl implements OrderService {
     }
   }
 
-  processOrderData(formData: any, cart: CartItem[]): Order {
+  processOrderData(formData: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    shipping: string;
+    payment: string;
+    customerNotes: string;
+  }, cart: CartItem[]): Order {
     try {
-      this.logOrderAction('process_order_data_start', { formData, cart });
+      this.logOrderAction('process_order_data_start', { formData, cartCount: cart.length });
       
       const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
       

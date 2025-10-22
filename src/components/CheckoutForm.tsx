@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { db } from "../firebase/firestore";
-import { collection, addDoc, Timestamp, getDocs, limit, query, runTransaction, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, limit, query } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
 import type { CartItem } from "./CartInline";
