@@ -11,10 +11,17 @@ export async function POST(request: NextRequest) {
     // 安全驗證配置
     validateLinePayConfig();
     
-    // 添加 API 認證標頭
-    const headers = new Headers();
-    headers.set('x-api-key', process.env.INTERNAL_API_KEY || 'linepay-internal');
-    headers.set('authorization', `Bearer ${process.env.INTERNAL_API_KEY || 'linepay-internal'}`);
+    // API 認證檢查
+    const apiKey = request.headers.get('x-api-key');
+    const authHeader = request.headers.get('authorization');
+    const expectedApiKey = process.env.INTERNAL_API_KEY || 'linepay-internal';
+    
+    if (apiKey !== expectedApiKey || !authHeader?.includes(expectedApiKey)) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized API access' },
+        { status: 401 }
+      );
+    }
 
     const body = await request.json();
     orderNumber = body.orderNumber;

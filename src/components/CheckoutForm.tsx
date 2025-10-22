@@ -142,6 +142,8 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'x-api-key': 'linepay-internal', // 添加 API 認證
+              'authorization': 'Bearer linepay-internal', // 添加 API 認證
             },
             body: JSON.stringify({ 
               orderNumber: newOrderNumber,
