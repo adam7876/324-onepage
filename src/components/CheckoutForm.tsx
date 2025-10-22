@@ -7,7 +7,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
 import type { CartItem } from "./CartInline";
 import { orderService } from "../services/order.service";
-import { cartService } from "../services/cart.service";
 
 interface CheckoutFormProps {
   cart: CartItem[];
