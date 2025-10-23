@@ -42,9 +42,9 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
     }
     
-    // 會員資料 - 需要身份驗證
+    // 會員資料 - 管理員或 API 端點可以存取
     match /members/{document} {
-      allow read, write: if request.auth != null && isAdmin();
+      allow read, write: if (request.auth != null && isAdmin()) || isApiRequest();
     }
     
     // 管理員配置 - 只有管理員可以存取
