@@ -204,7 +204,10 @@ export default function MembersPage() {
       // 先取得總數（小批測試）
       const headResp = await fetch('/api/admin/sync-sheets/batch', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer admin_324_moonp_secure_key_h94mp65k6'
+        },
         body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset: 0, limit: 1, ...(startRow ? { startRow } : {}) })
       });
       const head = await headResp.json();
@@ -226,7 +229,10 @@ export default function MembersPage() {
       for (let offset = 0; offset < total; offset += limit) {
         const resp = await fetch('/api/admin/sync-sheets/batch', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_324_moonp_secure_key_h94mp65k6'
+          },
           body: JSON.stringify({ sheetsUrl: sheetsUrl.trim(), offset, limit, ...(startRow ? { startRow } : {}) })
         });
         const data = await resp.json();
