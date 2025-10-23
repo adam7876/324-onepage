@@ -14,9 +14,12 @@ class CartServiceImpl implements CartService {
 
   private loadFromStorage(): void {
     try {
-      const stored = localStorage.getItem('cart');
-      if (stored) {
-        this.cart = JSON.parse(stored);
+      // 檢查是否在瀏覽器環境
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem('cart');
+        if (stored) {
+          this.cart = JSON.parse(stored);
+        }
       }
     } catch (error) {
       console.error('Failed to load cart from storage:', error);
@@ -26,7 +29,10 @@ class CartServiceImpl implements CartService {
 
   private saveToStorage(): void {
     try {
-      localStorage.setItem('cart', JSON.stringify(this.cart));
+      // 檢查是否在瀏覽器環境
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('cart', JSON.stringify(this.cart));
+      }
     } catch (error) {
       console.error('Failed to save cart to storage:', error);
     }

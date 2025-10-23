@@ -3,11 +3,10 @@ import Image from "next/image";
 import CheckoutForm from "./CheckoutForm";
 import { useCart } from "./CartContext";
 import { useState } from "react";
-import { cartService } from "../services/cart.service";
 
 export default function CartInline() {
   const { cart, updateQuantity, removeItem, clearCart } = useCart();
-  const total = cartService.getTotal();
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const [orderInfo, setOrderInfo] = useState<null | {
     orderId: string;
     shipping: string;
