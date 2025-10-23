@@ -86,6 +86,13 @@ async function setSyncMeta(update: { lastLineIndex: number; totalRows: number })
 
 export async function POST(request: NextRequest) {
   try {
+    // 管理員認證
+    const { AdminAuth } = await import('../../../../../lib/admin-auth');
+    const authResult = await AdminAuth.verifyAdmin(request);
+    if (!authResult.success) {
+      return AdminAuth.createUnauthorizedResponse(authResult.error);
+    }
+
     const { sheetsUrl, offset = 0, limit = 200, startRow } = await request.json();
     if (!sheetsUrl) {
       return NextResponse.json({ success: false, error: '缺少 sheetsUrl' });

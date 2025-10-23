@@ -293,6 +293,13 @@ async function syncMembers(sheetsMembers: SheetsMember[]): Promise<SyncResult> {
 
 export async function POST(request: NextRequest) {
   try {
+    // 管理員認證
+    const { AdminAuth } = await import('../../../../lib/admin-auth');
+    const authResult = await AdminAuth.verifyAdmin(request);
+    if (!authResult.success) {
+      return AdminAuth.createUnauthorizedResponse(authResult.error);
+    }
+
     const { sheetsUrl } = await request.json();
     
     if (!sheetsUrl) {
