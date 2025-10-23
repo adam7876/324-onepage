@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase/firestore';
+import { AdminAuth } from '../../../../lib/admin-auth';
 
 // 清理結果統計
 interface CleanupStats {
@@ -20,13 +21,10 @@ interface CleanupStats {
 
 export async function POST(request: NextRequest) {
   try {
-    // 簡單的驗證 - 在實際環境中應該有更嚴格的身份驗證
-    const { adminKey } = await request.json();
-    if (adminKey !== 'cleanup-324-games') {
-      return NextResponse.json({
-        success: false,
-        message: '無效的管理員金鑰'
-      }, { status: 401 });
+    // 管理員認證
+    const authResult = await AdminAuth.verifyAdmin(request);
+    if (!authResult.success) {
+      return AdminAuth.createUnauthorizedResponse(authResult.error);
     }
 
     const stats: CleanupStats = {

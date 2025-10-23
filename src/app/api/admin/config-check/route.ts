@@ -5,19 +5,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateConfig, getConfigSummary } from '@/config/config-validator';
-import { getApiConfig } from '@/config/app.config';
+import { AdminAuth } from '@/lib/admin-auth';
 
 export async function GET(request: NextRequest) {
   try {
-    // 簡單的 API 認證
-    const apiKey = request.headers.get('x-api-key');
-    const apiConfig = getApiConfig();
-    
-    if (apiKey !== apiConfig.adminApiKey) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // 管理員認證
+    const authResult = await AdminAuth.verifyAdmin(request);
+    if (!authResult.success) {
+      return AdminAuth.createUnauthorizedResponse(authResult.error);
     }
 
     // 執行配置驗證
