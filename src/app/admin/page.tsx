@@ -36,7 +36,6 @@ export default function AdminDashboard() {
           <Button className="w-full" onClick={() => router.push("/admin/games")}>遊戲管理</Button>
           <Button className="w-full" onClick={() => router.push("/admin/members")}>👥 會員管理</Button>
           <Button className="w-full" onClick={() => router.push("/admin/game-status")}>🎮 遊戲狀態管理</Button>
-          <Button className="w-full" variant="outline" onClick={() => router.push("/admin/maintenance")}>🧹 資料庫維護</Button>
         </div>
         <Button variant="outline" className="w-full" onClick={async () => { await signOut(getAuth(app)); router.replace("/admin/login"); }}>登出</Button>
       </div>
