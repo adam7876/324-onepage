@@ -1,22 +1,7 @@
 // LINE Pay 配置與安全設定
-export const LINE_PAY_CONFIG = {
-  // 環境變數（生產環境）
-  channelId: process.env.LINE_PAY_CHANNEL_ID || '1656251071',
-  channelSecret: process.env.LINE_PAY_CHANNEL_SECRET || '',
-  merchantId: process.env.LINE_PAY_MERCHANT_ID || 'KHHCR.41318699.QR',
-  
-  // API 端點 - 使用正式環境（因為有正式帳號）
-  apiUrl: 'http://198.13.49.191:3000',
-  
-  // 回傳網址
-  returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/linepay/return`,
-  cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/linepay/cancel`,
-  confirmUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/linepay/confirm`,
-  
-  // 安全設定
-  timeout: 30000, // 30秒超時
-  maxRetries: 3,
-};
+import { getLinePayConfig } from "../config/app.config";
+
+export const LINE_PAY_CONFIG = getLinePayConfig();
 
 // 安全驗證函數
 export function validateLinePayConfig() {

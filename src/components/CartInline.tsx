@@ -1,20 +1,9 @@
-//
 import { Button } from "./ui/button";
 import Image from "next/image";
 import CheckoutForm from "./CheckoutForm";
 import { useCart } from "./CartContext";
 import { useState } from "react";
 import { cartService } from "../services/cart.service";
-
-export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl?: string;
-  size?: string;
-  color?: string;
-  quantity: number;
-}
 
 export default function CartInline() {
   const { cart, updateQuantity, removeItem, clearCart } = useCart();

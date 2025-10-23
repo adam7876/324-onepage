@@ -3,24 +3,7 @@
  * 統一管理購物車相關邏輯
  */
 
-export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl?: string;
-  size?: string;
-  color?: string;
-  quantity: number;
-}
-
-export interface CartService {
-  getCart(): CartItem[];
-  addToCart(item: CartItem): void;
-  updateQuantity(id: string, quantity: number): void;
-  removeItem(id: string): void;
-  clearCart(): void;
-  getTotal(): number;
-}
+import type { CartItem, CartService } from '../types';
 
 class CartServiceImpl implements CartService {
   private cart: CartItem[] = [];
@@ -102,10 +85,10 @@ class CartServiceImpl implements CartService {
     return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 
-  private logCartAction(action: string, item: CartItem | null): void {
+  logCartAction(action: string, data: unknown): void {
     console.log(`Cart ${action}:`, {
       action,
-      item: item ? { id: item.id, name: item.name, quantity: item.quantity } : null,
+      data,
       cartSize: this.cart.length,
       total: this.getTotal(),
       timestamp: new Date().toISOString()

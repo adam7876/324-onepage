@@ -5,7 +5,7 @@
 
 import { createLinePayRequest, confirmLinePayPayment } from '../lib/linepay-service';
 import { validateLinePayConfig } from '../lib/linepay-config';
-import { Order } from './order.service';
+import type { Order } from '../types';
 
 export interface PaymentService {
   requestLinePayPayment(orderData: Order): Promise<{ success: boolean; paymentUrl?: string; error?: string }>;

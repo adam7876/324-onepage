@@ -5,7 +5,7 @@ import { db } from "../firebase/firestore";
 import { collection, addDoc, getDocs, limit, query } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
-import type { CartItem } from "./CartInline";
+import type { CartItem } from "../types";
 import { orderService } from "../services/order.service";
 
 interface CheckoutFormProps {
@@ -99,8 +99,6 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': 'linepay-internal', // 添加 API 認證
-              'authorization': 'Bearer linepay-internal', // 添加 API 認證
             },
             body: JSON.stringify({ 
               orderNumber: newOrderNumber,

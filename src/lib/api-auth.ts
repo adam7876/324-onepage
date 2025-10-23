@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { securityService } from '../services/security.service';
+import { getApiConfig } from '../config/app.config';
 
 export interface ApiAuthResult {
   success: boolean;
@@ -34,10 +35,10 @@ export class ApiAuth {
 
       const token = authHeader.substring(7);
       
-      // 這裡可以驗證 JWT token 或 Firebase token
-      // 目前簡化為檢查特定的 API key
+      // 使用統一配置管理
+      const apiConfig = getApiConfig();
       const validApiKeys = [
-        process.env.ADMIN_API_KEY,
+        apiConfig.adminApiKey,
         process.env.INTERNAL_API_KEY
       ].filter(Boolean);
 

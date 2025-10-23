@@ -3,25 +3,7 @@
  * 統一管理遊戲相關邏輯
  */
 
-export interface GameResult {
-  success: boolean;
-  result: 'win' | 'lose' | 'draw';
-  message: string;
-  reward?: {
-    type: string;
-    name: string;
-    value: number;
-    code?: string;
-  };
-}
-
-export interface GameService {
-  generateRandomChoice(): 'rock' | 'paper' | 'scissors';
-  determineWinner(player: 'rock' | 'paper' | 'scissors', computer: 'rock' | 'paper' | 'scissors'): 'win' | 'lose' | 'draw';
-  rollDice(): number;
-  getDiceEmoji(value: number): string;
-  drawReward(): { type: string; description: string; value: number };
-}
+import type { GameService } from '../types';
 
 class GameServiceImpl implements GameService {
   private readonly choices: { id: 'rock' | 'paper' | 'scissors'; name: string; emoji: string }[] = [

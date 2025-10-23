@@ -3,6 +3,7 @@ import { createLinePayRequest } from '@/lib/linepay-service';
 import { validateLinePayConfig } from '@/lib/linepay-config';
 import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
+import { ApiSecurityService } from '@/lib/api-security';
 
 export async function POST(request: NextRequest) {
   let orderNumber: string | undefined;
@@ -11,16 +12,28 @@ export async function POST(request: NextRequest) {
     // 安全驗證配置
     validateLinePayConfig();
     
-    // API 認證檢查
-    const apiKey = request.headers.get('x-api-key');
-    const authHeader = request.headers.get('authorization');
-    const expectedApiKey = process.env.INTERNAL_API_KEY || 'linepay-internal';
+    // 使用新的安全驗證服務
+    const securityCheck = ApiSecurityService.performSecurityCheck(request);
     
-    if (apiKey !== expectedApiKey || !authHeader?.includes(expectedApiKey)) {
+    if (!securityCheck.isValid) {
+      ApiSecurityService.logSecurityEvent('API_SECURITY_FAILED', {
+        reason: securityCheck.reason,
+        details: securityCheck.details,
+        endpoint: '/api/payment/linepay/request'
+      });
+      
       return NextResponse.json(
-        { success: false, error: 'Unauthorized API access' },
-        { status: 401 }
+        { success: false, error: 'Security check failed' },
+        { status: 403 }
       );
+    }
+    
+    // 記錄高風險請求
+    if (securityCheck.riskLevel === 'high') {
+      ApiSecurityService.logSecurityEvent('HIGH_RISK_REQUEST', {
+        details: securityCheck.details,
+        endpoint: '/api/payment/linepay/request'
+      });
     }
 
     const body = await request.json();

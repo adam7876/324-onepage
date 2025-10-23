@@ -1,30 +1,8 @@
 // Email 服務配置
-interface EmailConfig {
-  provider: 'console' | 'smtp' | 'sendgrid' | 'resend';
-  settings: {
-    apiKey?: string;
-    smtpHost?: string;
-    smtpPort?: number;
-    smtpUser?: string;
-    smtpPass?: string;
-    fromEmail?: string;
-    fromName?: string;
-  };
-}
+import { getEmailConfig } from "../config/app.config";
 
-// 預設使用 console 輸出（開發/測試環境）
-const EMAIL_CONFIG: EmailConfig = {
-  provider: (process.env.EMAIL_PROVIDER as 'console' | 'smtp' | 'sendgrid' | 'resend') || 'console',
-  settings: {
-    apiKey: process.env.EMAIL_API_KEY,
-    smtpHost: process.env.SMTP_HOST,
-    smtpPort: parseInt(process.env.SMTP_PORT || '587'),
-    smtpUser: process.env.SMTP_USER,
-    smtpPass: process.env.SMTP_PASS,
-    fromEmail: process.env.FROM_EMAIL || 'onboarding@resend.dev',
-    fromName: process.env.FROM_NAME || '324遊樂園🎠',
-  }
-};
+// 使用統一配置管理
+const EMAIL_CONFIG = getEmailConfig();
 
 // Email 驗證結果
 interface EmailSendResult {

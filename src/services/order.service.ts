@@ -5,44 +5,9 @@
 
 import { db } from '../firebase/firestore';
 import { collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
-import { CartItem } from './cart.service';
+import type { Order, CartItem, OrderService } from '../types';
 
-export interface Order {
-  id?: string;
-  orderNumber: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  shipping: string;
-  payment: string;
-  customerNotes?: string;
-  items: CartItem[];
-  total: number;
-  amountExpected: number;
-  paymentStatus: '未請款' | '已請款' | '已付款' | '付款失敗' | '已退款';
-  tradeNo?: string;
-  status: string;
-  createdAt: Timestamp;
-}
-
-export interface OrderService {
-  createOrder(orderData: Partial<Order>): Promise<string>;
-  getOrderByNumber(orderNumber: string): Promise<Order | null>;
-  updateOrderStatus(orderId: string, status: string): Promise<void>;
-  deleteOrder(orderId: string): Promise<void>;
-  batchDeleteOrders(orderIds: string[]): Promise<void>;
-  generateOrderNumber(): Promise<string>;
-  processOrderData(formData: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    shipping: string;
-    payment: string;
-    customerNotes: string;
-  }, cart: CartItem[]): Order;
-}
+// 使用統一類型定義，移除重複的介面定義
 
 class OrderServiceImpl implements OrderService {
   async createOrder(orderData: Partial<Order>): Promise<string> {
