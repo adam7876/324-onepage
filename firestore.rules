@@ -33,13 +33,13 @@ service cloud.firestore {
       allow write: if request.auth != null && isAdmin();
     }
     
-    // 遊戲歷史和令牌 - 暫時開放給 API 端點
+    // 遊戲歷史和令牌 - 需要身份驗證
     match /gameHistory/{document} {
-      allow read, write: if request.auth != null || isApiRequest();
+      allow read, write: if request.auth != null;
     }
     
     match /gameTokens/{document} {
-      allow read, write: if request.auth != null || isApiRequest();
+      allow read, write: if request.auth != null;
     }
     
     // 會員資料 - 需要身份驗證
@@ -52,9 +52,9 @@ service cloud.firestore {
       allow read, write: if request.auth != null && isAdmin();
     }
     
-    // 郵件驗證 - 暫時開放給 API 端點
+    // 郵件驗證 - 需要身份驗證
     match /emailVerifications/{document} {
-      allow read, write: if request.auth != null || isApiRequest();
+      allow read, write: if request.auth != null;
     }
     
     // 其他文件 - 需要身份驗證
