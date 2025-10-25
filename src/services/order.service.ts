@@ -5,7 +5,7 @@
 
 import { db } from '../firebase/firestore';
 import { collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
-import type { Order, CartItem, OrderService } from '../types';
+import type { Order, CartItem, OrderService, LogisticsInfo } from '../types';
 
 // 使用統一類型定義，移除重複的介面定義
 
@@ -134,6 +134,7 @@ class OrderServiceImpl implements OrderService {
     shipping: string;
     payment: string;
     customerNotes: string;
+    logisticsInfo?: LogisticsInfo;
   }, cart: CartItem[]): Order {
     try {
       this.logOrderAction('process_order_data_start', { formData, cartCount: cart.length });
@@ -165,6 +166,8 @@ class OrderServiceImpl implements OrderService {
         tradeNo: "",
         status: "待付款",
         createdAt: Timestamp.now(),
+        // 7-11 店到店物流資訊
+        logisticsInfo: formData.logisticsInfo,
       };
       
       this.logOrderAction('process_order_data_success', { orderData });

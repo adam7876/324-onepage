@@ -101,6 +101,20 @@ export interface CartContextType {
 // ==================== 訂單相關 ====================
 
 /**
+ * 7-11 店到店物流資訊
+ */
+export interface LogisticsInfo {
+  storeId: string;        // 門市代號
+  storeName: string;      // 門市名稱
+  storeAddress: string;    // 門市地址
+  storePhone?: string;    // 門市電話
+  logisticsNo?: string;   // 物流編號
+  logisticsStatus?: 'pending' | 'shipped' | 'delivered' | 'returned'; // 物流狀態
+  shippedAt?: Timestamp;  // 出貨時間
+  deliveredAt?: Timestamp; // 送達時間
+}
+
+/**
  * 訂單介面
  */
 export interface Order {
@@ -120,6 +134,8 @@ export interface Order {
   paymentStatus: '未請款' | '已請款' | '已付款' | '付款失敗' | '已退款';
   tradeNo?: string;
   createdAt: Timestamp;
+  // 7-11 店到店物流資訊
+  logisticsInfo?: LogisticsInfo;
 }
 
 /**
@@ -133,6 +149,8 @@ export interface OrderFormData {
   customerNotes?: string;
   shipping: string;
   payment: string;
+  // 7-11 店到店物流資訊
+  logisticsInfo?: LogisticsInfo;
 }
 
 // ==================== 會員相關 ====================

@@ -17,6 +17,17 @@ interface OrderItem {
   imageUrl?: string;
 }
 
+interface LogisticsInfo {
+  storeId: string;
+  storeName: string;
+  storeAddress: string;
+  storePhone?: string;
+  logisticsNo?: string;
+  logisticsStatus?: 'pending' | 'shipped' | 'delivered' | 'returned';
+  shippedAt?: { seconds: number; nanoseconds: number };
+  deliveredAt?: { seconds: number; nanoseconds: number };
+}
+
 interface Order {
   id: string;
   orderNumber?: string;
@@ -36,9 +47,8 @@ interface Order {
   tradeNo?: string;
   status: string;
   createdAt: { seconds: number; nanoseconds: number };
-  // 預留欄位
-  logisticsStatus?: string;
-  logisticsNo?: string;
+  // 7-11 店到店物流資訊
+  logisticsInfo?: LogisticsInfo;
 }
 
 // 訂單狀態選項
