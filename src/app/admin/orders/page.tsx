@@ -431,8 +431,18 @@ export default function AdminOrders() {
                         <div className="mb-2">請款時間：{o.paymentRequestedAt ? new Date(o.paymentRequestedAt.seconds * 1000).toLocaleString() : '-'}</div>
                         <div className="mb-2">付款時間：{o.paidAt ? new Date(o.paidAt.seconds * 1000).toLocaleString() : '-'}</div>
                         <div className="mb-2">金流交易編號：{o.tradeNo || '-'}</div>
-                        <div className="mb-2">物流狀態：{o.logisticsStatus ?? "-"}</div>
-                        <div className="mb-2">物流單號：{o.logisticsNo ?? "-"}</div>
+                        <div className="mb-2">物流狀態：{o.logisticsInfo?.logisticsStatus ?? "-"}</div>
+                        <div className="mb-2">物流單號：{o.logisticsInfo?.logisticsNo ?? "-"}</div>
+                        {o.logisticsInfo && (
+                          <>
+                            <div className="mb-2">門市代號：{o.logisticsInfo.storeId}</div>
+                            <div className="mb-2">門市名稱：{o.logisticsInfo.storeName}</div>
+                            <div className="mb-2">門市地址：{o.logisticsInfo.storeAddress}</div>
+                            {o.logisticsInfo.storePhone && (
+                              <div className="mb-2">門市電話：{o.logisticsInfo.storePhone}</div>
+                            )}
+                          </>
+                        )}
                       </td>
                     </tr>
                   )}
