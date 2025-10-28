@@ -5,8 +5,9 @@ import { db } from "../firebase/firestore";
 import { collection, addDoc, getDocs, limit, query } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebaseConfig";
-import type { CartItem } from "../types";
+import type { CartItem, LogisticsInfo } from "../types";
 import { orderService } from "../services/order.service";
+import StoreSelector from "./StoreSelector";
 
 interface CheckoutFormProps {
   cart: CartItem[];
@@ -27,6 +28,7 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [orderId, setOrderId] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const [firebaseReady, setFirebaseReady] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<LogisticsInfo | null>(null);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -87,7 +89,8 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       
       // 使用服務層處理訂單資料
       const formData = {
-        name, email, phone, address, shipping, payment, customerNotes
+        name, email, phone, address, shipping, payment, customerNotes,
+        logisticsInfo: selectedStore || undefined
       };
       const orderData = orderService.processOrderData(formData, cart);
       orderData.orderNumber = newOrderNumber;
@@ -241,6 +244,14 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
           <option value="324 店取">324 店取</option>
         </select>
       </div>
+      
+      {shipping === "7-11 超商取貨" && (
+        <StoreSelector
+          onStoreSelected={setSelectedStore}
+          selectedStore={selectedStore}
+          disabled={submitting}
+        />
+      )}
       <div>
         <label className="block mb-1">付款方式</label>
         <select
