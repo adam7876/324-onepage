@@ -63,11 +63,11 @@ export class PayNowLogisticsService {
    */
   async chooseLogisticsService(orderNumber: string, logisticsServiceId: '01' | '03' | '05' = '01'): Promise<string> {
     try {
-      // 根據 PayNow 文件，直接構建跳轉 URL，不進行 API 調用
+      // 根據 PayNow 文件，構建簡單的跳轉 URL
       const params = new URLSearchParams({
         user_account: this.config.userAccount,
         orderno: orderNumber,
-        apicode: this.encryptApiCode(),
+        apicode: this.config.apiCode,
         Logistic_serviceID: logisticsServiceId,
         returnUrl: this.config.returnUrl
       });
