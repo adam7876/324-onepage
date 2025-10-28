@@ -14,7 +14,7 @@ export interface PayNowConfig {
 export const getPayNowConfig = (): PayNowConfig => {
   return {
     baseUrl: process.env.PAYNOW_BASE_URL || 'https://logistic.paynow.com.tw',
-    userAccount: process.env.PAYNOW_USER_ACCOUNT || '28229955',
+    userAccount: process.env.PAYNOW_USER_ACCOUNT || '',
     apiCode: process.env.PAYNOW_API_CODE || '',
     returnUrl: process.env.PAYNOW_RETURN_URL || 'https://324-onepage.vercel.app/checkout/success',
     testMode: process.env.NODE_ENV === 'development' || process.env.PAYNOW_TEST_MODE === 'true'
