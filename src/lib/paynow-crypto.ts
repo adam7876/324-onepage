@@ -8,8 +8,7 @@ import crypto from 'crypto';
 /**
  * TripleDES 加密
  * 根據 PayNow API 文件要求
- * 公鑰: 12345678
- * 私鑰: 1234567890 + Password + 123456 (總共24碼)
+ * 使用特定的 IV 和密鑰格式
  */
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
@@ -19,10 +18,11 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 確保私鑰長度為 24 字節
     const paddedKey = privateKey.substring(0, 24);
     
-    // 公鑰作為 IV
+    // 使用正確的 IV (8 字節)
     const iv = Buffer.from('12345678', 'utf8');
     
-    const cipher = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
+    // 使用 createCipheriv 和正確的算法
+    const cipher = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv);
     let encrypted = cipher.update(text, 'utf8', 'base64');
     encrypted += cipher.final('base64');
     
