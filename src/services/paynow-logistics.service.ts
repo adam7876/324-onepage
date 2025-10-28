@@ -248,7 +248,7 @@ export class PayNowLogisticsService {
   /**
    * 加密訂單資料 (TripleDES + URL Encode)
    */
-  private encryptOrderData(data: any): string {
+  private encryptOrderData(data: Record<string, unknown>): string {
     const jsonString = JSON.stringify(data);
     const encrypted = tripleDESEncrypt(jsonString, this.config.apiCode);
     return urlEncode(encrypted);
@@ -269,15 +269,15 @@ export class PayNowLogisticsService {
   /**
    * 解析訂單回應
    */
-  private parseOrderResponse(response: any): PayNowOrderInfo {
+  private parseOrderResponse(response: Record<string, unknown>): PayNowOrderInfo {
     return {
-      orderNumber: response.orderno || '',
-      logisticsNumber: response.LogisticNumber || '',
-      status: response.Status || '',
-      deliveryStatus: response.Delivery_Status || '',
-      paymentNumber: response.paymentno || '',
-      validationNumber: response.validationno || '',
-      errorMessage: response.ErrorMsg || ''
+      orderNumber: (response.orderno as string) || '',
+      logisticsNumber: (response.LogisticNumber as string) || '',
+      status: (response.Status as string) || '',
+      deliveryStatus: (response.Delivery_Status as string) || '',
+      paymentNumber: (response.paymentno as string) || '',
+      validationNumber: (response.validationno as string) || '',
+      errorMessage: (response.ErrorMsg as string) || ''
     };
   }
 }

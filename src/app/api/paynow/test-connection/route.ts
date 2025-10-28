@@ -3,11 +3,10 @@
  * 測試 PayNow 服務是否正常運作
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { payNowLogisticsService } from '@/services/paynow-logistics.service';
+import { NextResponse } from 'next/server';
 import { getPayNowConfig, validatePayNowConfig } from '@/config/paynow.config';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // 取得配置
     const config = getPayNowConfig();
