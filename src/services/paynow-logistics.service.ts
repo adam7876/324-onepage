@@ -63,6 +63,7 @@ export class PayNowLogisticsService {
    */
   async chooseLogisticsService(orderNumber: string, logisticsServiceId: '01' | '03' | '05' = '01'): Promise<string> {
     try {
+      // 根據 PayNow 文件，直接構建跳轉 URL，不進行 API 調用
       const params = new URLSearchParams({
         user_account: this.config.userAccount,
         orderno: orderNumber,
@@ -71,20 +72,9 @@ export class PayNowLogisticsService {
         returnUrl: this.config.returnUrl
       });
 
-      const response = await fetch(`${this.config.baseUrl}/Member/Order/Choselogistics`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString()
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      return result.redirectUrl || `${this.config.baseUrl}/Member/Order/Choselogistics?${params.toString()}`;
+      // 直接返回跳轉 URL
+      const redirectUrl = `${this.config.baseUrl}/Member/Order/Choselogistics?${params.toString()}`;
+      return redirectUrl;
     } catch (error) {
       console.error('PayNow choose logistics service error:', error);
       throw error;
