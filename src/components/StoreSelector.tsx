@@ -16,13 +16,6 @@ interface StoreSelectorProps {
   disabled?: boolean;
 }
 
-interface PayNowStoreResponse {
-  success: boolean;
-  storeId?: string;
-  storeName?: string;
-  storeAddress?: string;
-  error?: string;
-}
 
 export default function StoreSelector({ onStoreSelected, selectedStore, disabled = false }: StoreSelectorProps) {
   const [isLoading, setIsLoading] = useState(false);
