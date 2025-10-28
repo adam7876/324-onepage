@@ -3,7 +3,7 @@
  * 測試門市選擇 URL 生成
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { payNowLogisticsService } from '@/services/paynow-logistics.service';
 
 export async function GET() {
