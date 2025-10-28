@@ -3,7 +3,7 @@
  * 測試 PayNow 服務是否正常運作
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPayNowConfig, validatePayNowConfig } from '@/config/paynow.config';
 
 export async function GET() {
