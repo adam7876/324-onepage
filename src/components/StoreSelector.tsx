@@ -71,6 +71,12 @@ export default function StoreSelector({ onStoreSelected, selectedStore, disabled
       form.submit();
       document.body.removeChild(form);
       
+      // 表單提交成功後，重置載入狀態
+      // 使用 setTimeout 確保表單提交完成
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      
     } catch (err) {
       console.error('門市選擇錯誤:', err);
       setError(err instanceof Error ? err.message : '門市選擇失敗');
