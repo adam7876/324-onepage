@@ -16,7 +16,7 @@ export const getPayNowConfig = (): PayNowConfig => {
     baseUrl: process.env.PAYNOW_BASE_URL || 'https://logistic.paynow.com.tw',
     userAccount: process.env.PAYNOW_USER_ACCOUNT || 'S225319286',
     apiCode: process.env.PAYNOW_API_CODE || '324moonp',
-    returnUrl: process.env.PAYNOW_RETURN_URL || 'https://324-onepage.vercel.app/checkout/success',
+    returnUrl: process.env.PAYNOW_RETURN_URL || 'https://324-onepage.vercel.app/api/paynow/callback',
     testMode: process.env.NODE_ENV === 'development' || process.env.PAYNOW_TEST_MODE === 'true'
   };
 };

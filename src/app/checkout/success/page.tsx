@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('orderNumber');
+  const storeId = searchParams.get('store_id');
+  const storeName = searchParams.get('store_name');
+  const storeAddress = searchParams.get('store_address');
   const [orderData, setOrderData] = useState<{
     id: string;
     orderNumber: string;
@@ -18,6 +21,11 @@ function CheckoutSuccessContent() {
     address: string;
     shipping: string;
     customerNotes?: string;
+    logisticsInfo?: {
+      storeId: string;
+      storeName: string;
+      storeAddress: string;
+    };
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,6 +48,11 @@ function CheckoutSuccessContent() {
           address: data.address || '',
           shipping: data.shipping || '',
           customerNotes: data.customerNotes || '',
+          logisticsInfo: storeId && storeName ? {
+            storeId,
+            storeName,
+            storeAddress: storeAddress || ''
+          } : undefined
         });
       }
     } catch (error) {
@@ -84,6 +97,15 @@ function CheckoutSuccessContent() {
             <p><strong>聯絡電話：</strong>{orderData.phone}</p>
             {orderData.shipping !== '7-11 超商取貨' && orderData.shipping !== '324 店取' && (
               <p><strong>收件地址：</strong>{orderData.address}</p>
+            )}
+            {orderData.logisticsInfo && (
+              <div className="mt-2 p-2 bg-green-50 rounded border">
+                <p><strong>取貨門市：</strong>{orderData.logisticsInfo.storeName}</p>
+                <p><strong>門市代號：</strong>{orderData.logisticsInfo.storeId}</p>
+                {orderData.logisticsInfo.storeAddress && (
+                  <p><strong>門市地址：</strong>{orderData.logisticsInfo.storeAddress}</p>
+                )}
+              </div>
             )}
             {orderData.customerNotes && (
               <p><strong>備註：</strong>{orderData.customerNotes}</p>
