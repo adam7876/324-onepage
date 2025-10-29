@@ -28,28 +28,28 @@ export async function GET() {
     // 嘗試不同的加密方法
     const results = [];
     
-    // 方法 1: 使用零向量 IV
+    // 方法 1: 使用 des-ede3-cbc 模式
     try {
-      const iv1 = Buffer.alloc(8, 0);
-      const cipher1 = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv1);
+      const iv1 = Buffer.from('12345678', 'utf8');
+      const cipher1 = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv1);
       cipher1.setAutoPadding(false);
       let encrypted1 = cipher1.update(text, 'utf8', 'base64');
       encrypted1 += cipher1.final('base64');
       encrypted1 = encrypted1.replace(/\s/g, '+');
       
       results.push({
-        method: 'Zero IV',
+        method: 'des-ede3-cbc',
         encrypted: encrypted1,
         match: encrypted1 === expectedResult
       });
     } catch (error) {
       results.push({
-        method: 'Zero IV',
+        method: 'des-ede3-cbc',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
     
-    // 方法 2: 使用 '12345678' 作為 IV
+    // 方法 2: 使用 des-ede3 模式
     try {
       const iv2 = Buffer.from('12345678', 'utf8');
       const cipher2 = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv2);
@@ -59,13 +59,13 @@ export async function GET() {
       encrypted2 = encrypted2.replace(/\s/g, '+');
       
       results.push({
-        method: '12345678 IV',
+        method: 'des-ede3',
         encrypted: encrypted2,
         match: encrypted2 === expectedResult
       });
     } catch (error) {
       results.push({
-        method: '12345678 IV',
+        method: 'des-ede3',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
