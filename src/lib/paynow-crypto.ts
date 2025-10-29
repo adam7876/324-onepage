@@ -18,12 +18,13 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 確保私鑰長度為 24 字節
     const paddedKey = privateKey.substring(0, 24);
     
-    // 使用正確的 TripleDES-EDE3 設定
-    // 根據 Node.js 文檔，des-ede3 需要 8 字節 IV
-    const iv = Buffer.from('12345678', 'utf8');
+    // 根據附錄一 VB.NET 範例：使用 ECB 模式
+    // ECB 模式不需要 IV，但 Node.js 的 createCipheriv 需要 IV
+    // 使用零向量作為 IV
+    const iv = Buffer.alloc(8, 0);
     
-    // 使用 des-ede3-cbc 模式
-    const cipher = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv);
+    // 嘗試使用 des-ede3-ecb 模式
+    const cipher = crypto.createCipheriv('des-ede3-ecb', Buffer.from(paddedKey, 'utf8'), iv);
     cipher.setAutoPadding(false); // PaddingMode.Zeros
     
     // 按照附錄一：直接處理字串，讓 Node.js 自動轉換為 UTF-8

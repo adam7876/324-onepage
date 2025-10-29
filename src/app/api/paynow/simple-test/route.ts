@@ -28,19 +28,40 @@ export async function GET() {
     // 嘗試不同的加密方法
     const results = [];
     
-    // 方法 1: 使用 des-ede3-cbc 模式
+    // 方法 1: 使用 des-ede3-ecb 模式
     try {
-      const iv1 = Buffer.from('12345678', 'utf8');
-      const cipher1 = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv1);
+      const iv1 = Buffer.alloc(8, 0);
+      const cipher1 = crypto.createCipheriv('des-ede3-ecb', Buffer.from(paddedKey, 'utf8'), iv1);
       cipher1.setAutoPadding(false);
       let encrypted1 = cipher1.update(text, 'utf8', 'base64');
       encrypted1 += cipher1.final('base64');
       encrypted1 = encrypted1.replace(/\s/g, '+');
       
       results.push({
-        method: 'des-ede3-cbc',
+        method: 'des-ede3-ecb',
         encrypted: encrypted1,
         match: encrypted1 === expectedResult
+      });
+    } catch (error) {
+      results.push({
+        method: 'des-ede3-ecb',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+    
+    // 方法 1.5: 使用 des-ede3-cbc 模式
+    try {
+      const iv1_5 = Buffer.from('12345678', 'utf8');
+      const cipher1_5 = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv1_5);
+      cipher1_5.setAutoPadding(false);
+      let encrypted1_5 = cipher1_5.update(text, 'utf8', 'base64');
+      encrypted1_5 += cipher1_5.final('base64');
+      encrypted1_5 = encrypted1_5.replace(/\s/g, '+');
+      
+      results.push({
+        method: 'des-ede3-cbc',
+        encrypted: encrypted1_5,
+        match: encrypted1_5 === expectedResult
       });
     } catch (error) {
       results.push({
