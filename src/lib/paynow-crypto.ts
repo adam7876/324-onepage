@@ -18,8 +18,11 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 確保私鑰長度為 24 字節
     const paddedKey = privateKey.substring(0, 24);
     
-    // 使用 ECB 模式，不需要 IV
-    const cipher = crypto.createCipher('des-ede3', paddedKey);
+    // 使用 createCipheriv 替代已棄用的 createCipher
+    // ECB 模式不需要 IV，使用零向量
+    const iv = Buffer.alloc(8, 0); // 8 字節零向量
+    
+    const cipher = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
     cipher.setAutoPadding(false); // 使用 Zeros 填充
     
     let encrypted = cipher.update(text, 'utf8', 'base64');
@@ -42,7 +45,12 @@ export function tripleDESDecrypt(encryptedText: string, key: string): string {
   try {
     const paddedKey = key.padEnd(24, '0').substring(0, 24);
     
-    const decipher = crypto.createDecipher('des-ede3', paddedKey);
+    // 使用 createDecipheriv 替代已棄用的 createDecipher
+    const iv = Buffer.alloc(8, 0); // 8 字節零向量
+    
+    const decipher = crypto.createDecipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
+    decipher.setAutoPadding(false);
+    
     let decrypted = decipher.update(encryptedText, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
     
