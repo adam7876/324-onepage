@@ -18,9 +18,8 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 確保私鑰長度為 24 字節
     const paddedKey = privateKey.substring(0, 24);
     
-    // 使用 des-ede3-cbc 模式（ECB 模式在 Node.js 中有問題）
-    // 使用 PayNow 文件中的公鑰作為 IV
-    const iv = Buffer.from('12345678', 'utf8');
+    // 使用 des-ede3-cbc 模式，Zero IV 最接近預期結果
+    const iv = Buffer.alloc(8, 0);
     
     // 使用 des-ede3-cbc 模式
     const cipher = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv);
