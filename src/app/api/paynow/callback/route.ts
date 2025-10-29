@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       successUrl.searchParams.set('store_address', storeAddress);
     }
     
-    // 直接返回 HTML 頁面，避免 POST 方法問題
+    // 直接返回 HTML 頁面，通知父視窗並關閉
     const html = `
       <!DOCTYPE html>
       <html>
@@ -47,14 +47,31 @@ export async function POST(request: NextRequest) {
         <title>門市選擇完成</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script>
-          // 使用 JavaScript 重導向到成功頁面
-          window.location.href = '${successUrl.toString()}';
+          // 通知父視窗門市選擇完成
+          if (window.opener) {
+            window.opener.postMessage({
+              type: 'PAYNOW_STORE_SELECTED',
+              storeInfo: {
+                storeId: '${storeId}',
+                storeName: '${storeName}',
+                storeAddress: '${storeAddress}',
+                service: '01'
+              }
+            }, '*');
+            
+            // 關閉視窗
+            window.close();
+          } else {
+            // 如果沒有父視窗，重導向到商品頁面
+            window.location.href = '${successUrl.toString()}';
+          }
         </script>
       </head>
       <body>
         <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
-          <h2>正在跳轉...</h2>
-          <p>門市選擇已完成，正在跳轉到訂單確認頁面...</p>
+          <h2>門市選擇完成</h2>
+          <p>正在關閉視窗並更新原頁面...</p>
+          <p>如果視窗沒有自動關閉，請手動關閉此視窗。</p>
         </div>
       </body>
       </html>

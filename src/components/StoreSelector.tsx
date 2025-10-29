@@ -23,29 +23,27 @@ export default function StoreSelector({ onStoreSelected, selectedStore, disabled
 
   // 處理 PayNow 回調
   useEffect(() => {
-    const handlePayNowCallback = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const storeId = urlParams.get('store_id');
-      const storeName = urlParams.get('store_name');
-      const storeAddress = urlParams.get('store_address');
-
-      if (storeId && storeName) {
+    // 監聽來自 PayNow 回調的訊息
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'PAYNOW_STORE_SELECTED') {
         const storeInfo: LogisticsInfo = {
-          storeId,
-          storeName,
-          storeAddress: storeAddress || '',
+          storeId: event.data.storeInfo.storeId,
+          storeName: event.data.storeInfo.storeName,
+          storeAddress: event.data.storeInfo.storeAddress || '',
           logisticsStatus: 'pending'
         };
         
         onStoreSelected(storeInfo);
-        
-        // 清除 URL 參數
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, '', newUrl);
+        console.log('收到 PayNow 門市選擇訊息:', storeInfo);
       }
     };
 
-    handlePayNowCallback();
+    window.addEventListener('message', handleMessage);
+
+    // 清理事件監聽器
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
   }, [onStoreSelected]);
 
   const handleSelectStore = async () => {
@@ -55,11 +53,11 @@ export default function StoreSelector({ onStoreSelected, selectedStore, disabled
     setError(null);
 
     try {
-      // 直接跳轉到 PayNow 門市選擇 API，它會返回 HTML 表單並自動提交
+      // 開啟新視窗進行門市選擇
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/api/paynow/choose-store';
-      form.target = '_blank'; // 在新視窗中開啟
+      form.target = 'paynow-store-selector'; // 指定視窗名稱
       
       const orderNumberInput = document.createElement('input');
       orderNumberInput.type = 'hidden';
@@ -68,14 +66,23 @@ export default function StoreSelector({ onStoreSelected, selectedStore, disabled
       
       form.appendChild(orderNumberInput);
       document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
       
-      // 表單提交成功後，重置載入狀態
-      // 使用 setTimeout 確保表單提交完成
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
+      // 開啟新視窗
+      const popup = window.open('', 'paynow-store-selector', 'width=800,height=600,scrollbars=yes,resizable=yes');
+      if (popup) {
+        form.submit();
+        document.body.removeChild(form);
+        
+        // 監聽視窗關閉事件
+        const checkClosed = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkClosed);
+            setIsLoading(false);
+          }
+        }, 1000);
+      } else {
+        throw new Error('無法開啟新視窗，請檢查瀏覽器彈出視窗設定');
+      }
       
     } catch (err) {
       console.error('門市選擇錯誤:', err);
