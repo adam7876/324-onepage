@@ -5,7 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayNowConfig } from '@/config/paynow.config';
-import { generatePayNowPassCode } from '@/lib/paynow-crypto';
 
 export async function GET(request: NextRequest) {
   try {

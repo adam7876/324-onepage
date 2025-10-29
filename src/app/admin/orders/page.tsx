@@ -98,6 +98,9 @@ export default function AdminOrders() {
   const [statusError, setStatusError] = useState<string | null>(null);
   const [statusSuccess, setStatusSuccess] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string[]>([]);
+  const [creatingLogistics, setCreatingLogistics] = useState<string | null>(null);
+  const [logisticsError, setLogisticsError] = useState<{ orderId: string; error: string } | null>(null);
+  const [logisticsSuccess, setLogisticsSuccess] = useState<string | null>(null);
   const [filterOrderNumber, setFilterOrderNumber] = useState("");
   const [filterId, setFilterId] = useState("");
   const [filterEmail, setFilterEmail] = useState("");
@@ -196,6 +199,53 @@ export default function AdminOrders() {
       alert("刪除失敗，請稍後再試");
     } finally {
       setBatchDeleting(false);
+    }
+  };
+
+  // 建立 PayNow 物流訂單
+  const handleCreateLogistics = async (orderId: string) => {
+    setCreatingLogistics(orderId);
+    setLogisticsError(null);
+    setLogisticsSuccess(null);
+    
+    try {
+      // 取得管理員 API Key（需要從環境變數或設定中取得）
+      const authToken = 'Bearer admin_324_moonp_secure_key_h94mp65k6';
+      
+      const response = await fetch('/api/admin/create-logistics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authToken
+        },
+        body: JSON.stringify({ orderId })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setLogisticsSuccess(orderId);
+        
+        // 重新載入訂單資料
+        fetchOrders();
+        
+        setTimeout(() => {
+          setLogisticsSuccess(null);
+        }, 3000);
+      } else {
+        setLogisticsError({ orderId, error: result.error || '建立物流訂單失敗' });
+        setTimeout(() => {
+          setLogisticsError(null);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('建立物流訂單錯誤:', error);
+      setLogisticsError({ orderId, error: '建立物流訂單時發生錯誤' });
+      setTimeout(() => {
+        setLogisticsError(null);
+      }, 5000);
+    } finally {
+      setCreatingLogistics(null);
     }
   };
 
@@ -442,6 +492,27 @@ export default function AdminOrders() {
                               <div className="mb-2">門市電話：{o.logisticsInfo.storePhone}</div>
                             )}
                           </>
+                        )}
+                        {/* 建立物流訂單按鈕 */}
+                        {o.shipping === '7-11 超商取貨' && 
+                         o.status === '已付款' && 
+                         o.logisticsInfo && 
+                         !o.logisticsInfo.logisticsNo && (
+                          <div className="mt-4 pt-4 border-t">
+                            <Button
+                              onClick={() => handleCreateLogistics(o.id)}
+                              disabled={creatingLogistics === o.id}
+                              className="bg-blue-500 text-white hover:bg-blue-600"
+                            >
+                              {creatingLogistics === o.id ? '建立中...' : '建立 7-11 物流單'}
+                            </Button>
+                            {logisticsSuccess === o.id && (
+                              <span className="ml-3 text-green-600 text-sm">✅ 物流訂單建立成功！</span>
+                            )}
+                            {logisticsError && logisticsError.orderId === o.id && (
+                              <div className="mt-2 text-red-600 text-sm">{logisticsError.error}</div>
+                            )}
+                          </div>
                         )}
                       </td>
                     </tr>

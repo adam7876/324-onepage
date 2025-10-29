@@ -42,6 +42,43 @@ export async function GET(request: NextRequest) {
         tradeNo: transactionId,
       });
 
+      // 如果是 7-11 超商取貨且有門市資訊，建立 PayNow 物流訂單
+      if (orderData.shipping === '7-11 超商取貨' && orderData.logisticsInfo) {
+        try {
+          const logisticsResult = await payNowLogisticsService.createLogisticsOrder({
+            orderNumber: orderNumber,
+            logisticsService: '01',
+            deliverMode: '02', // 取貨不付款
+            totalAmount: orderData.total,
+            remark: orderData.customerNotes || '',
+            description: `訂單 ${orderNumber}`,
+            receiverStoreId: orderData.logisticsInfo.storeId,
+            receiverStoreName: orderData.logisticsInfo.storeName,
+            returnStoreId: '',
+            receiverName: orderData.name,
+            receiverPhone: orderData.phone,
+            receiverEmail: orderData.email,
+            receiverAddress: orderData.logisticsInfo.storeAddress,
+            senderName: '324.SAMISA',
+            senderPhone: '0952759957',
+            senderEmail: 'axikorea@gmail.com',
+            senderAddress: '台北市信義區信義路五段7號'
+          });
+
+          // 更新訂單物流資訊
+          await updateDoc(orderDoc.ref, {
+            'logisticsInfo.logisticsNo': logisticsResult.logisticsNumber,
+            'logisticsInfo.logisticsStatus': 'shipped',
+            'logisticsInfo.shippedAt': Timestamp.now(),
+          });
+
+          console.log('PayNow 物流訂單建立成功:', logisticsResult);
+        } catch (logisticsError) {
+          console.error('PayNow 物流訂單建立失敗:', logisticsError);
+          // 不影響付款流程，只記錄錯誤
+        }
+      }
+
       return NextResponse.redirect(
         new URL(`/checkout/success?orderNumber=${orderNumber}&transactionId=${transactionId}`, request.url)
       );
