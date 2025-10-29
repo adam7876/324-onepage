@@ -18,16 +18,15 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 確保私鑰長度為 24 字節
     const paddedKey = privateKey.substring(0, 24);
     
-    // 使用 createCipheriv，按照附錄一的設定
-    const iv = Buffer.from('12345678', 'utf8'); // 公鑰作為 IV
+    // 按照附錄一 VB.NET 範例：使用 ECB 模式，不需要 IV
+    // 但 Node.js 的 createCipheriv 需要 IV，所以使用零向量
+    const iv = Buffer.alloc(8, 0);
     
     const cipher = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
     cipher.setAutoPadding(false); // PaddingMode.Zeros
     
-    // 按照附錄一：先轉換為 UTF-8 位元組
-    const data = Buffer.from(text, 'utf8');
-    
-    let encrypted = cipher.update(data, null, 'base64');
+    // 按照附錄一：直接處理字串，讓 Node.js 自動轉換為 UTF-8
+    let encrypted = cipher.update(text, 'utf8', 'base64');
     encrypted += cipher.final('base64');
     
     // 根據附錄一：將空格替換為 +
@@ -36,6 +35,12 @@ export function tripleDESEncrypt(text: string, password: string): string {
     return encrypted;
   } catch (error) {
     console.error('TripleDES encryption error:', error);
+    console.error('Error details:', {
+      text,
+      password,
+      privateKey: `1234567890${password}123456`,
+      paddedKey: `1234567890${password}123456`.substring(0, 24)
+    });
     throw new Error('Failed to encrypt data');
   }
 }
