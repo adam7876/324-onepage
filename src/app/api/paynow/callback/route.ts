@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     });
     
     // 重導向到成功頁面，並帶上門市資訊
-    const successUrl = new URL('/checkout/success', request.url);
+    const successUrl = new URL('/paynow/success', request.url);
     if (orderNumber) {
       successUrl.searchParams.set('orderNumber', orderNumber);
     }
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     });
     
     // 重導向到成功頁面，並帶上門市資訊
-    const successUrl = new URL('/checkout/success', request.url);
+    const successUrl = new URL('/paynow/success', request.url);
     if (orderNumber) {
       successUrl.searchParams.set('orderNumber', orderNumber);
     }
