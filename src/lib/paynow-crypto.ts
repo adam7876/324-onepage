@@ -15,8 +15,8 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 根據 PayNow 文件：私鑰格式為 1234567890 + Password + 123456
     const privateKey = `1234567890${password}123456`;
     
-    // 確保私鑰長度為 24 字節
-    const paddedKey = privateKey.substring(0, 24);
+    // 確保私鑰長度為 24 字節，不足則用 0 填充
+    const paddedKey = privateKey.padEnd(24, '0').substring(0, 24);
     
     // 使用 createCipheriv 替代已棄用的 createCipher
     // TripleDES-EDE3 需要 8 字節 IV
