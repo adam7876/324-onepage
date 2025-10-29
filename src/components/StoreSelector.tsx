@@ -55,29 +55,25 @@ export default function StoreSelector({ onStoreSelected, selectedStore, disabled
     setError(null);
 
     try {
-      // 跳轉到 PayNow 門市選擇頁面
-      const response = await fetch('/api/paynow/choose-store', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderNumber: `TEMP_${Date.now()}` // 臨時訂單編號
-        })
-      });
-
-      const result = await response.json();
-
-      if (result.success && result.redirectUrl) {
-        // 跳轉到 PayNow 門市選擇頁面
-        window.location.href = result.redirectUrl;
-      } else {
-        throw new Error(result.error || '無法開啟門市選擇頁面');
-      }
+      // 直接跳轉到 PayNow 門市選擇 API，它會返回 HTML 表單並自動提交
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/api/paynow/choose-store';
+      form.target = '_blank'; // 在新視窗中開啟
+      
+      const orderNumberInput = document.createElement('input');
+      orderNumberInput.type = 'hidden';
+      orderNumberInput.name = 'orderNumber';
+      orderNumberInput.value = `TEMP_${Date.now()}`;
+      
+      form.appendChild(orderNumberInput);
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+      
     } catch (err) {
       console.error('門市選擇錯誤:', err);
       setError(err instanceof Error ? err.message : '門市選擇失敗');
-    } finally {
       setIsLoading(false);
     }
   };
