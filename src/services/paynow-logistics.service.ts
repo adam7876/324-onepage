@@ -245,9 +245,14 @@ export class PayNowLogisticsService {
 
   /**
    * 加密 API 密碼 (TripleDES)
+   * 根據 PayNow 錯誤訊息，嘗試使用原始密碼
    */
   private encryptApiCode(): string {
-    return tripleDESEncrypt(this.config.apiCode, this.config.apiCode);
+    // 先嘗試使用原始密碼（不加密）
+    return this.config.apiCode;
+    
+    // 如果原始密碼不行，再嘗試加密
+    // return tripleDESEncrypt(this.config.apiCode, this.config.apiCode);
   }
 
   /**
