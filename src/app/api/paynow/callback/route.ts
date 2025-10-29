@@ -38,8 +38,34 @@ export async function POST(request: NextRequest) {
       successUrl.searchParams.set('store_address', storeAddress);
     }
     
-    // 重導向到成功頁面
-    return NextResponse.redirect(successUrl);
+    // 直接返回 HTML 頁面，避免 POST 方法問題
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>門市選擇完成</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+          // 使用 JavaScript 重導向到成功頁面
+          window.location.href = '${successUrl.toString()}';
+        </script>
+      </head>
+      <body>
+        <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+          <h2>正在跳轉...</h2>
+          <p>門市選擇已完成，正在跳轉到訂單確認頁面...</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    return new NextResponse(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+      },
+    });
     
   } catch (error) {
     console.error('PayNow 回調處理錯誤:', error);
