@@ -60,7 +60,7 @@ function CheckoutSuccessContent() {
     } finally {
       setLoading(false);
     }
-  }, [orderNumber]);
+  }, [orderNumber, storeId, storeName, storeAddress]);
 
   useEffect(() => {
     if (orderNumber) {

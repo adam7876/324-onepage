@@ -22,9 +22,6 @@ export async function GET(request: NextRequest) {
 
     const config = getPayNowConfig();
     
-    // 生成 PassCode (用於 PayNow API 驗證)
-    const passCode = generatePayNowPassCode(config.userAccount, orderNumber, '20', config.apiCode);
-    
     // 查詢 PayNow 物流訂單狀態
     const queryUrl = `${config.baseUrl}/api/Orderapi/Get_Order_Info_orderno?orderno=${encodeURIComponent(orderNumber)}&user_account=${config.userAccount}&sno=1`;
     
