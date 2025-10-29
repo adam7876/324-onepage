@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "./ui/button";
 import { db } from "../firebase/firestore";
 import { collection, addDoc, getDocs, limit, query } from "firebase/firestore";
@@ -15,6 +16,7 @@ interface CheckoutFormProps {
 }
 
 export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -31,6 +33,30 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
   const [selectedStore, setSelectedStore] = useState<LogisticsInfo | null>(null);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // 處理 PayNow 回調的門市資訊
+  useEffect(() => {
+    const storeId = searchParams.get('store_id');
+    const storeName = searchParams.get('store_name');
+    const storeAddress = searchParams.get('store_address');
+
+    if (storeId && storeName) {
+      const storeInfo: LogisticsInfo = {
+        storeId,
+        storeName,
+        storeAddress: storeAddress || '',
+        logisticsStatus: 'pending'
+      };
+      
+      setSelectedStore(storeInfo);
+      
+      // 清除 URL 參數
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      console.log('PayNow 回調門市資訊已設定:', storeInfo);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     console.log("CheckoutForm 已載入，檢查 Firebase 狀態...");
