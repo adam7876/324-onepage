@@ -18,11 +18,11 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 確保私鑰長度為 24 字節
     const paddedKey = privateKey.substring(0, 24);
     
-    // 使用 des-ede3-cbc 模式，Zero IV 最接近預期結果
-    const iv = Buffer.alloc(8, 0);
+    // 根據 PayNow 附錄一：使用公鑰 "12345678" 作為 IV
+    const iv = Buffer.from('12345678', 'utf8');
     
-    // 使用 des-ede3-cbc 模式
-    const cipher = crypto.createCipheriv('des-ede3-cbc', Buffer.from(paddedKey, 'utf8'), iv);
+    // 根據 PayNow 附錄一：使用 ECB 模式 (des-ede3-ecb)
+    const cipher = crypto.createCipheriv('des-ede3-ecb', Buffer.from(paddedKey, 'utf8'), iv);
     cipher.setAutoPadding(false); // PaddingMode.Zeros
     
     // 按照附錄一：直接處理字串，讓 Node.js 自動轉換為 UTF-8
