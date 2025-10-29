@@ -80,7 +80,7 @@ export class PayNowLogisticsService {
             <input type="hidden" name="orderno" value="${orderNumber}">
             <input type="hidden" name="apicode" value="${encryptedApiCode}">
             <input type="hidden" name="Logistic_serviceID" value="${logisticsServiceId}">
-            <input type="hidden" name="returnUrl" value="${this.config.returnUrl}">
+            <input type="hidden" name="returnUrl" value="${this.config.returnUrl.replace('/callback', '/debug-callback')}">
           </form>
           <script>
             document.getElementById('paynowForm').submit();

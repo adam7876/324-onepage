@@ -36,9 +36,9 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
 
   // 處理 PayNow 回調的門市資訊
   useEffect(() => {
-    const storeId = searchParams.get('store_id');
-    const storeName = searchParams.get('store_name');
-    const storeAddress = searchParams.get('store_address');
+    const storeId = searchParams.get('storeid');
+    const storeName = searchParams.get('storename');
+    const storeAddress = searchParams.get('storeaddress');
 
     if (storeId && storeName) {
       const storeInfo: LogisticsInfo = {
@@ -55,6 +55,9 @@ export default function CheckoutForm({ cart, onSuccess }: CheckoutFormProps) {
       window.history.replaceState({}, '', newUrl);
       
       console.log('PayNow 回調門市資訊已設定:', storeInfo);
+    } else {
+      console.log('PayNow 回調參數檢查:', { storeId, storeName, storeAddress });
+      console.log('所有 URL 參數:', Object.fromEntries(searchParams.entries()));
     }
   }, [searchParams]);
 

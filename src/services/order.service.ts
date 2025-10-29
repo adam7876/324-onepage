@@ -166,8 +166,8 @@ class OrderServiceImpl implements OrderService {
         tradeNo: "",
         status: "待付款",
         createdAt: Timestamp.now(),
-        // 7-11 店到店物流資訊
-        logisticsInfo: formData.logisticsInfo,
+        // 7-11 店到店物流資訊（只有當有值時才加入）
+        ...(formData.logisticsInfo && { logisticsInfo: formData.logisticsInfo }),
       };
       
       this.logOrderAction('process_order_data_success', { orderData });

@@ -10,10 +10,10 @@ export async function POST(request: NextRequest) {
     // 處理 PayNow 回調資料
     const formData = await request.formData();
     
-    // 取得 PayNow 回調的參數
-    const storeId = formData.get('store_id') as string;
-    const storeName = formData.get('store_name') as string;
-    const storeAddress = formData.get('store_address') as string;
+    // 取得 PayNow 回調的參數（根據 API 文件，參數名稱是 storeid, storename, storeaddress）
+    const storeId = formData.get('storeid') as string;
+    const storeName = formData.get('storename') as string;
+    const storeAddress = formData.get('storeaddress') as string;
     const orderNumber = formData.get('orderno') as string;
     
     console.log('PayNow 回調資料:', {
@@ -83,10 +83,10 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     
-    // 取得 PayNow 回調的參數
-    const storeId = searchParams.get('store_id');
-    const storeName = searchParams.get('store_name');
-    const storeAddress = searchParams.get('store_address');
+    // 取得 PayNow 回調的參數（根據 API 文件，參數名稱是 storeid, storename, storeaddress）
+    const storeId = searchParams.get('storeid');
+    const storeName = searchParams.get('storename');
+    const storeAddress = searchParams.get('storeaddress');
     const orderNumber = searchParams.get('orderno');
     
     console.log('PayNow GET 回調資料:', {
