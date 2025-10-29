@@ -63,18 +63,33 @@ export class PayNowLogisticsService {
    */
   async chooseLogisticsService(orderNumber: string, logisticsServiceId: '01' | '03' | '05' = '01'): Promise<string> {
     try {
-      // 根據 PayNow 文件，可能需要使用不同的參數名稱
-      const params = new URLSearchParams({
-        user_account: this.config.userAccount,
-        orderno: orderNumber,
-        apicode: this.config.apiCode,
-        Logistic_serviceID: logisticsServiceId,
-        returnUrl: this.config.returnUrl
-      });
-
-      // 嘗試不同的端點格式
-      const redirectUrl = `${this.config.baseUrl}/Member/Order/Choselogistics.aspx?${params.toString()}`;
-      return redirectUrl;
+      // 根據 PayNow 文件，使用 POST 方法並加密 apicode
+      const encryptedApiCode = this.encryptApiCode();
+      
+      // 構建 POST 表單 HTML
+      const formHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>跳轉到 PayNow 門市選擇</title>
+        </head>
+        <body>
+          <form id="paynowForm" method="POST" action="${this.config.baseUrl}/Member/Order/Choselogistics">
+            <input type="hidden" name="user_account" value="${this.config.userAccount}">
+            <input type="hidden" name="orderno" value="${orderNumber}">
+            <input type="hidden" name="apicode" value="${encryptedApiCode}">
+            <input type="hidden" name="Logistic_serviceID" value="${logisticsServiceId}">
+            <input type="hidden" name="returnUrl" value="${this.config.returnUrl}">
+          </form>
+          <script>
+            document.getElementById('paynowForm').submit();
+          </script>
+        </body>
+        </html>
+      `;
+      
+      return formHtml;
     } catch (error) {
       console.error('PayNow choose logistics service error:', error);
       throw error;

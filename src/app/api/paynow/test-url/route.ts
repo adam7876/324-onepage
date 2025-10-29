@@ -9,22 +9,13 @@ import { payNowLogisticsService } from '@/services/paynow-logistics.service';
 export async function GET() {
   try {
     const testOrderNumber = `TEST_${Date.now()}`;
-    const redirectUrl = await payNowLogisticsService.chooseLogisticsService(testOrderNumber, '01');
-
-    // 測試不同的 URL 格式
-    const testUrls = {
-      original: redirectUrl,
-      withoutAspx: redirectUrl.replace('.aspx', ''),
-      withAspx: redirectUrl,
-      alternative: `https://logistic.paynow.com.tw/Member/Order/Choselogistics?user_account=S225319286&orderno=${testOrderNumber}&apicode=324moonp&Logistic_serviceID=01&returnUrl=https://324-onepage.vercel.app/checkout/success`
-    };
+    const formHtml = await payNowLogisticsService.chooseLogisticsService(testOrderNumber, '01');
 
     return NextResponse.json({
       success: true,
       testOrderNumber,
-      redirectUrl,
-      testUrls,
-      message: 'PayNow 門市選擇 URL 已生成，包含多種格式測試',
+      formHtml,
+      message: 'PayNow 門市選擇表單已生成，使用 POST 方法和加密 apicode',
       timestamp: new Date().toISOString()
     });
 
@@ -32,7 +23,7 @@ export async function GET() {
     console.error('PayNow test error:', error);
     return NextResponse.json({
       success: false,
-      error: '無法生成 PayNow 門市選擇 URL',
+      error: '無法生成 PayNow 門市選擇表單',
       details: error instanceof Error ? error.message : '未知錯誤'
     }, { status: 500 });
   }
