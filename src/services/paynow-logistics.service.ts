@@ -245,10 +245,15 @@ export class PayNowLogisticsService {
 
   /**
    * 加密 API 密碼 (TripleDES)
-   * 使用修復後的 ECB 模式加密
+   * 由於 Node.js 的 TripleDES 實現與 Python/C# 不同，
+   * 暫時使用原始密碼測試 PayNow 是否接受
    */
   private encryptApiCode(): string {
-    return tripleDESEncrypt(this.config.apiCode, this.config.apiCode);
+    // 暫時使用原始密碼，因為 Node.js 的 TripleDES 結果與 Python/C# 不同
+    return this.config.apiCode;
+    
+    // 如果 PayNow 需要加密，我們需要找到正確的 Node.js 實現
+    // return tripleDESEncrypt(this.config.apiCode, this.config.apiCode);
   }
 
   /**
