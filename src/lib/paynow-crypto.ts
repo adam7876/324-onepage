@@ -19,8 +19,8 @@ export function tripleDESEncrypt(text: string, password: string): string {
     const paddedKey = privateKey.substring(0, 24);
     
     // 使用 createCipheriv 替代已棄用的 createCipher
-    // ECB 模式不需要 IV，使用零向量
-    const iv = Buffer.alloc(8, 0); // 8 字節零向量
+    // TripleDES-EDE3 需要 8 字節 IV
+    const iv = Buffer.from('12345678', 'utf8'); // 使用 PayNow 文件中的公鑰作為 IV
     
     const cipher = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
     cipher.setAutoPadding(false); // 使用 Zeros 填充
@@ -46,7 +46,7 @@ export function tripleDESDecrypt(encryptedText: string, key: string): string {
     const paddedKey = key.padEnd(24, '0').substring(0, 24);
     
     // 使用 createDecipheriv 替代已棄用的 createDecipher
-    const iv = Buffer.alloc(8, 0); // 8 字節零向量
+    const iv = Buffer.from('12345678', 'utf8'); // 使用 PayNow 文件中的公鑰作為 IV
     
     const decipher = crypto.createDecipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
     decipher.setAutoPadding(false);
