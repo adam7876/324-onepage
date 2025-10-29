@@ -82,7 +82,7 @@ export async function GET() {
       const textBufferPadded = Buffer.alloc(Math.ceil(textBuffer.length / blockSize) * blockSize);
       textBuffer.copy(textBufferPadded);
       
-      let encrypted = cipher.update(textBufferPadded, null, 'base64');
+      let encrypted = cipher.update(textBufferPadded, undefined, 'base64');
       encrypted += cipher.final('base64');
       encrypted = encrypted.replace(/\s/g, '+');
       
