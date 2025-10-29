@@ -12,23 +12,25 @@ import crypto from 'crypto';
  */
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
-    // 根據 PayNow 文件：私鑰格式為 1234567890 + Password + 123456
+    // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
     const privateKey = `1234567890${password}123456`;
     
-    // 確保私鑰長度為 24 字節，不足則用 0 填充
-    const paddedKey = privateKey.padEnd(24, '0').substring(0, 24);
+    // 確保私鑰長度為 24 字節
+    const paddedKey = privateKey.substring(0, 24);
     
-    // 使用 createCipheriv 替代已棄用的 createCipher
-    // TripleDES-EDE3 需要 8 字節 IV
-    const iv = Buffer.from('12345678', 'utf8'); // 使用 PayNow 文件中的公鑰作為 IV
+    // 使用 createCipheriv，按照附錄一的設定
+    const iv = Buffer.from('12345678', 'utf8'); // 公鑰作為 IV
     
     const cipher = crypto.createCipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
-    cipher.setAutoPadding(false); // 使用 Zeros 填充
+    cipher.setAutoPadding(false); // PaddingMode.Zeros
     
-    let encrypted = cipher.update(text, 'utf8', 'base64');
+    // 按照附錄一：先轉換為 UTF-8 位元組
+    const data = Buffer.from(text, 'utf8');
+    
+    let encrypted = cipher.update(data, null, 'base64');
     encrypted += cipher.final('base64');
     
-    // 根據文件，將空格替換為 +
+    // 根據附錄一：將空格替換為 +
     encrypted = encrypted.replace(/\s/g, '+');
     
     return encrypted;

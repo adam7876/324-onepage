@@ -8,28 +8,52 @@ import { tripleDESEncrypt, generatePayNowPassCode } from '@/lib/paynow-crypto';
 
 export async function GET() {
   try {
-    const testPassword = '324moonp';
-    const testText = '324moonp';
+    // 測試附錄一的範例
+    const examplePassword = '70828783';
+    const exampleText = '402595001111222299912/12';
+    const expectedResult = 'Sg8WeCxr1ebvGrkGOkjH7UvrNKxCEeJF';
+    
+    // 測試你的實際密碼
+    const yourPassword = '324moonp';
+    const yourText = '324moonp';
+    
+    // 測試附錄一範例
+    const exampleEncrypted = tripleDESEncrypt(exampleText, examplePassword);
+    const exampleMatch = exampleEncrypted === expectedResult;
+    
+    // 測試你的密碼
+    const yourEncrypted = tripleDESEncrypt(yourText, yourPassword);
     
     // 測試私鑰生成
-    const privateKey = `1234567890${testPassword}123456`;
-    const paddedKey = privateKey.padEnd(24, '0').substring(0, 24);
-    
-    // 測試加密
-    const encrypted = tripleDESEncrypt(testText, testPassword);
+    const yourPrivateKey = `1234567890${yourPassword}123456`;
+    const yourPaddedKey = yourPrivateKey.substring(0, 24);
     
     // 測試 PassCode 生成
-    const passCode = generatePayNowPassCode('S225319286', 'TEST123', '100', testPassword);
+    const passCode = generatePayNowPassCode('S225319286', 'TEST123', '100', yourPassword);
     
     return NextResponse.json({
       success: true,
-      testPassword,
-      testText,
-      privateKey,
-      paddedKey,
-      paddedKeyLength: paddedKey.length,
-      encrypted,
-      passCode,
+      // 附錄一範例測試
+      exampleTest: {
+        password: examplePassword,
+        text: exampleText,
+        expected: expectedResult,
+        actual: exampleEncrypted,
+        match: exampleMatch
+      },
+      // 你的密碼測試
+      yourTest: {
+        password: yourPassword,
+        text: yourText,
+        privateKey: yourPrivateKey,
+        paddedKey: yourPaddedKey,
+        paddedKeyLength: yourPaddedKey.length,
+        encrypted: yourEncrypted
+      },
+      // PassCode 測試
+      passCodeTest: {
+        passCode: passCode
+      },
       message: 'PayNow 加密測試完成',
       timestamp: new Date().toISOString()
     });
