@@ -24,12 +24,14 @@ export async function POST(request: NextRequest) {
     if (!snap.exists()) return NextResponse.json({ success: false, error: '訂單不存在' }, { status: 404 });
 
     const order = snap.data() as { orderNumber?: string; total?: number; logisticsInfo?: { logisticsNo?: string } };
-    const logisticsNo = order?.logisticsInfo?.logisticsNo;
-    if (!logisticsNo) return NextResponse.json({ success: false, error: '此訂單尚無物流單號' }, { status: 400 });
+    const logisticsNoMaybe = order?.logisticsInfo?.logisticsNo;
+    if (!logisticsNoMaybe) return NextResponse.json({ success: false, error: '此訂單尚無物流單號' }, { status: 400 });
+    if (!order.orderNumber) return NextResponse.json({ success: false, error: '訂單缺少 orderNumber，無法取消物流單' }, { status: 400 });
+    const logisticsNo = logisticsNoMaybe as string;
 
     // 呼叫 PayNow 取消 API
     const cfg = getPayNowConfig();
-    const passCode = generatePayNowPassCode(cfg.userAccount, order.orderNumber, String(order.total || 0), cfg.apiCode);
+    const passCode = generatePayNowPassCode(cfg.userAccount, order.orderNumber, String(order.total ?? 0), cfg.apiCode);
     const params = new URLSearchParams({
       LogisticNumber: logisticsNo,
       sno: '1',
