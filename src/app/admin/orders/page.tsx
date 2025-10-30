@@ -549,7 +549,7 @@ export default function AdminOrders() {
                                   } else {
                                     alert('取消失敗：' + (j.error || j.message));
                                   }
-                                } catch (err) {
+                                } catch {
                                   alert('取消時發生錯誤');
                                 }
                               }}

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const snap = await getDoc(orderRef);
     if (!snap.exists()) return NextResponse.json({ success: false, error: '訂單不存在' }, { status: 404 });
 
-    const order = snap.data() as any;
+    const order = snap.data() as { orderNumber?: string; total?: number; logisticsInfo?: { logisticsNo?: string } };
     const logisticsNo = order?.logisticsInfo?.logisticsNo;
     if (!logisticsNo) return NextResponse.json({ success: false, error: '此訂單尚無物流單號' }, { status: 400 });
 

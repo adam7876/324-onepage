@@ -8,6 +8,7 @@ import { AdminAuth } from '@/lib/admin-auth';
 import { getDoc, updateDoc, doc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 import { payNowLogisticsService } from '@/services/paynow-logistics.service';
+import type { PayNowLogisticsRequest } from '@/services/paynow-logistics.service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // 建立 PayNow 物流訂單（支援乾跑）
     try {
-      const requestPayload = {
+      const requestPayload: PayNowLogisticsRequest = {
         orderNumber: orderData.orderNumber,
         logisticsService: '01', // 7-11 交貨便
         deliverMode: '02', // 取貨不付款
@@ -93,10 +94,10 @@ export async function POST(request: NextRequest) {
         senderPhone: '0952759957',
         senderEmail: 'axikorea@gmail.com',
         senderAddress: '台北市信義區信義路五段7號'
-      } as const;
+      };
 
       if (dryRun) {
-        const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload as any);
+        const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload);
         return NextResponse.json({
           success: true,
           dryRun: true,
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      const logisticsResult = await payNowLogisticsService.createLogisticsOrder(requestPayload as any);
+      const logisticsResult = await payNowLogisticsService.createLogisticsOrder(requestPayload);
 
       // 更新訂單物流資訊
       await updateDoc(orderRef, {
