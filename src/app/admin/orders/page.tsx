@@ -205,7 +205,7 @@ export default function AdminOrders() {
   };
 
   // 建立 PayNow 物流訂單
-  const handleCreateLogistics = async (orderId: string) => {
+  const handleCreateLogistics = async (orderId: string, dryRun: boolean) => {
     setCreatingLogistics(orderId);
     setLogisticsError(null);
     setLogisticsSuccess(null);
@@ -220,12 +220,12 @@ export default function AdminOrders() {
           'Content-Type': 'application/json',
           'Authorization': authToken
         },
-        body: JSON.stringify({ orderId })
+        body: JSON.stringify({ orderId, dryRun })
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (result.success && !result.dryRun) {
         setLogisticsSuccess(orderId);
         
         // 重新載入訂單資料
@@ -234,6 +234,8 @@ export default function AdminOrders() {
         setTimeout(() => {
           setLogisticsSuccess(null);
         }, 3000);
+      } else if (result.success && result.dryRun) {
+        alert('乾跑預覽（未送出）：\n\n' + JSON.stringify(result.preview, null, 2));
       } else {
         setLogisticsError({ orderId, error: result.error || '建立物流訂單失敗' });
         setTimeout(() => {
@@ -501,8 +503,19 @@ export default function AdminOrders() {
                          o.logisticsInfo && 
                          !o.logisticsInfo.logisticsNo && (
                           <div className="mt-4 pt-4 border-t">
+                            <div className="mb-2 text-sm text-gray-600">建立前請再次確認資訊是否正確。可先勾選「乾跑」僅預覽參數，不送出。</div>
+                            <label className="mr-3 inline-flex items-center gap-2 text-sm">
+                              <input type="checkbox" checked={creatingLogistics === 'dry_'+o.id}
+                                onChange={(e) => {
+                                  setCreatingLogistics(e.target.checked ? 'dry_'+o.id : null);
+                                }} /> 乾跑(不送單)
+                            </label>
                             <Button
-                              onClick={() => handleCreateLogistics(o.id)}
+                              onClick={() => {
+                                const dry = creatingLogistics === 'dry_'+o.id;
+                                if (!dry && !confirm('確定要建立 7-11 物流單？此操作會於 PayNow 正式建立訂單。')) return;
+                                handleCreateLogistics(o.id, dry);
+                              }}
                               disabled={creatingLogistics === o.id}
                               className="bg-blue-500 text-white hover:bg-blue-600"
                             >
@@ -514,6 +527,33 @@ export default function AdminOrders() {
                             {logisticsError && logisticsError.orderId === o.id && (
                               <div className="mt-2 text-red-600 text-sm">{logisticsError.error}</div>
                             )}
+                          </div>
+                        )}
+                        {/* 取消物流訂單按鈕 */}
+                        {o.logisticsInfo?.logisticsNo && (
+                          <div className="mt-4 pt-4 border-t">
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                if (!confirm('確定要取消此物流訂單？')) return;
+                                try {
+                                  const authToken = 'Bearer admin_324_moonp_secure_key_h94mp65k6';
+                                  const r = await fetch('/api/admin/cancel-logistics', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': authToken },
+                                    body: JSON.stringify({ orderId: o.id })
+                                  });
+                                  const j = await r.json();
+                                  if (j.success) {
+                                    fetchOrders();
+                                  } else {
+                                    alert('取消失敗：' + (j.error || j.message));
+                                  }
+                                } catch (err) {
+                                  alert('取消時發生錯誤');
+                                }
+                              }}
+                            >取消物流訂單</Button>
                           </div>
                         )}
                       </td>

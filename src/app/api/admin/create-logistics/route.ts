@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { orderId } = body;
+    const { orderId, dryRun } = body as { orderId: string; dryRun?: boolean };
 
     if (!orderId) {
       return NextResponse.json({
@@ -73,9 +73,9 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 建立 PayNow 物流訂單
+    // 建立 PayNow 物流訂單（支援乾跑）
     try {
-      const logisticsResult = await payNowLogisticsService.createLogisticsOrder({
+      const requestPayload = {
         orderNumber: orderData.orderNumber,
         logisticsService: '01', // 7-11 交貨便
         deliverMode: '02', // 取貨不付款
@@ -93,7 +93,18 @@ export async function POST(request: NextRequest) {
         senderPhone: '0952759957',
         senderEmail: 'axikorea@gmail.com',
         senderAddress: '台北市信義區信義路五段7號'
-      });
+      } as const;
+
+      if (dryRun) {
+        const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload as any);
+        return NextResponse.json({
+          success: true,
+          dryRun: true,
+          preview
+        });
+      }
+
+      const logisticsResult = await payNowLogisticsService.createLogisticsOrder(requestPayload as any);
 
       // 更新訂單物流資訊
       await updateDoc(orderRef, {

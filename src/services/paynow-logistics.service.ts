@@ -151,6 +151,44 @@ export class PayNowLogisticsService {
   }
 
   /**
+   * 組裝建立物流訂單 payload（供乾跑/預覽使用，不送出）
+   */
+  buildCreateOrderPayload(request: PayNowLogisticsRequest): {
+    orderData: Record<string, unknown>;
+    encryptedData: string;
+    formBody: string;
+  } {
+    const orderData = {
+      user_account: this.config.userAccount,
+      apicode: this.encryptApiCode(),
+      Logistic_service: request.logisticsService,
+      OrderNo: request.orderNumber,
+      DeliverMode: request.deliverMode,
+      TotalAmount: request.totalAmount.toString(),
+      Remark: request.remark || '',
+      Description: request.description || '',
+      EC: '',
+      receiver_storeid: request.receiverStoreId,
+      receiver_storename: request.receiverStoreName,
+      return_storeid: request.returnStoreId || '',
+      Receiver_Name: request.receiverName,
+      Receiver_Phone: request.receiverPhone,
+      Receiver_Email: request.receiverEmail,
+      Receiver_address: request.receiverAddress,
+      Sender_Name: request.senderName,
+      Sender_Phone: request.senderPhone,
+      Sender_Email: request.senderEmail,
+      Sender_address: request.senderAddress || '',
+      PassCode: this.generatePassCode(request.orderNumber, request.totalAmount.toString())
+    };
+
+    const encryptedData = this.encryptOrderData(orderData);
+    const params = new URLSearchParams({ JsonOrder: encryptedData });
+
+    return { orderData, encryptedData, formBody: params.toString() };
+  }
+
+  /**
    * 查詢物流狀態
    */
   async getLogisticsInfo(logisticsNumber: string): Promise<PayNowOrderInfo> {
