@@ -106,6 +106,18 @@ export default function AdminOrders() {
   const [filterEmail, setFilterEmail] = useState("");
   const [filterPhone, setFilterPhone] = useState("");
   const [filterName, setFilterName] = useState("");
+
+  // 提取共用的訂單載入函數，方便在操作後重新載入
+  const fetchOrders = async () => {
+    const q = collection(db, "orders");
+    const querySnapshot = await getDocs(q);
+    const items: Order[] = [];
+    querySnapshot.forEach((doc) => {
+      items.push({ id: doc.id, ...doc.data() } as Order);
+    });
+    setOrders(items.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
+    setLoading(false);
+  };
   const [filterDateStart, setFilterDateStart] = useState("");
   const [filterDateEnd, setFilterDateEnd] = useState("");
   const [filterAmountMin, setFilterAmountMin] = useState("");
@@ -127,16 +139,6 @@ export default function AdminOrders() {
 
   // 取得訂單列表
   useEffect(() => {
-    async function fetchOrders() {
-      const q = collection(db, "orders");
-      const querySnapshot = await getDocs(q);
-      const items: Order[] = [];
-      querySnapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() } as Order);
-      });
-      setOrders(items.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
-      setLoading(false);
-    }
     fetchOrders();
   }, []);
 
