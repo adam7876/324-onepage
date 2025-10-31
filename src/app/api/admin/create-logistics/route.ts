@@ -76,6 +76,11 @@ export async function POST(request: NextRequest) {
 
     // 建立 PayNow 物流訂單（支援乾跑）
     try {
+      // 7-11 交貨便的姓名長度限制為 10 個字元
+      const truncateName = (name: string, maxLength: number = 10): string => {
+        return name.substring(0, maxLength);
+      };
+
       const requestPayload: PayNowLogisticsRequest = {
         orderNumber: orderData.orderNumber,
         logisticsService: '01', // 7-11 交貨便
@@ -86,11 +91,11 @@ export async function POST(request: NextRequest) {
         receiverStoreId: orderData.logisticsInfo.storeId,
         receiverStoreName: orderData.logisticsInfo.storeName,
         returnStoreId: '',
-        receiverName: orderData.name,
+        receiverName: truncateName(orderData.name, 10), // 7-11 限制 10 字元
         receiverPhone: orderData.phone,
         receiverEmail: orderData.email,
         receiverAddress: orderData.logisticsInfo.storeAddress,
-        senderName: '324.SAMISA',
+        senderName: truncateName('324.SAMISA', 10), // 7-11 限制 10 字元
         senderPhone: '0952759957',
         senderEmail: 'axikorea@gmail.com',
         senderAddress: '台北市信義區信義路五段7號'
