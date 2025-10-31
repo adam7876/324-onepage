@@ -130,7 +130,11 @@ export class PayNowLogisticsService {
         JsonOrder: encryptedData
       });
 
-      const response = await fetch(`${this.config.baseUrl}/api/Orderapi/Add_Order`, {
+      const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
+      console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
+      console.log('PayNow 建立物流訂單 - 請求 Body:', params.toString().substring(0, 200) + '...');
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -138,11 +142,35 @@ export class PayNowLogisticsService {
         body: params.toString()
       });
 
+      console.log('PayNow 建立物流訂單 - 回應狀態:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('PayNow API 錯誤回應:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
-      const result = await response.json();
+      // PayNow API 可能回傳 JSON 或純文字，先嘗試解析 JSON
+      const responseText = await response.text();
+      console.log('PayNow API 原始回應:', responseText);
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        // 如果不是 JSON，可能是純文字錯誤訊息
+        console.error('PayNow 回應不是 JSON 格式:', responseText);
+        throw new Error(`PayNow API 回應格式錯誤: ${responseText}`);
+      }
+
+      console.log('PayNow API 解析後結果:', result);
+
+      // 檢查 PayNow 回應的 Status 欄位
+      if (result.Status === 'F' || result.ErrorMsg) {
+        console.error('PayNow 建立訂單失敗:', result.ErrorMsg || result.ReturnMsg || '未知錯誤');
+        throw new Error(result.ErrorMsg || result.ReturnMsg || 'PayNow 建立訂單失敗');
+      }
+
       return this.parseOrderResponse(result);
     } catch (error) {
       console.error('PayNow create logistics order error:', error);
