@@ -157,7 +157,7 @@ export class PayNowLogisticsService {
       let result;
       try {
         result = JSON.parse(responseText);
-      } catch (parseError) {
+      } catch {
         // 如果不是 JSON，可能是純文字錯誤訊息
         console.error('PayNow 回應不是 JSON 格式:', responseText);
         throw new Error(`PayNow API 回應格式錯誤: ${responseText}`);
