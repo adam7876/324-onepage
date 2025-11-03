@@ -126,20 +126,20 @@ export class PayNowLogisticsService {
       };
 
       const encryptedData = this.encryptOrderData(orderData);
-      const params = new URLSearchParams({
-        JsonOrder: encryptedData
-      });
+      // 根據 PayNow C# 範例：直接組合字串，不使用 URLSearchParams（避免雙重編碼）
+      // encryptedData 已經是 URL encoded，直接組合成 "JsonOrder=加密資料"
+      const postData = `JsonOrder=${encryptedData}`;
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
-      console.log('PayNow 建立物流訂單 - 請求 Body:', params.toString().substring(0, 200) + '...');
+      console.log('PayNow 建立物流訂單 - 請求 Body:', postData.substring(0, 200) + '...');
 
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: params.toString()
+        body: postData
       });
 
       console.log('PayNow 建立物流訂單 - 回應狀態:', response.status, response.statusText);
@@ -211,9 +211,10 @@ export class PayNowLogisticsService {
     };
 
     const encryptedData = this.encryptOrderData(orderData);
-    const params = new URLSearchParams({ JsonOrder: encryptedData });
+    // 與 createLogisticsOrder 使用相同的格式
+    const formBody = `JsonOrder=${encryptedData}`;
 
-    return { orderData, encryptedData, formBody: params.toString() };
+    return { orderData, encryptedData, formBody };
   }
 
   /**
@@ -260,16 +261,15 @@ export class PayNowLogisticsService {
       };
 
       const encryptedData = this.encryptOrderData(updateData);
-      const params = new URLSearchParams({
-        UpdateOrder: encryptedData
-      });
+      // 直接組合成字串，避免雙重 URL encoding
+      const postData = `UpdateOrder=${encryptedData}`;
 
       const response = await fetch(`${this.config.baseUrl}/api/Orderapi/Put`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: params.toString()
+        body: postData
       });
 
       if (!response.ok) {
