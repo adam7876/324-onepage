@@ -237,10 +237,12 @@ export default function AdminOrders() {
       } else if (result.success && result.dryRun) {
         alert('乾跑預覽（未送出）：\n\n' + JSON.stringify(result.preview, null, 2));
       } else {
-        setLogisticsError({ orderId, error: result.error || '建立物流訂單失敗' });
+        const errorMsg = result.error || '建立物流訂單失敗';
+        const detailsMsg = result.details ? `\n詳細資訊: ${result.details}` : '';
+        setLogisticsError({ orderId, error: `${errorMsg}${detailsMsg}` });
         setTimeout(() => {
           setLogisticsError(null);
-        }, 5000);
+        }, 10000); // 延長顯示時間以便閱讀
       }
     } catch (error) {
       console.error('建立物流訂單錯誤:', error);
