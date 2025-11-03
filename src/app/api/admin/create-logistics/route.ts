@@ -81,24 +81,38 @@ export async function POST(request: NextRequest) {
         return name.substring(0, maxLength);
       };
 
+      // 移除 Ibon 禁用字元（根據 PayNow API 文件，7-11 訂單所有欄位都不能包含這些字元）
+      // 禁用字元: ', ", %, |, &, `, ^, @, !, ., #, (, ), *, _, +, -, ;, :, ,
+      // 注意：Email 欄位需要保留 @ 符號，所以使用特殊處理
+      const removeIbonForbiddenChars = (text: string, preserveAt: boolean = false): string => {
+        if (!text) return text;
+        if (preserveAt) {
+          // Email 欄位：移除 @ 以外的禁用字元
+          return text.replace(/['"%|&`^!\.#()*_+\-;:,]/g, '');
+        } else {
+          // 其他欄位：移除所有禁用字元（包括 @）
+          return text.replace(/['"%|&`^@!\.#()*_+\-;:,]/g, '');
+        }
+      };
+
       const requestPayload: PayNowLogisticsRequest = {
         orderNumber: orderData.orderNumber,
         logisticsService: '01', // 7-11 交貨便
         deliverMode: '02', // 取貨不付款
         totalAmount: orderData.total,
-        remark: orderData.customerNotes || '',
-        description: `訂單 ${orderData.orderNumber}`,
-        receiverStoreId: orderData.logisticsInfo.storeId,
-        receiverStoreName: orderData.logisticsInfo.storeName,
+        remark: removeIbonForbiddenChars(orderData.customerNotes || ''),
+        description: removeIbonForbiddenChars(`訂單${orderData.orderNumber}`), // 移除空格和特殊字元
+        receiverStoreId: removeIbonForbiddenChars(orderData.logisticsInfo.storeId),
+        receiverStoreName: removeIbonForbiddenChars(orderData.logisticsInfo.storeName),
         returnStoreId: '',
-        receiverName: truncateName(orderData.name, 10), // 7-11 限制 10 字元
+        receiverName: truncateName(removeIbonForbiddenChars(orderData.name), 10), // 先移除禁用字元再截斷
         receiverPhone: orderData.phone,
-        receiverEmail: orderData.email,
-        receiverAddress: orderData.logisticsInfo.storeAddress,
-        senderName: truncateName('324.SAMISA', 10), // 7-11 限制 10 字元
+        receiverEmail: removeIbonForbiddenChars(orderData.email, true), // Email 保留 @ 符號
+        receiverAddress: removeIbonForbiddenChars(orderData.logisticsInfo.storeAddress),
+        senderName: truncateName(removeIbonForbiddenChars('324SAMISA'), 10), // 移除點號，7-11 限制 10 字元
         senderPhone: '0952759957',
-        senderEmail: 'axikorea@gmail.com',
-        senderAddress: '台北市信義區信義路五段7號'
+        senderEmail: removeIbonForbiddenChars('axikorea@gmail.com', true), // Email 保留 @ 符號
+        senderAddress: removeIbonForbiddenChars('台北市信義區信義路五段7號')
       };
 
       if (dryRun) {
