@@ -83,14 +83,14 @@ export async function POST(request: NextRequest) {
 
       // 移除 Ibon 禁用字元（根據 PayNow API 文件，7-11 訂單所有欄位都不能包含這些字元）
       // 禁用字元: ', ", %, |, &, `, ^, @, !, ., #, (, ), *, _, +, -, ;, :, ,
-      // 注意：Email 欄位需要保留 @ 符號，所以使用特殊處理
+      // 注意：Email 欄位需要保留 @ 和 . 符號，所以使用特殊處理
       const removeIbonForbiddenChars = (text: string, preserveAt: boolean = false): string => {
         if (!text) return text;
         if (preserveAt) {
-          // Email 欄位：移除 @ 以外的禁用字元
-          return text.replace(/['"%|&`^!\.#()*_+\-;:,]/g, '');
+          // Email 欄位：只移除會破壞 Email 格式的禁用字元，保留 @ 和 .
+          return text.replace(/['"%|&`^!#()*_+\-;:,]/g, '');
         } else {
-          // 其他欄位：移除所有禁用字元（包括 @）
+          // 其他欄位：移除所有禁用字元（包括 @ 和 .）
           return text.replace(/['"%|&`^@!\.#()*_+\-;:,]/g, '');
         }
       };

@@ -51,21 +51,28 @@ export function tripleDESEncrypt(text: string, password: string): string {
 
 /**
  * TripleDES 解密
+ * 必須與加密方法匹配：使用 ECB 模式，不使用 IV
  */
-export function tripleDESDecrypt(encryptedText: string, key: string): string {
+export function tripleDESDecrypt(encryptedText: string, password: string): string {
   try {
-    const paddedKey = key.padEnd(24, '0').substring(0, 24);
+    // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456（與加密方法一致）
+    const privateKey = `1234567890${password}123456`;
     
-    // 使用 createDecipheriv 替代已棄用的 createDecipher
-    const iv = Buffer.from('12345678', 'utf8'); // 使用 PayNow 文件中的公鑰作為 IV
+    // 確保私鑰長度為 24 字節
+    const paddedKey = privateKey.substring(0, 24);
     
-    const decipher = crypto.createDecipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), iv);
-    decipher.setAutoPadding(false);
+    // 還原空格替換（加密時將空格替換為 +）
+    const normalizedText = encryptedText.replace(/\+/g, ' ');
     
-    let decrypted = decipher.update(encryptedText, 'base64', 'utf8');
+    // 使用 des-ede3-ecb 模式，不使用 IV（與加密方法一致）
+    const decipher = crypto.createDecipheriv('des-ede3-ecb', Buffer.from(paddedKey, 'utf8'), Buffer.alloc(0));
+    decipher.setAutoPadding(false); // PaddingMode.Zeros
+    
+    let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
     
-    return decrypted;
+    // 移除 Zero Padding（手動移除末尾的 \0）
+    return decrypted.replace(/\0+$/, '');
   } catch (error) {
     console.error('TripleDES decryption error:', error);
     throw new Error('Failed to decrypt data');

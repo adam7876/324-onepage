@@ -5,7 +5,7 @@
 
 import type { LogisticsInfo } from '../types';
 import { getPayNowConfig } from '../config/paynow.config';
-import { tripleDESEncrypt, generatePayNowPassCode, urlEncode } from '../lib/paynow-crypto';
+import { tripleDESEncrypt, generatePayNowPassCode, urlEncode, tripleDESDecrypt, urlDecode } from '../lib/paynow-crypto';
 
 export interface PayNowConfig {
   baseUrl: string;
@@ -132,6 +132,19 @@ export class PayNowLogisticsService {
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
       const encryptedData = this.encryptOrderData(orderData);
+      
+      // 測試本地解密，確認加密是否正確
+      try {
+        const decodedData = urlDecode(encryptedData);
+        const decryptedJson = tripleDESDecrypt(decodedData, this.config.apiCode);
+        console.log('PayNow 本地解密後的 JSON:', decryptedJson);
+        console.log('PayNow 本地解密是否成功:', decryptedJson === jsonString);
+        // 嘗試解析 JSON 確認格式正確
+        const parsedJson = JSON.parse(decryptedJson);
+        console.log('PayNow 本地解密後的 JSON 解析成功:', !!parsedJson);
+      } catch (decryptError) {
+        console.error('PayNow 本地解密測試失敗:', decryptError);
+      }
       // 根據 PayNow C# 範例：直接組合字串，不使用 URLSearchParams（避免雙重編碼）
       // encryptedData 已經是 URL encoded，直接組合成 "JsonOrder=加密資料"
       const postData = `JsonOrder=${encryptedData}`;
