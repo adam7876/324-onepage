@@ -95,13 +95,20 @@ export async function POST(request: NextRequest) {
         }
       };
 
+      // 驗證 OrderNo 只包含英文和數字（根據 PayNow API 文件要求）
+      const sanitizeOrderNumber = (orderNumber: string): string => {
+        return orderNumber.replace(/[^a-zA-Z0-9]/g, '');
+      };
+
+      const cleanedOrderNumber = sanitizeOrderNumber(orderData.orderNumber);
+      
       const requestPayload: PayNowLogisticsRequest = {
-        orderNumber: orderData.orderNumber,
+        orderNumber: cleanedOrderNumber, // 只保留英文和數字
         logisticsService: '01', // 7-11 交貨便
         deliverMode: '02', // 取貨不付款
         totalAmount: orderData.total,
         remark: removeIbonForbiddenChars(orderData.customerNotes || ''),
-        description: removeIbonForbiddenChars(`訂單${orderData.orderNumber}`), // 移除空格和特殊字元
+        description: removeIbonForbiddenChars(`訂單${cleanedOrderNumber}`), // 使用清理後的訂單編號
         receiverStoreId: removeIbonForbiddenChars(orderData.logisticsInfo.storeId),
         receiverStoreName: removeIbonForbiddenChars(orderData.logisticsInfo.storeName),
         returnStoreId: '',

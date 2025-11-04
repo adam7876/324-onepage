@@ -125,6 +125,12 @@ export class PayNowLogisticsService {
         PassCode: this.generatePassCode(request.orderNumber, request.totalAmount.toString())
       };
 
+      // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
+      const jsonString = JSON.stringify(orderData);
+      console.log('PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
+      console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
+      
       const encryptedData = this.encryptOrderData(orderData);
       // 根據 PayNow C# 範例：直接組合字串，不使用 URLSearchParams（避免雙重編碼）
       // encryptedData 已經是 URL encoded，直接組合成 "JsonOrder=加密資料"
