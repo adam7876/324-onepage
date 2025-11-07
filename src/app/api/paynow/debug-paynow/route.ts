@@ -88,8 +88,9 @@ export async function GET() {
       }
     }
 
-    // 6. 測試 PassCode 生成
-    const passCode = generatePayNowPassCode(config.userAccount, 'TEST_ORDER', '100', config.apiCode);
+    // 6. 測試 PassCode 生成（使用測試用的 base64Cipher）
+    const testBase64Cipher = 'TEST_BASE64_CIPHER';
+    const passCode = generatePayNowPassCode(config.apiCode, testBase64Cipher, config.apiCode);
     
     return NextResponse.json({
       success: true,

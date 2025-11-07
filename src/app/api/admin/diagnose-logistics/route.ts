@@ -9,7 +9,6 @@ import { getDoc, doc } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 import { payNowLogisticsService } from '@/services/paynow-logistics.service';
 import type { PayNowLogisticsRequest } from '@/services/paynow-logistics.service';
-import { generatePayNowPassCode } from '@/lib/paynow-crypto';
 import { getPayNowConfig } from '@/config/paynow.config';
 
 export async function POST(request: NextRequest) {
@@ -93,15 +92,14 @@ export async function POST(request: NextRequest) {
     // 取得配置
     const config = getPayNowConfig();
 
-    // 計算 PassCode
-    const passCode = generatePayNowPassCode(
-      config.userAccount,
-      requestPayload.orderNumber,
-      requestPayload.totalAmount.toString(),
-      config.apiCode
-    );
+    // 建立 payload 預覽（包含正確的 PassCode 計算）
+    const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload);
+    
+    // 從 preview 中提取 PassCode（從 formBody 中解析）
+    const passCodeMatch = preview.formBody.match(/PassCode=([^&]+)/);
+    const passCode = passCodeMatch ? passCodeMatch[1] : '';
 
-    // 組裝要加密的資料
+    // 組裝要加密的資料（PassCode 不在 JSON 中）
     const orderDataToEncrypt = {
       user_account: config.userAccount,
       apicode: '7XBJHzfFtxw=', // 加密後的 apicode
@@ -122,12 +120,9 @@ export async function POST(request: NextRequest) {
       Sender_Name: requestPayload.senderName,
       Sender_Phone: requestPayload.senderPhone,
       Sender_Email: requestPayload.senderEmail,
-      Sender_address: requestPayload.senderAddress || '',
-      PassCode: passCode
+      Sender_address: requestPayload.senderAddress || ''
+      // PassCode 不在 JSON 中，而是在 POST 資料中單獨發送
     };
-
-    // 建立 payload 預覽
-    const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload);
 
     // 嘗試實際建立（捕捉所有錯誤）
     let actualResponse = null;

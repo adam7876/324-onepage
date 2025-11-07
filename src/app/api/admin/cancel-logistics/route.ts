@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
 
     // 呼叫 PayNow 取消 API
     const cfg = getPayNowConfig();
-    const passCode = generatePayNowPassCode(cfg.userAccount, order.orderNumber, String(order.total ?? 0), cfg.apiCode);
+    // 取消訂單的 PassCode：使用 LogisticNumber 作為 base64Cipher
+    // 格式：SHA1(Apicode + LogisticNumber + Password)
+    const passCode = generatePayNowPassCode(cfg.apiCode, logisticsNo, cfg.apiCode);
     const params = new URLSearchParams({
       LogisticNumber: logisticsNo,
       sno: '1',

@@ -28,8 +28,9 @@ export async function GET() {
     const yourPrivateKey = `1234567890${yourPassword}123456`;
     const yourPaddedKey = yourPrivateKey.substring(0, 24);
     
-    // 測試 PassCode 生成
-    const passCode = generatePayNowPassCode('S225319286', 'TEST123', '100', yourPassword);
+    // 測試 PassCode 生成（使用測試用的 base64Cipher）
+    const testBase64Cipher = 'TEST_BASE64_CIPHER';
+    const passCode = generatePayNowPassCode('S225319286', testBase64Cipher, yourPassword);
     
     return NextResponse.json({
       success: true,
