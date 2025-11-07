@@ -9,6 +9,7 @@ import { getDoc, updateDoc, doc, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/firestore';
 import { payNowLogisticsService } from '@/services/paynow-logistics.service';
 import type { PayNowLogisticsRequest } from '@/services/paynow-logistics.service';
+import { getPayNowConfig } from '@/config/paynow.config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -124,10 +125,34 @@ export async function POST(request: NextRequest) {
 
       if (dryRun) {
         const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload);
+        const config = getPayNowConfig();
+        
+        // 解析 formBody 獲取各個參數（用於 Postman 測試）
+        const apicodeMatch = preview.formBody.match(/Apicode=([^&]+)/);
+        const jsonOrderMatch = preview.formBody.match(/JsonOrder=([^&]+)/);
+        const passCodeMatch = preview.formBody.match(/PassCode=([^&]+)/);
+        
         return NextResponse.json({
           success: true,
           dryRun: true,
-          preview
+          message: '以下資料可用於 Postman 測試（使用 x-www-form-urlencoded）',
+          postmanTest: {
+            Apicode: apicodeMatch ? decodeURIComponent(apicodeMatch[1]) : '',
+            JsonOrder: jsonOrderMatch ? decodeURIComponent(jsonOrderMatch[1]) : '', // 未 URL 編碼的 Base64 密文（讓 Postman 自己編碼）
+            PassCode: passCodeMatch ? passCodeMatch[1] : ''
+          },
+          preview: {
+            ...preview,
+            // 添加原始 JSON 供參考
+            jsonString: JSON.stringify(preview.orderData),
+            // 添加 PassCode 計算用的原始值
+            passCodeCalculation: {
+              apicode: config.apiCode,
+              base64Cipher: preview.encryptedData, // 未 URL 編碼
+              password: config.apiCode,
+              expectedPassCode: passCodeMatch ? passCodeMatch[1] : ''
+            }
+          }
         });
       }
 

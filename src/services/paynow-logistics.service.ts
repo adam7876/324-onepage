@@ -142,6 +142,15 @@ export class PayNowLogisticsService {
       // 組裝 POST 資料：Apicode + JsonOrder（URL 編碼）+ PassCode
       const postData = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
       console.log('PayNow POST 資料:', postData.substring(0, 200) + '...');
+      console.log('PayNow 診斷資訊:', {
+        apicode: this.config.apiCode,
+        apicodeEncoded: encodeURIComponent(this.config.apiCode),
+        base64CipherLength: base64Cipher.length,
+        base64CipherFirst50: base64Cipher.substring(0, 50),
+        passCode,
+        passCodeLength: passCode.length,
+        postDataLength: postData.length
+      });
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
