@@ -277,13 +277,17 @@ export class PayNowLogisticsService {
    */
   async updateStore(logisticsNumber: string, newStoreId: string, newStoreName: string, changeType: '01' | '02' = '01'): Promise<boolean> {
     try {
+      // 更新門市的 PassCode 計算方式可能不同，暫時使用 logisticsNumber 作為 orderNumber，'0' 作為 totalAmount
+      // 注意：這可能需要根據 PayNow 文件調整
+      const passCode = this.generatePassCode(logisticsNumber, '0');
+      
       const updateData = {
         LogisticNumber: logisticsNumber,
         sno: 1,
         ChangeType: changeType,
         NewStoreId: newStoreId,
         NewStoreName: newStoreName,
-        PassCode: this.generatePassCode(logisticsNumber)
+        PassCode: passCode
       };
 
       const encryptedData = this.encryptOrderData(updateData);
