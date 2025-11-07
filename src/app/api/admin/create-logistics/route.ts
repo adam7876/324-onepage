@@ -127,19 +127,18 @@ export async function POST(request: NextRequest) {
         const preview = payNowLogisticsService.buildCreateOrderPayload(requestPayload);
         const config = getPayNowConfig();
         
-        // 解析 formBody 獲取各個參數（用於 Postman 測試）
-        const apicodeMatch = preview.formBody.match(/Apicode=([^&]+)/);
+        // 解析 formBody 獲取 JsonOrder 參數（用於 Postman 測試）
         const jsonOrderMatch = preview.formBody.match(/JsonOrder=([^&]+)/);
-        const passCodeMatch = preview.formBody.match(/PassCode=([^&]+)/);
+        
+        // 從 orderData 中提取 PassCode（PassCode 現在在 JSON 中）
+        const passCode = preview.orderData.PassCode as string;
         
         return NextResponse.json({
           success: true,
           dryRun: true,
           message: '以下資料可用於 Postman 測試（使用 x-www-form-urlencoded）',
           postmanTest: {
-            Apicode: apicodeMatch ? decodeURIComponent(apicodeMatch[1]) : '',
-            JsonOrder: jsonOrderMatch ? decodeURIComponent(jsonOrderMatch[1]) : '', // 未 URL 編碼的 Base64 密文（讓 Postman 自己編碼）
-            PassCode: passCodeMatch ? passCodeMatch[1] : ''
+            JsonOrder: jsonOrderMatch ? decodeURIComponent(jsonOrderMatch[1]) : '' // 未 URL 編碼的 Base64 密文（讓 Postman 自己編碼）
           },
           preview: {
             ...preview,
@@ -147,10 +146,12 @@ export async function POST(request: NextRequest) {
             jsonString: JSON.stringify(preview.orderData),
             // 添加 PassCode 計算用的原始值
             passCodeCalculation: {
+              user_account: config.userAccount,
+              OrderNo: requestPayload.orderNumber,
+              TotalAmount: requestPayload.totalAmount.toString(),
               apicode: config.apiCode,
-              base64Cipher: preview.encryptedData, // 未 URL 編碼
-              password: config.apiCode,
-              expectedPassCode: passCodeMatch ? passCodeMatch[1] : ''
+              combined: `${config.userAccount}${requestPayload.orderNumber}${requestPayload.totalAmount.toString()}${config.apiCode}`,
+              expectedPassCode: passCode
             }
           }
         });
