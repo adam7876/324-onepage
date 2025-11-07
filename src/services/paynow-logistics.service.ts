@@ -5,7 +5,7 @@
 
 import type { LogisticsInfo } from '../types';
 import { getPayNowConfig } from '../config/paynow.config';
-import { tripleDESEncrypt, generatePayNowPassCode, urlEncode, tripleDESDecrypt, urlDecode } from '../lib/paynow-crypto';
+import { tripleDESEncrypt, generatePayNowPassCode, urlEncode } from '../lib/paynow-crypto';
 
 export interface PayNowConfig {
   baseUrl: string;
@@ -121,8 +121,8 @@ export class PayNowLogisticsService {
         Sender_Name: request.senderName,
         Sender_Phone: request.senderPhone,
         Sender_Email: request.senderEmail,
-        Sender_address: request.senderAddress || '',
-        PassCode: this.generatePassCode(request.orderNumber, request.totalAmount.toString())
+        Sender_address: request.senderAddress || ''
+        // PassCode 不在 JSON 中，而是在 POST 資料中單獨發送
       };
 
       // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
@@ -131,23 +131,17 @@ export class PayNowLogisticsService {
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
-      const encryptedData = this.encryptOrderData(orderData);
+      // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
+      const base64Cipher = this.encryptOrderData(orderData);
+      console.log('PayNow Base64 密文（未 URL 編碼）:', base64Cipher);
       
-      // 測試本地解密，確認加密是否正確
-      try {
-        const decodedData = urlDecode(encryptedData);
-        const decryptedJson = tripleDESDecrypt(decodedData, this.config.apiCode);
-        console.log('PayNow 本地解密後的 JSON:', decryptedJson);
-        console.log('PayNow 本地解密是否成功:', decryptedJson === jsonString);
-        // 嘗試解析 JSON 確認格式正確
-        const parsedJson = JSON.parse(decryptedJson);
-        console.log('PayNow 本地解密後的 JSON 解析成功:', !!parsedJson);
-      } catch (decryptError) {
-        console.error('PayNow 本地解密測試失敗:', decryptError);
-      }
-      // 根據 PayNow C# 範例：直接組合字串，不使用 URLSearchParams（避免雙重編碼）
-      // encryptedData 已經是 URL encoded，直接組合成 "JsonOrder=加密資料"
-      const postData = `JsonOrder=${encryptedData}`;
+      // 計算 PassCode（使用未 URL 編碼的 Base64 密文）
+      const passCode = this.generatePassCode(base64Cipher);
+      console.log('PayNow PassCode:', passCode);
+      
+      // 組裝 POST 資料：Apicode + JsonOrder（URL 編碼）+ PassCode
+      const postData = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
+      console.log('PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
@@ -225,15 +219,20 @@ export class PayNowLogisticsService {
       Sender_Name: request.senderName,
       Sender_Phone: request.senderPhone,
       Sender_Email: request.senderEmail,
-      Sender_address: request.senderAddress || '',
-      PassCode: this.generatePassCode(request.orderNumber, request.totalAmount.toString())
+      Sender_address: request.senderAddress || ''
+      // PassCode 不在 JSON 中，而是在 POST 資料中單獨發送
     };
 
-    const encryptedData = this.encryptOrderData(orderData);
-    // 與 createLogisticsOrder 使用相同的格式
-    const formBody = `JsonOrder=${encryptedData}`;
+    // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
+    const base64Cipher = this.encryptOrderData(orderData);
+    
+    // 計算 PassCode（使用未 URL 編碼的 Base64 密文）
+    const passCode = this.generatePassCode(base64Cipher);
+    
+    // 組裝 POST 資料：Apicode + JsonOrder（URL 編碼）+ PassCode
+    const formBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
 
-    return { orderData, encryptedData, formBody };
+    return { orderData, encryptedData: base64Cipher, formBody };
   }
 
   /**
@@ -344,23 +343,25 @@ export class PayNowLogisticsService {
   }
 
   /**
-   * 加密訂單資料 (TripleDES + URL Encode)
+   * 加密訂單資料 (TripleDES)
+   * 返回未 URL 編碼的 Base64 密文（用於計算 PassCode）
    */
   private encryptOrderData(data: Record<string, unknown>): string {
     const jsonString = JSON.stringify(data);
-    const encrypted = tripleDESEncrypt(jsonString, this.config.apiCode);
-    return urlEncode(encrypted);
+    // 使用 password（私鑰）而不是 apiCode 來加密
+    return tripleDESEncrypt(jsonString, this.config.apiCode); // apiCode 就是私鑰
   }
 
   /**
    * 生成 PassCode (SHA-1 雜湊)
+   * 格式: SHA1(Apicode + Base64Cipher + Password)
    */
-  private generatePassCode(orderNumber: string, totalAmount?: string): string {
+  private generatePassCode(base64Cipher: string): string {
+    // Base64Cipher 必須是未 URL 編碼的
     return generatePayNowPassCode(
-      this.config.userAccount,
-      orderNumber,
-      totalAmount || '0',
-      this.config.apiCode
+      this.config.apiCode, // Apicode
+      base64Cipher, // 未 URL 編碼的 Base64 密文
+      this.config.apiCode // Password（私鑰，這裡假設 apiCode 就是私鑰）
     );
   }
 

@@ -6,44 +6,38 @@
 import crypto from 'crypto';
 
 /**
- * TripleDES 加密
+ * TripleDES 加密 (3DES-ECB + ZeroPadding + Base64)
  * 根據 PayNow API 文件要求
- * 使用 ECB 模式和 Zeros 填充
+ * 使用 ECB 模式和 ZeroPadding（若剛好整除，仍需補 8 個 0x00）
  */
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
     // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
-    const privateKey = `1234567890${password}123456`;
+    const keyStr = `1234567890${password}123456`; // 24 chars
+    const key = Buffer.from(keyStr, 'utf8');
     
-    // 確保私鑰長度為 24 字節
-    const paddedKey = privateKey.substring(0, 24);
-    
-    // 手動實現 Zero Padding (與 Python/C# 一致)
-    const textBuffer = Buffer.from(text, 'utf8');
+    // 手動實現 Zero Padding
+    let data = Buffer.from(text, 'utf8');
     const blockSize = 8;
-    const paddedLength = Math.ceil(textBuffer.length / blockSize) * blockSize;
-    const paddedBuffer = Buffer.alloc(paddedLength);
-    textBuffer.copy(paddedBuffer);
+    // 若剛好整除，仍需補 8 個 0x00
+    const padLen = blockSize - (data.length % blockSize || blockSize);
+    data = Buffer.concat([data, Buffer.alloc(padLen, 0x00)]);
     
-    // 使用 des-ede3-ecb 模式，不使用 IV
-    const cipher = crypto.createCipheriv('des-ede3-ecb', Buffer.from(paddedKey, 'utf8'), Buffer.alloc(0));
-    cipher.setAutoPadding(false); // PaddingMode.Zeros
+    // 使用 des-ede3 模式，IV 為 null（ECB 模式）
+    const cipher = crypto.createCipheriv('des-ede3', key, null);
+    cipher.setAutoPadding(false); // 關閉自動 padding（我們自己做 ZeroPadding）
     
-    // 加密填充後的緩衝區
-    let encrypted = cipher.update(paddedBuffer, undefined, 'base64');
-    encrypted += cipher.final('base64');
+    // 加密
+    const enc = Buffer.concat([cipher.update(data), cipher.final()]);
     
-    // 根據附錄一：將空格替換為 +
-    encrypted = encrypted.replace(/\s/g, '+');
-    
-    return encrypted;
+    // Base64，並把 / 換成 +
+    return enc.toString('base64').replace(/\//g, '+');
   } catch (error) {
     console.error('TripleDES encryption error:', error);
     console.error('Error details:', {
       text,
       password,
-      privateKey: `1234567890${password}123456`,
-      paddedKey: `1234567890${password}123456`.substring(0, 24)
+      keyStr: `1234567890${password}123456`
     });
     throw new Error('Failed to encrypt data');
   }
@@ -93,17 +87,18 @@ export function sha1Hash(text: string): string {
 }
 
 /**
- * 生成 PayNow PassCode
- * 格式: user_account + OrderNo + TotalAmount + apicode
+ * 生成 PayNow PassCode（用於建立物流訂單）
+ * 格式: SHA1(Apicode + Base64Cipher + Password)
+ * 注意：Base64Cipher 必須是未 URL 編碼的
  */
 export function generatePayNowPassCode(
-  userAccount: string,
-  orderNumber: string,
-  totalAmount: string,
-  apiCode: string
+  apicode: string,
+  base64Cipher: string, // 未 URL 編碼的 Base64 密文
+  password: string // 私鑰
 ): string {
-  const combinedString = `${userAccount}${orderNumber}${totalAmount}${apiCode}`;
-  return sha1Hash(combinedString);
+  const raw = apicode + base64Cipher + password;
+  const sha1 = crypto.createHash('sha1').update(raw, 'utf8').digest('hex');
+  return sha1.toUpperCase(); // 轉為大寫
 }
 
 /**
