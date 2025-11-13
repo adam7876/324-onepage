@@ -146,6 +146,14 @@ export class PayNowLogisticsService {
       // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
       const base64Cipher = this.encryptOrderData(orderData);
       console.log('PayNow Base64 密文（未 URL 編碼）:', base64Cipher);
+      console.log('PayNow Base64 密文診斷:', {
+        length: base64Cipher.length,
+        first50: base64Cipher.substring(0, 50),
+        last50: base64Cipher.substring(base64Cipher.length - 50),
+        containsSlash: base64Cipher.includes('/'),
+        containsPlus: base64Cipher.includes('+'),
+        containsSpace: base64Cipher.includes(' ')
+      });
       
       // 根據文件：POST 請求只需要 JsonOrder 參數
       const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}`;

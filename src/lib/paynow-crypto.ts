@@ -30,8 +30,8 @@ export function tripleDESEncrypt(text: string, password: string): string {
     // 加密
     const enc = Buffer.concat([cipher.update(data), cipher.final()]);
     
-    // Base64，並把 / 換成 +
-    return enc.toString('base64').replace(/\//g, '+');
+    // Base64，並把空格換成 +（根據文件：Base64 內如有空白需替換為 +）
+    return enc.toString('base64').replace(/\s/g, '+');
   } catch (error) {
     console.error('TripleDES encryption error:', error);
     console.error('Error details:', {
@@ -58,8 +58,8 @@ export function tripleDESDecrypt(encryptedText: string, password: string): strin
     // 還原空格替換（加密時將空格替換為 +）
     const normalizedText = encryptedText.replace(/\+/g, ' ');
     
-    // 使用 des-ede3-ecb 模式，不使用 IV（與加密方法一致）
-    const decipher = crypto.createDecipheriv('des-ede3-ecb', Buffer.from(paddedKey, 'utf8'), Buffer.alloc(0));
+    // 使用 des-ede3 模式，IV 為 null（ECB 模式，與加密方法一致）
+    const decipher = crypto.createDecipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), null);
     decipher.setAutoPadding(false); // PaddingMode.Zeros
     
     let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
