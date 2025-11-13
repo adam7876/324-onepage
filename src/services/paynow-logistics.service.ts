@@ -5,7 +5,7 @@
 
 import type { LogisticsInfo } from '../types';
 import { getPayNowConfig } from '../config/paynow.config';
-import { tripleDESEncrypt } from '../lib/paynow-crypto';
+import { tripleDESEncrypt, tripleDESDecrypt } from '../lib/paynow-crypto';
 import crypto from 'crypto';
 
 export interface PayNowConfig {
@@ -154,6 +154,22 @@ export class PayNowLogisticsService {
         containsPlus: base64Cipher.includes('+'),
         containsSpace: base64Cipher.includes(' ')
       });
+      
+      // 本地解密測試：驗證加密是否正確
+      try {
+        const decryptedJson = tripleDESDecrypt(base64Cipher, this.config.apiCode);
+        console.log('PayNow 本地解密測試 - 成功');
+        console.log('PayNow 本地解密後的 JSON:', decryptedJson);
+        console.log('PayNow 本地解密是否與原始 JSON 一致:', decryptedJson === jsonString);
+        
+        // 嘗試解析 JSON 確認格式正確
+        const parsedJson = JSON.parse(decryptedJson);
+        console.log('PayNow 本地解密後的 JSON 解析成功:', !!parsedJson);
+        console.log('PayNow 本地解密後的 PassCode:', parsedJson.PassCode);
+      } catch (decryptError) {
+        console.error('PayNow 本地解密測試失敗:', decryptError);
+        console.error('這表示加密方法有問題，PayNow 也無法解密');
+      }
       
       // 根據文件：POST 請求只需要 JsonOrder 參數
       const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}`;
