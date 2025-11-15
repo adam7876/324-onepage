@@ -20,7 +20,8 @@ export function tripleDESEncrypt(text: string, password: string): string {
     let data = Buffer.from(text, 'utf8');
     const blockSize = 8;
     // 若剛好整除，仍需補 8 個 0x00
-    const padLen = blockSize - (data.length % blockSize || blockSize);
+    const remainder = data.length % blockSize;
+    const padLen = remainder === 0 ? blockSize : blockSize - remainder;
     data = Buffer.concat([data, Buffer.alloc(padLen, 0x00)]);
     
     // 使用 des-ede3 模式，IV 為 null（ECB 模式）
