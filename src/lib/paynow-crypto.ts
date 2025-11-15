@@ -40,7 +40,7 @@ export function tripleDESEncrypt(text: string, password: string): string {
 export function tripleDESDecrypt(encryptedText: string, password: string): string {
   try {
     const key = buildTripleDesKey(password);
-    const normalizedText = encryptedText.replace(/\+/g, ' ');
+    const normalizedText = encryptedText.replace(/\s/g, '+');
 
     const decipher = crypto.createDecipheriv('des-ede3-ecb', key, null);
     decipher.setAutoPadding(false);
