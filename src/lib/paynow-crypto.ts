@@ -13,25 +13,14 @@ import crypto from 'crypto';
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
     // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
-    const keyStr = `1234567890${password}123456`; // 24 chars
-    const key = Buffer.from(keyStr, 'utf8');
-    
-    // 手動實現 Zero Padding
-    let data = Buffer.from(text, 'utf8');
-    const blockSize = 8;
-    // 若剛好整除，仍需補 8 個 0x00
-    const remainder = data.length % blockSize;
-    const padLen = remainder === 0 ? blockSize : blockSize - remainder;
-    data = Buffer.concat([data, Buffer.alloc(padLen, 0x00)]);
-    
-    // 使用 des-ede3 模式，IV 為 null（ECB 模式）
+    const key = buildTripleDesKey(password);
+    const data = zeroPad(Buffer.from(text, 'utf8'));
+
     const cipher = crypto.createCipheriv('des-ede3', key, null);
-    cipher.setAutoPadding(false); // 關閉自動 padding（我們自己做 ZeroPadding）
-    
-    // 加密
+    cipher.setAutoPadding(false);
+
     const enc = Buffer.concat([cipher.update(data), cipher.final()]);
-    
-    // Base64，並把空格換成 +（根據文件：Base64 內如有空白需替換為 +）
+
     return enc.toString('base64').replace(/\s/g, '+');
   } catch (error) {
     console.error('TripleDES encryption error:', error);
@@ -50,24 +39,16 @@ export function tripleDESEncrypt(text: string, password: string): string {
  */
 export function tripleDESDecrypt(encryptedText: string, password: string): string {
   try {
-    // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456（與加密方法一致）
-    const privateKey = `1234567890${password}123456`;
-    
-    // 確保私鑰長度為 24 字節
-    const paddedKey = privateKey.substring(0, 24);
-    
-    // 還原空格替換（加密時將空格替換為 +）
+    const key = buildTripleDesKey(password);
     const normalizedText = encryptedText.replace(/\+/g, ' ');
-    
-    // 使用 des-ede3 模式，IV 為 null（ECB 模式，與加密方法一致）
-    const decipher = crypto.createDecipheriv('des-ede3', Buffer.from(paddedKey, 'utf8'), null);
-    decipher.setAutoPadding(false); // PaddingMode.Zeros
-    
+
+    const decipher = crypto.createDecipheriv('des-ede3', key, null);
+    decipher.setAutoPadding(false);
+
     let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
-    
-    // 移除 Zero Padding（手動移除末尾的 \0）
-    return decrypted.replace(/\0+$/, '');
+
+    return removeZeroPadding(decrypted);
   } catch (error) {
     console.error('TripleDES decryption error:', error);
     throw new Error('Failed to decrypt data');
@@ -114,4 +95,25 @@ export function urlEncode(text: string): string {
  */
 export function urlDecode(encodedText: string): string {
   return decodeURIComponent(encodedText);
+}
+
+function buildTripleDesKey(password: string): Buffer {
+  const keyStr = `1234567890${password}123456`;
+  const keyBuffer = Buffer.from(keyStr, 'utf8');
+  if (keyBuffer.length === 24) return keyBuffer;
+  if (keyBuffer.length > 24) return keyBuffer.subarray(0, 24);
+  const padded = Buffer.alloc(24);
+  keyBuffer.copy(padded);
+  return padded;
+}
+
+function zeroPad(buffer: Buffer): Buffer {
+  const blockSize = 8;
+  const remainder = buffer.length % blockSize;
+  const padLen = remainder === 0 ? blockSize : blockSize - remainder;
+  return Buffer.concat([buffer, Buffer.alloc(padLen, 0x00)]);
+}
+
+function removeZeroPadding(text: string): string {
+  return text.replace(/\0+$/, '');
 }
