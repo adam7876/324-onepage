@@ -16,7 +16,7 @@ export function tripleDESEncrypt(text: string, password: string): string {
     const key = buildTripleDesKey(password);
     const data = zeroPad(Buffer.from(text, 'utf8'));
 
-    const cipher = crypto.createCipheriv('des-ede3', key, null);
+    const cipher = crypto.createCipheriv('des-ede3-ecb', key, null);
     cipher.setAutoPadding(false);
 
     const enc = Buffer.concat([cipher.update(data), cipher.final()]);
@@ -42,7 +42,7 @@ export function tripleDESDecrypt(encryptedText: string, password: string): strin
     const key = buildTripleDesKey(password);
     const normalizedText = encryptedText.replace(/\+/g, ' ');
 
-    const decipher = crypto.createDecipheriv('des-ede3', key, null);
+    const decipher = crypto.createDecipheriv('des-ede3-ecb', key, null);
     decipher.setAutoPadding(false);
 
     let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
