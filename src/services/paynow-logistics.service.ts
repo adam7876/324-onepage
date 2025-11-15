@@ -171,8 +171,8 @@ export class PayNowLogisticsService {
         console.error('這表示加密方法有問題，PayNow 也無法解密');
       }
       
-      // 根據文件：POST 請求只需要 JsonOrder 參數
-      const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}`;
+      // 根據文件與實際需求：同時送出 Apicode（供伺服器辨識商家）與 JsonOrder、PassCode
+      const postData = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
       console.log('PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
@@ -261,8 +261,8 @@ export class PayNowLogisticsService {
     // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
     const base64Cipher = this.encryptOrderData(orderData);
     
-    // 根據文件：POST 請求只需要 JsonOrder 參數
-    const formBody = `JsonOrder=${encodeURIComponent(base64Cipher)}`;
+    // 根據文件與 PayNow 實際需求：Apicode + JsonOrder + PassCode
+    const formBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
 
     return { orderData, encryptedData: base64Cipher, formBody };
   }
