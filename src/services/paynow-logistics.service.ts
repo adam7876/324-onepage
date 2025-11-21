@@ -137,16 +137,14 @@ export class PayNowLogisticsService {
         PassCode: passCode // PassCode 在 JSON 中
       };
 
-      const payload = { Obj_Order: orderData };
-
       // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
-      const jsonString = JSON.stringify(payload);
+      const jsonString = JSON.stringify(orderData);
       console.log('PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
       // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-      const base64Cipher = this.encryptOrderData(payload);
+      const base64Cipher = this.encryptOrderData(orderData);
       console.log('PayNow Base64 密文（未 URL 編碼）:', base64Cipher);
       console.log('PayNow Base64 密文診斷:', {
         length: base64Cipher.length,
@@ -261,13 +259,12 @@ export class PayNowLogisticsService {
     };
 
     // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-    const payload = { Obj_Order: orderData };
-    const base64Cipher = this.encryptOrderData(payload);
+    const base64Cipher = this.encryptOrderData(orderData);
     
     // 根據文件與 PayNow 實際需求：Apicode + JsonOrder + PassCode
     const formBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
 
-    return { orderData: payload, encryptedData: base64Cipher, formBody };
+    return { orderData, encryptedData: base64Cipher, formBody };
   }
 
   /**

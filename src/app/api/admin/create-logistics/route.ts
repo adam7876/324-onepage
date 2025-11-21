@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         const jsonOrderMatch = preview.formBody.match(/JsonOrder=([^&]+)/);
         
         // 從 orderData 中提取 PassCode（PassCode 現在在 JSON 中）
-        const passCode = (preview.orderData?.Obj_Order as Record<string, unknown> | undefined)?.PassCode as string | undefined;
+        const passCode = preview.orderData?.PassCode as string | undefined;
         
         return NextResponse.json({
           success: true,
