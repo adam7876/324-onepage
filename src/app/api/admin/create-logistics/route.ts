@@ -138,7 +138,17 @@ export async function POST(request: NextRequest) {
           dryRun: true,
           message: '以下資料可用於 Postman 測試（使用 x-www-form-urlencoded）',
           postmanTest: {
-            JsonOrder: jsonOrderMatch ? decodeURIComponent(jsonOrderMatch[1]) : '' // 未 URL 編碼的 Base64 密文（讓 Postman 自己編碼）
+            standard: {
+              Apicode: config.apiCode,
+              JsonOrder: jsonOrderMatch ? decodeURIComponent(jsonOrderMatch[1]) : '',
+              PassCode: passCode ?? preview.orderData.PassCode
+            },
+            legacy: {
+              Apicode: config.apiCode,
+              payload: preview.legacy?.payload ?? '',
+              JsonOrder: preview.legacy ? decodeURIComponent(preview.legacy.encryptedData) : '',
+              PassCode: passCode ?? preview.orderData.PassCode
+            }
           },
           preview: {
             ...preview,

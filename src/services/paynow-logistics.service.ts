@@ -5,7 +5,7 @@
 
 import type { LogisticsInfo } from '../types';
 import { getPayNowConfig } from '../config/paynow.config';
-import { tripleDESEncrypt, tripleDESDecrypt } from '../lib/paynow-crypto';
+import { tripleDESEncrypt, tripleDESDecrypt, urlEncode } from '../lib/paynow-crypto';
 import crypto from 'crypto';
 
 export interface PayNowConfig {
@@ -230,6 +230,11 @@ export class PayNowLogisticsService {
     orderData: Record<string, unknown>;
     encryptedData: string;
     formBody: string;
+    legacy: {
+      payload: string;
+      encryptedData: string;
+      formBody: string;
+    };
   } {
     // 計算 PassCode（根據文件：user_account + OrderNo + TotalAmount + apicode）
     const passCode = this.generatePassCode(request.orderNumber, request.totalAmount.toString());
@@ -264,7 +269,21 @@ export class PayNowLogisticsService {
     // 根據文件與 PayNow 實際需求：Apicode + JsonOrder + PassCode
     const formBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
 
-    return { orderData, encryptedData: base64Cipher, formBody };
+    // PayNow 部分系統仍期待 Obj_Order=... 形式，提供 legacy payload 供測試
+    const legacyPayload = `Obj_Order=${JSON.stringify(orderData)}`;
+    const legacyEncryptedData = this.encryptRawString(legacyPayload);
+    const legacyFormBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(legacyEncryptedData)}&PassCode=${passCode}`;
+
+    return {
+      orderData,
+      encryptedData: base64Cipher,
+      formBody,
+      legacy: {
+        payload: legacyPayload,
+        encryptedData: legacyEncryptedData,
+        formBody: legacyFormBody
+      }
+    };
   }
 
   /**
@@ -384,8 +403,12 @@ export class PayNowLogisticsService {
    */
   private encryptOrderData(data: Record<string, unknown>): string {
     const jsonString = JSON.stringify(data);
-    // 使用 password（私鑰）而不是 apiCode 來加密
-    return tripleDESEncrypt(jsonString, this.config.apiCode); // apiCode 就是私鑰
+    return this.encryptRawString(jsonString);
+  }
+
+  private encryptRawString(jsonString: string): string {
+    const encrypted = tripleDESEncrypt(jsonString, this.config.apiCode);
+    return urlEncode(encrypted);
   }
 
   /**
