@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
           },
           preview: {
             ...preview,
+            maskedOrderData: requestPayload,
             // 添加原始 JSON 供參考
             jsonString: JSON.stringify(preview.orderData),
             // 添加 PassCode 計算用的原始值
