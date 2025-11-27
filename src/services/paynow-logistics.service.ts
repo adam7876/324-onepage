@@ -115,7 +115,7 @@ export class PayNowLogisticsService {
 
       const orderData = {
         user_account: this.config.userAccount,
-        apicode: this.encryptApiCode(), // JSON 中使用加密後的 apicode
+        apicode: this.config.apiCode, // 修正：JSON 中使用原始 apicode，不加密
         Logistic_service: request.logisticsService,
         OrderNo: request.orderNumber,
         DeliverMode: request.deliverMode,
@@ -139,7 +139,7 @@ export class PayNowLogisticsService {
 
       // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
       const jsonString = JSON.stringify(orderData);
-      console.log('[NEW-VERSION] PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION-v2] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
