@@ -144,7 +144,10 @@ export class PayNowLogisticsService {
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
       // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-      const base64Cipher = this.encryptOrderData(orderData);
+      // 改用 Legacy 模式：Obj_Order 包裹
+      const legacyPayload = JSON.stringify({ Obj_Order: orderData });
+      const base64Cipher = this.encryptRawString(legacyPayload);
+      
       console.log('PayNow Base64 密文（未 URL 編碼）:', base64Cipher);
       console.log('PayNow Base64 密文診斷:', {
         length: base64Cipher.length,
@@ -264,24 +267,24 @@ export class PayNowLogisticsService {
     };
 
     // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-    const base64Cipher = this.encryptOrderData(orderData);
+    const cipher = this.encryptOrderData(orderData);
     
     // 根據文件與 PayNow 實際需求：Apicode + JsonOrder + PassCode
+    // 改用 Legacy 模式：Obj_Order 包裹
+    const legacyPayload = JSON.stringify({ Obj_Order: orderData });
+    const base64Cipher = this.encryptRawString(legacyPayload);
+    
     const formBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
 
-    // PayNow 部分系統仍期待 Obj_Order=... 形式，提供 legacy payload 供測試
-    const legacyPayload = `Obj_Order=${JSON.stringify(orderData)}`;
-    const legacyEncryptedData = this.encryptRawString(legacyPayload);
-    const legacyFormBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(legacyEncryptedData)}&PassCode=${passCode}`;
-
+    // 提供兩種 payload 供測試（雖然現在預設使用 Legacy）
     return {
       orderData,
       encryptedData: base64Cipher,
       formBody,
       legacy: {
         payload: legacyPayload,
-        encryptedData: legacyEncryptedData,
-        formBody: legacyFormBody
+        encryptedData: base64Cipher,
+        formBody: formBody
       }
     };
   }
