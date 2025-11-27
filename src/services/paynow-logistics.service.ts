@@ -267,7 +267,7 @@ export class PayNowLogisticsService {
     };
 
     // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-    const cipher = this.encryptOrderData(orderData);
+    // const cipher = this.encryptOrderData(orderData); // 暫時註解掉未使用的變數
     
     // 根據文件與 PayNow 實際需求：Apicode + JsonOrder + PassCode
     // 改用 Legacy 模式：Obj_Order 包裹
