@@ -80,9 +80,9 @@ export async function POST(request: NextRequest) {
     // 建立 PayNow 物流訂單（支援乾跑）
     try {
       // 7-11 交貨便的姓名長度限制為 10 個字元
-      const truncateName = (name: string, maxLength: number = 10): string => {
-        return name.substring(0, maxLength);
-      };
+      // const truncateName = (name: string, maxLength: number = 10): string => {
+      //   return name.substring(0, maxLength);
+      // };
 
       // 移除 Ibon 禁用字元（根據 PayNow API 文件，7-11 訂單所有欄位都不能包含這些字元）
       // 禁用字元: ', ", %, |, &, `, ^, @, !, ., #, (, ), *, _, +, -, ;, :, ,
