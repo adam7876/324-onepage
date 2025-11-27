@@ -16,11 +16,13 @@ export function tripleDESEncrypt(text: string, password: string): string {
     const key = buildTripleDesKey(password);
     const data = zeroPad(Buffer.from(text, 'utf8'));
 
-    const cipher = crypto.createCipheriv('des-ede3-ecb', key, null);
-    cipher.setAutoPadding(false);
+    // 嘗試改為 CBC 模式，IV 為 8 個 0
+    const iv = Buffer.alloc(8, 0);
+    const cipher = crypto.createCipheriv('des-ede3-cbc', key, iv);
+    cipher.setAutoPadding(false); // 繼續使用我們自己的 Padding 邏輯（或嘗試改為 true 使用 PKCS7）
 
     const enc = Buffer.concat([cipher.update(data), cipher.final()]);
-
+    
     return enc.toString('base64').replace(/\s/g, '+');
   } catch (error) {
     console.error('TripleDES encryption error:', error);
