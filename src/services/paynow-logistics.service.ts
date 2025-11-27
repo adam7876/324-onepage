@@ -244,7 +244,7 @@ export class PayNowLogisticsService {
 
     const orderData = {
       user_account: this.config.userAccount,
-      apicode: this.encryptApiCode(), // JSON 中使用加密後的 apicode
+      apicode: this.config.apiCode, // 嘗試傳送原始 apicode，不加密
       Logistic_service: request.logisticsService,
       OrderNo: request.orderNumber,
       DeliverMode: request.deliverMode,
@@ -274,7 +274,8 @@ export class PayNowLogisticsService {
     const legacyPayload = JSON.stringify({ Obj_Order: orderData });
     const base64Cipher = this.encryptRawString(legacyPayload);
     
-    const formBody = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
+    // 調整參數順序，將 JsonOrder 放在最前面，避免解析錯誤
+    const formBody = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${encodeURIComponent(this.config.apiCode)}`;
 
     // 提供兩種 payload 供測試（雖然現在預設使用 Legacy）
     return {
