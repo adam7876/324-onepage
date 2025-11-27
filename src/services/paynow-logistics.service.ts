@@ -115,7 +115,7 @@ export class PayNowLogisticsService {
 
       const orderData = {
         user_account: this.config.userAccount,
-        apicode: this.config.apiCode, // 修正：JSON 中使用原始 apicode，不加密
+        apicode: this.encryptApiCode(), // COMBO: JSON 內部使用加密的 apicode
         Logistic_service: request.logisticsService,
         OrderNo: request.orderNumber,
         DeliverMode: request.deliverMode,
@@ -134,53 +134,41 @@ export class PayNowLogisticsService {
         Sender_Phone: request.senderPhone,
         Sender_Email: request.senderEmail,
         Sender_address: request.senderAddress || '',
-        PassCode: passCode // PassCode 在 JSON 中
+        PassCode: passCode
       };
 
-      // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
-      const jsonString = JSON.stringify(orderData);
-      console.log('[NEW-VERSION-v4-STANDARD] PayNow 加密前的 JSON 字串:', jsonString);
+      // COMBO: 使用 Obj_Order 包裹 (Legacy Mode)
+      const legacyPayload = { Obj_Order: orderData };
+      const jsonString = JSON.stringify(legacyPayload);
+
+      console.log('[NEW-VERSION-v6-COMBO-REAL] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
       // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-      // 改回標準模式：純 JSON 物件，無 Obj_Order 包裹（搭配正確的 POST 順序與原始 apicode）
       const base64Cipher = this.encryptRawString(jsonString);
       
       console.log('PayNow Base64 密文（未 URL 編碼）:', base64Cipher);
-      console.log('PayNow Base64 密文診斷:', {
-        length: base64Cipher.length,
-        first50: base64Cipher.substring(0, 50),
-        last50: base64Cipher.substring(base64Cipher.length - 50),
-        containsSlash: base64Cipher.includes('/'),
-        containsPlus: base64Cipher.includes('+'),
-        containsSpace: base64Cipher.includes(' ')
-      });
       
-      // 本地解密測試：驗證加密是否正確
+      // 本地解密測試
       try {
         const decryptedJson = tripleDESDecrypt(base64Cipher, this.config.apiCode);
         console.log('PayNow 本地解密測試 - 成功');
         console.log('PayNow 本地解密後的 JSON:', decryptedJson);
-        console.log('PayNow 本地解密是否與原始 JSON 一致:', decryptedJson === jsonString);
         
-        // 嘗試解析 JSON 確認格式正確
         const parsedJson = JSON.parse(decryptedJson);
         console.log('PayNow 本地解密後的 JSON 解析成功:', !!parsedJson);
-        console.log('PayNow 本地解密後的 PassCode:', parsedJson.PassCode);
       } catch (decryptError) {
         console.error('PayNow 本地解密測試失敗:', decryptError);
-        console.error('這表示加密方法有問題，PayNow 也無法解密');
       }
       
-      // 根據文件與實際需求：同時送出 Apicode（供伺服器辨識商家）與 JsonOrder、PassCode
-      // 修正：將 JsonOrder 放在最前面，且嘗試不傳送 Apicode 內容，以避免 PayNow 解析錯誤 (Error converting value 3...)
+      // COMBO: POST 資料中 Apicode 留空，避免干擾解密
+      // 參數順序: JsonOrder, PassCode, Apicode
       const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=`;
-      console.log('[NEW-VERSION-v5-NO-APICODE] PayNow POST 資料:', postData.substring(0, 200) + '...');
+      console.log('[NEW-VERSION-v6-COMBO-REAL] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
-      console.log('PayNow 建立物流訂單 - 請求 Body:', postData.substring(0, 200) + '...');
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -198,7 +186,6 @@ export class PayNowLogisticsService {
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
-      // PayNow API 可能回傳 JSON 或純文字，先嘗試解析 JSON
       const responseText = await response.text();
       console.log('PayNow API 原始回應:', responseText);
 
@@ -206,14 +193,12 @@ export class PayNowLogisticsService {
       try {
         result = JSON.parse(responseText);
       } catch {
-        // 如果不是 JSON，可能是純文字錯誤訊息
         console.error('PayNow 回應不是 JSON 格式:', responseText);
         throw new Error(`PayNow API 回應格式錯誤: ${responseText}`);
       }
 
       console.log('PayNow API 解析後結果:', result);
 
-      // 檢查 PayNow 回應的 Status 欄位
       if (result.Status === 'F' || result.ErrorMsg) {
         console.error('PayNow 建立訂單失敗:', result.ErrorMsg || result.ReturnMsg || '未知錯誤');
         throw new Error(result.ErrorMsg || result.ReturnMsg || 'PayNow 建立訂單失敗');
@@ -239,12 +224,13 @@ export class PayNowLogisticsService {
       formBody: string;
     };
   } {
-    // 計算 PassCode（根據文件：user_account + OrderNo + TotalAmount + apicode）
+    // 計算 PassCode
     const passCode = this.generatePassCode(request.orderNumber, request.totalAmount.toString());
 
+    // COMBO 設定: 內部加密 apicode
     const orderData = {
       user_account: this.config.userAccount,
-      apicode: this.config.apiCode, // 嘗試傳送原始 apicode，不加密
+      apicode: this.encryptApiCode(), 
       Logistic_service: request.logisticsService,
       OrderNo: request.orderNumber,
       DeliverMode: request.deliverMode,
@@ -263,30 +249,27 @@ export class PayNowLogisticsService {
       Sender_Phone: request.senderPhone,
       Sender_Email: request.senderEmail,
       Sender_address: request.senderAddress || '',
-      PassCode: passCode // PassCode 在 JSON 中
+      PassCode: passCode
     };
 
-    // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-    // const cipher = this.encryptOrderData(orderData); // 暫時註解掉未使用的變數
-    
-    // 根據文件與 PayNow 實際需求：Apicode + JsonOrder + PassCode
-    // 改用 Legacy 模式：Obj_Order 包裹
-    const legacyPayload = JSON.stringify({ Obj_Order: orderData });
-    const base64Cipher = this.encryptRawString(legacyPayload);
-    
-    // 調整參數順序，將 JsonOrder 放在最前面，避免解析錯誤
-    // 嘗試：不傳送 Apicode 參數，或者傳送空值，避免 PayNow 將其串接在解密後的 JSON 前面導致 'value 3' 錯誤
+    // 標準 Payload (不用於 COMBO)
+    const jsonString = JSON.stringify(orderData);
+    const base64Cipher = this.encryptRawString(jsonString);
     const formBody = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=`;
 
-    // 提供兩種 payload 供測試（雖然現在預設使用 Legacy）
+    // COMBO Payload (Legacy Mode: Obj_Order)
+    const legacyPayload = JSON.stringify({ Obj_Order: orderData });
+    const legacyBase64Cipher = this.encryptRawString(legacyPayload);
+    const legacyFormBody = `JsonOrder=${encodeURIComponent(legacyBase64Cipher)}&PassCode=${passCode}&Apicode=`;
+
     return {
       orderData,
       encryptedData: base64Cipher,
       formBody,
       legacy: {
         payload: legacyPayload,
-        encryptedData: base64Cipher,
-        formBody: formBody
+        encryptedData: legacyBase64Cipher,
+        formBody: legacyFormBody
       }
     };
   }
@@ -325,8 +308,6 @@ export class PayNowLogisticsService {
    */
   async updateStore(logisticsNumber: string, newStoreId: string, newStoreName: string, changeType: '01' | '02' = '01'): Promise<boolean> {
     try {
-      // 更新門市的 PassCode 計算方式可能不同，暫時使用 logisticsNumber 作為 orderNumber，'0' 作為 totalAmount
-      // 注意：這可能需要根據 PayNow 文件調整
       const passCode = this.generatePassCode(logisticsNumber, '0');
       
       const updateData = {
@@ -339,7 +320,6 @@ export class PayNowLogisticsService {
       };
 
       const encryptedData = this.encryptOrderData(updateData);
-      // 直接組合成字串，避免雙重 URL encoding
       const postData = `UpdateOrder=${encryptedData}`;
 
       const response = await fetch(`${this.config.baseUrl}/api/Orderapi/Put`, {
@@ -394,12 +374,6 @@ export class PayNowLogisticsService {
   private encryptApiCode(): string {
     // 使用 Python/C# 的正確加密結果：324moonp -> 7XBJHzfFtxw=
     return '7XBJHzfFtxw=';
-    
-    // 原始密碼（備用）
-    // return this.config.apiCode;
-    
-    // Node.js 加密（有問題）
-    // return tripleDESEncrypt(this.config.apiCode, this.config.apiCode);
   }
 
   /**

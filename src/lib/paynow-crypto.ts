@@ -13,6 +13,7 @@ import crypto from 'crypto';
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
     // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
+    console.log('[CRYPTO-CHECK] Encryption Key Generation');
     const key = buildTripleDesKey(password);
     const data = zeroPad(Buffer.from(text, 'utf8'));
 
