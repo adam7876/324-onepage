@@ -174,9 +174,9 @@ export class PayNowLogisticsService {
       }
       
       // 根據文件與實際需求：同時送出 Apicode（供伺服器辨識商家）與 JsonOrder、PassCode
-      // 修正：將 JsonOrder 放在最前面，以避免 PayNow 解析錯誤 (Error converting value 3...)
-      const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${encodeURIComponent(this.config.apiCode)}`;
-      console.log('[NEW-VERSION-v3-FIXED] PayNow POST 資料:', postData.substring(0, 200) + '...');
+      // 修正：將 JsonOrder 放在最前面，且嘗試不傳送 Apicode 內容，以避免 PayNow 解析錯誤 (Error converting value 3...)
+      const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=`;
+      console.log('[NEW-VERSION-v5-NO-APICODE] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
@@ -275,7 +275,8 @@ export class PayNowLogisticsService {
     const base64Cipher = this.encryptRawString(legacyPayload);
     
     // 調整參數順序，將 JsonOrder 放在最前面，避免解析錯誤
-    const formBody = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${encodeURIComponent(this.config.apiCode)}`;
+    // 嘗試：不傳送 Apicode 參數，或者傳送空值，避免 PayNow 將其串接在解密後的 JSON 前面導致 'value 3' 錯誤
+    const formBody = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=`;
 
     // 提供兩種 payload 供測試（雖然現在預設使用 Legacy）
     return {
