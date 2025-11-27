@@ -88,6 +88,30 @@ const getStatusColor = (status: string) => {
   }
 };
 
+interface LogisticsDryRunResult {
+  success: boolean;
+  dryRun: boolean;
+  message: string;
+  postmanTest?: {
+    standard: {
+      Apicode: string;
+      JsonOrder: string;
+      PassCode: string;
+    };
+    legacy: {
+      Apicode: string;
+      payload: string;
+      JsonOrder: string;
+      PassCode: string;
+    };
+  };
+  preview?: {
+    jsonString: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  };
+}
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +149,7 @@ export default function AdminOrders() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [batchDeleting, setBatchDeleting] = useState(false);
-  const [logisticsDryRunResult, setLogisticsDryRunResult] = useState<any>(null);
+  const [logisticsDryRunResult, setLogisticsDryRunResult] = useState<LogisticsDryRunResult | null>(null);
   const router = useRouter();
 
   // 權限驗證
