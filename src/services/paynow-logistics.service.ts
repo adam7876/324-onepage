@@ -137,11 +137,10 @@ export class PayNowLogisticsService {
         PassCode: passCode
       };
 
-      // COMBO: 使用 Obj_Order 包裹 (Legacy Mode)
-      const legacyPayload = { Obj_Order: orderData };
-      const jsonString = JSON.stringify(legacyPayload);
+      // COMBO: 使用 Obj_Order 包裹 (Legacy Mode) - 移除，改回 Plain JSON
+      const jsonString = JSON.stringify(orderData);
 
-      console.log('[NEW-VERSION-v6-COMBO-REAL] PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION-v7-PLAIN-FULL-POST] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
@@ -162,10 +161,10 @@ export class PayNowLogisticsService {
         console.error('PayNow 本地解密測試失敗:', decryptError);
       }
       
-      // COMBO: POST 資料中 Apicode 留空，避免干擾解密
-      // 參數順序: JsonOrder, PassCode, Apicode
-      const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=`;
-      console.log('[NEW-VERSION-v6-COMBO-REAL] PayNow POST 資料:', postData.substring(0, 200) + '...');
+      // COMBO: POST 資料中 Apicode 留空 - 改回完整 POST 參數
+      // 嘗試加入 user_account 以明確身份，避免系統自動 prepend apicode
+      const postData = `user_account=${this.config.userAccount}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${this.config.apiCode}`;
+      console.log('[NEW-VERSION-v7-PLAIN-FULL-POST] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
