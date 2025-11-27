@@ -407,8 +407,7 @@ export class PayNowLogisticsService {
   }
 
   private encryptRawString(jsonString: string): string {
-    const encrypted = tripleDESEncrypt(jsonString, this.config.apiCode);
-    return urlEncode(encrypted);
+    return tripleDESEncrypt(jsonString, this.config.apiCode);
   }
 
   /**
