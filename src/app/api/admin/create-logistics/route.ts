@@ -110,19 +110,19 @@ export async function POST(request: NextRequest) {
         logisticsService: '01', // 7-11 交貨便
         deliverMode: '02', // 取貨不付款
         totalAmount: orderData.total,
-        remark: removeIbonForbiddenChars(orderData.customerNotes || ''),
-        description: removeIbonForbiddenChars(`訂單${cleanedOrderNumber}`), // 使用清理後的訂單編號
+        remark: 'Test Remark', // 暫時全英文測試
+        description: `Order ${cleanedOrderNumber}`, // 暫時全英文測試
         receiverStoreId: removeIbonForbiddenChars(orderData.logisticsInfo.storeId),
-        receiverStoreName: removeIbonForbiddenChars(orderData.logisticsInfo.storeName),
+        receiverStoreName: 'Test Store', // 暫時全英文測試
         returnStoreId: '',
-        receiverName: truncateName(removeIbonForbiddenChars(orderData.name), 10), // 先移除禁用字元再截斷
+        receiverName: 'TEST NAME', // 暫時全英文測試
         receiverPhone: orderData.phone,
         receiverEmail: removeIbonForbiddenChars(orderData.email, true), // Email 保留 @ 符號
-        receiverAddress: removeIbonForbiddenChars(orderData.logisticsInfo.storeAddress),
-        senderName: truncateName(removeIbonForbiddenChars('324SAMISA'), 10), // 移除點號，7-11 限制 10 字元
+        receiverAddress: 'Test Address', // 暫時全英文測試
+        senderName: 'SENDER', // 暫時全英文測試
         senderPhone: '0952759957',
         senderEmail: removeIbonForbiddenChars('axikorea@gmail.com', true), // Email 保留 @ 符號
-        senderAddress: removeIbonForbiddenChars('台北市信義區信義路五段7號')
+        senderAddress: 'Test Sender Address' // 暫時全英文測試
       };
 
       if (dryRun) {
