@@ -175,8 +175,9 @@ export class PayNowLogisticsService {
       }
       
       // 根據文件與實際需求：同時送出 Apicode（供伺服器辨識商家）與 JsonOrder、PassCode
-      const postData = `Apicode=${encodeURIComponent(this.config.apiCode)}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
-      console.log('PayNow POST 資料:', postData.substring(0, 200) + '...');
+      // 修正：將 JsonOrder 放在最前面，以避免 PayNow 解析錯誤 (Error converting value 3...)
+      const postData = `JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${encodeURIComponent(this.config.apiCode)}`;
+      console.log('[NEW-VERSION-v3-FIXED] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
