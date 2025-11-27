@@ -139,14 +139,13 @@ export class PayNowLogisticsService {
 
       // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
       const jsonString = JSON.stringify(orderData);
-      console.log('[NEW-VERSION-v2] PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION-v4-STANDARD] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
       // 加密訂單資料（返回未 URL 編碼的 Base64 密文）
-      // 改用 Legacy 模式：Obj_Order 包裹
-      const legacyPayload = JSON.stringify({ Obj_Order: orderData });
-      const base64Cipher = this.encryptRawString(legacyPayload);
+      // 改回標準模式：純 JSON 物件，無 Obj_Order 包裹（搭配正確的 POST 順序與原始 apicode）
+      const base64Cipher = this.encryptRawString(jsonString);
       
       console.log('PayNow Base64 密文（未 URL 編碼）:', base64Cipher);
       console.log('PayNow Base64 密文診斷:', {
