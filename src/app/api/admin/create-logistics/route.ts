@@ -11,6 +11,8 @@ import { payNowLogisticsService } from '@/services/paynow-logistics.service';
 import type { PayNowLogisticsRequest } from '@/services/paynow-logistics.service';
 import { getPayNowConfig } from '@/config/paynow.config';
 
+export const dynamic = 'force-dynamic'; // 強制動態渲染，避免 Vercel 快取
+
 export async function POST(request: NextRequest) {
   try {
     // 管理員認證
