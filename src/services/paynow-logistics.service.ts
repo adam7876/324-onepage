@@ -5,7 +5,7 @@
 
 import type { LogisticsInfo } from '../types';
 import { getPayNowConfig } from '../config/paynow.config';
-import { tripleDESEncrypt, tripleDESDecrypt, urlEncode } from '../lib/paynow-crypto';
+import { tripleDESEncrypt, tripleDESDecrypt } from '../lib/paynow-crypto';
 import crypto from 'crypto';
 
 export interface PayNowConfig {
