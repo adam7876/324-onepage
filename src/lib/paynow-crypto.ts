@@ -110,7 +110,10 @@ function buildTripleDesKey(password: string): Buffer {
 function zeroPad(buffer: Buffer): Buffer {
   const blockSize = 8;
   const remainder = buffer.length % blockSize;
-  const padLen = remainder === 0 ? blockSize : blockSize - remainder;
+  if (remainder === 0) {
+    return buffer;
+  }
+  const padLen = blockSize - remainder;
   return Buffer.concat([buffer, Buffer.alloc(padLen, 0x00)]);
 }
 

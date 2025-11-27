@@ -125,6 +125,7 @@ export default function AdminOrders() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [batchDeleting, setBatchDeleting] = useState(false);
+  const [logisticsDryRunResult, setLogisticsDryRunResult] = useState<any>(null);
   const router = useRouter();
 
   // 權限驗證
@@ -235,7 +236,7 @@ export default function AdminOrders() {
           setLogisticsSuccess(null);
         }, 3000);
       } else if (result.success && result.dryRun) {
-        alert('乾跑預覽（未送出）：\n\n' + JSON.stringify(result.preview, null, 2));
+        setLogisticsDryRunResult(result);
       } else {
         const errorMsg = result.error || '建立物流訂單失敗';
         const detailsMsg = result.details ? `\n詳細資訊: ${result.details}` : '';
@@ -270,6 +271,89 @@ export default function AdminOrders() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-12">
+      {logisticsDryRunResult && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">PayNow 物流訂單乾跑測試結果</h2>
+              <button 
+                onClick={() => setLogisticsDryRunResult(null)}
+                className="text-gray-500 hover:text-black text-2xl font-bold"
+              >
+                &times;
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-blue-50 p-4 rounded border border-blue-200">
+                <h3 className="font-bold mb-2 text-blue-800">測試說明</h3>
+                <p className="text-sm text-blue-700 mb-2">
+                  您可以直接複製下方的參數，用於比對或除錯。如果不使用 Postman，請確認下方的 JSON 內容是否符合 PayNow 要求。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold mb-2 border-b pb-1">標準模式 (Standard)</h3>
+                <p className="text-xs text-gray-500 mb-2">使用純 JSON 物件加密，無 Obj_Order 包裹</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-100 p-3 rounded">
+                    <div className="text-xs font-bold text-gray-500 mb-1">JsonOrder (Base64 密文)</div>
+                    <textarea 
+                      readOnly 
+                      className="w-full h-24 text-xs font-mono bg-white border rounded p-2"
+                      value={logisticsDryRunResult.postmanTest?.standard?.JsonOrder || ''}
+                    />
+                  </div>
+                  <div className="bg-gray-100 p-3 rounded">
+                    <div className="text-xs font-bold text-gray-500 mb-1">PassCode</div>
+                    <input 
+                      readOnly 
+                      className="w-full text-xs font-mono bg-white border rounded p-2"
+                      value={logisticsDryRunResult.postmanTest?.standard?.PassCode || ''}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-bold mb-2 border-b pb-1">舊版模式 (Legacy)</h3>
+                <p className="text-xs text-gray-500 mb-2">使用 {"{Obj_Order: ...}"} 包裹後加密</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-100 p-3 rounded">
+                    <div className="text-xs font-bold text-gray-500 mb-1">JsonOrder (Base64 密文)</div>
+                    <textarea 
+                      readOnly 
+                      className="w-full h-24 text-xs font-mono bg-white border rounded p-2"
+                      value={logisticsDryRunResult.postmanTest?.legacy?.JsonOrder || ''}
+                    />
+                  </div>
+                  <div className="bg-gray-100 p-3 rounded">
+                    <div className="text-xs font-bold text-gray-500 mb-1">PassCode (Legacy)</div>
+                    <input 
+                      readOnly 
+                      className="w-full text-xs font-mono bg-white border rounded p-2"
+                      value={logisticsDryRunResult.postmanTest?.legacy?.PassCode || ''}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-bold mb-2 border-b pb-1">原始訂單資料 (JSON)</h3>
+                <pre className="bg-gray-800 text-green-400 p-4 rounded text-xs overflow-x-auto">
+                  {logisticsDryRunResult.preview?.jsonString}
+                </pre>
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <Button onClick={() => setLogisticsDryRunResult(null)} variant="outline">
+                  關閉
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex gap-2 mb-4">
         <Link href="/admin" className="px-4 py-2 rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回主控台</Link>
         <Link href="/" className="px-4 py-2 rounded bg-gray-100 text-black font-bold hover:bg-gray-200">回首頁</Link>
