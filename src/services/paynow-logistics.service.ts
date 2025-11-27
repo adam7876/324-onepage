@@ -139,7 +139,7 @@ export class PayNowLogisticsService {
 
       // 記錄加密前的 JSON 字串，檢查是否包含禁用字元
       const jsonString = JSON.stringify(orderData);
-      console.log('PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
