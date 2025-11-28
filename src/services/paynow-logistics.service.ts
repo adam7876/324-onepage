@@ -137,11 +137,16 @@ export class PayNowLogisticsService {
         PassCode: passCode
       };
 
-      // COMBO: 使用 Obj_Order 包裹 (Legacy Mode) - 根據 Value 3 錯誤推測需要此結構
-      const legacyPayload = { Obj_Order: orderData };
-      const jsonString = JSON.stringify(legacyPayload);
+      // COMBO: 根據文件：user_account + OrderNo + TotalAmount + apicode（不包含 + 號）
+      // 嘗試修正：PassCode 計算時使用加密後的 apicode 嗎？
+      // 不，文件說 PassCode 計算用的是 apicode (原始值)
+      // 但文件也說 JsonOrder 內的 apicode 要加密
+      
+      // 嘗試 v9: 移除 Obj_Order 包裹，直接送 Plain JSON，但加密模式維持 CBC
+      // 這是 v7 (ECB+Plain) 和 v8 (CBC+Obj_Order) 的交叉驗證
+      const jsonString = JSON.stringify(orderData);
 
-      console.log('[NEW-VERSION-v8-CBC-ZERO-IV-LEGACY] PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION-v9-CBC-PLAIN] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
@@ -165,7 +170,7 @@ export class PayNowLogisticsService {
       // COMBO: POST 資料中 Apicode 留空 - 改回完整 POST 參數
       // 嘗試加入 user_account 以明確身份，避免系統自動 prepend apicode
       const postData = `user_account=${this.config.userAccount}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${this.config.apiCode}`;
-      console.log('[NEW-VERSION-v8-CBC-ZERO-IV-LEGACY] PayNow POST 資料:', postData.substring(0, 200) + '...');
+      console.log('[NEW-VERSION-v9-CBC-PLAIN] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
