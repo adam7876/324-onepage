@@ -13,15 +13,19 @@ import crypto from 'crypto';
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
     // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
-    console.log('[CRYPTO-CHECK] Using 3DES-CBC with Zero IV');
+    console.log('[CRYPTO-CHECK] Using 3DES-CBC with Zero IV and PKCS7 Padding');
     const key = buildTripleDesKey(password);
     const iv = Buffer.alloc(8, 0); // Zero IV
-    const data = zeroPad(Buffer.from(text, 'utf8'));
-
+    
+    // PKCS7 Padding
+    const blockSize = 8;
+    const pad = blockSize - (text.length % blockSize);
+    const paddedText = Buffer.concat([Buffer.from(text, 'utf8'), Buffer.alloc(pad, pad)]);
+    
     const cipher = crypto.createCipheriv('des-ede3-cbc', key, iv);
-    cipher.setAutoPadding(false);
+    cipher.setAutoPadding(false); // We do manual padding
 
-    const enc = Buffer.concat([cipher.update(data), cipher.final()]);
+    const enc = Buffer.concat([cipher.update(paddedText), cipher.final()]);
     
     return enc.toString('base64').replace(/\s/g, '+');
   } catch (error) {
