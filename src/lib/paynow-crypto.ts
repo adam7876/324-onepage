@@ -114,6 +114,7 @@ function buildTripleDesKey(password: string): Buffer {
   return padded;
 }
 
+/*
 function removePKCS7Padding(text: string): string {
   if (text.length === 0) return text;
   const lastChar = text.charCodeAt(text.length - 1);
@@ -123,3 +124,4 @@ function removePKCS7Padding(text: string): string {
   }
   return text;
 }
+*/
