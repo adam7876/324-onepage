@@ -114,6 +114,7 @@ function buildTripleDesKey(password: string): Buffer {
   return padded;
 }
 
+/*
 function zeroPad(buffer: Buffer): Buffer {
   const blockSize = 8;
   const remainder = buffer.length % blockSize;
@@ -123,6 +124,7 @@ function zeroPad(buffer: Buffer): Buffer {
   const padLen = blockSize - remainder;
   return Buffer.concat([buffer, Buffer.alloc(padLen, 0x00)]);
 }
+*/
 
 function removeZeroPadding(text: string): string {
   return text.replace(/\0+$/, '');
