@@ -12,19 +12,20 @@ import crypto from 'crypto';
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
     // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
-    console.log('[CRYPTO-CHECK] Using 3DES-ECB with PKCS7 Padding');
+    console.log('[CRYPTO-CHECK] Using 3DES-ECB with PKCS7 Padding (UTF-8)');
     const key = buildTripleDesKey(password);
     // ECB 模式不需要 IV
     
-    // PKCS7 Padding
-    const blockSize = 8;
-    const pad = blockSize - (text.length % blockSize);
-    const paddedText = Buffer.concat([Buffer.from(text, 'utf8'), Buffer.alloc(pad, pad)]);
+    // 重要：某些老舊系統可能需要 Big5 或 UTF-16LE 編碼
+    // 但 apicode 加密範例 (7XBJHzfFtxw=) 證明了 apicode 本身是用 UTF-8 (ASCII) 加密的
+    // 如果 JSON 需要 UTF-16LE，那 apicode 應該也會不一樣
+    // 暫時維持 UTF-8，因為我們已經用純英文測試過了
+    // 但為了排除 Padding 實作差異，我們改用 Node.js 內建的 AutoPadding
     
     const cipher = crypto.createCipheriv('des-ede3-ecb', key, null);
-    cipher.setAutoPadding(false); // We do manual padding
+    cipher.setAutoPadding(true); // Use Node.js default PKCS7 padding
 
-    const enc = Buffer.concat([cipher.update(paddedText), cipher.final()]);
+    const enc = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
     
     return enc.toString('base64').replace(/\s/g, '+');
   } catch (error) {
@@ -49,12 +50,12 @@ export function tripleDESDecrypt(encryptedText: string, password: string): strin
     const normalizedText = encryptedText.replace(/\s/g, '+');
 
     const decipher = crypto.createDecipheriv('des-ede3-ecb', key, null);
-    decipher.setAutoPadding(false);
+    decipher.setAutoPadding(true); // Use Node.js default PKCS7 padding removal
 
     let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
 
-    return removePKCS7Padding(decrypted);
+    return decrypted;
   } catch (error) {
     console.error('TripleDES decryption error:', error);
     throw new Error('Failed to decrypt data');
