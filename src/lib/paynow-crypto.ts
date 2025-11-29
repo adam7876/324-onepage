@@ -6,9 +6,8 @@
 import crypto from 'crypto';
 
 /**
- * TripleDES 加密 (3DES-ECB + ZeroPadding + Base64)
+ * TripleDES 加密 (3DES-CBC + Zero IV + PKCS7 Padding)
  * 根據 PayNow API 文件要求
- * 使用 ECB 模式和 ZeroPadding（若剛好整除，仍需補 8 個 0x00）
  */
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
@@ -41,7 +40,7 @@ export function tripleDESEncrypt(text: string, password: string): string {
 
 /**
  * TripleDES 解密
- * 必須與加密方法匹配：使用 ECB 模式，不使用 IV
+ * 必須與加密方法匹配：使用 CBC 模式，Zero IV，並移除 PKCS7 Padding
  */
 export function tripleDESDecrypt(encryptedText: string, password: string): string {
   try {
@@ -55,7 +54,7 @@ export function tripleDESDecrypt(encryptedText: string, password: string): strin
     let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
 
-    return removeZeroPadding(decrypted);
+    return removePKCS7Padding(decrypted);
   } catch (error) {
     console.error('TripleDES decryption error:', error);
     throw new Error('Failed to decrypt data');
@@ -126,6 +125,18 @@ function zeroPad(buffer: Buffer): Buffer {
 }
 */
 
+/*
 function removeZeroPadding(text: string): string {
   return text.replace(/\0+$/, '');
+}
+*/
+
+function removePKCS7Padding(text: string): string {
+  if (text.length === 0) return text;
+  const lastChar = text.charCodeAt(text.length - 1);
+  // Check if the last char is a valid padding length (1 to 8)
+  if (lastChar > 0 && lastChar <= 8) {
+    return text.substring(0, text.length - lastChar);
+  }
+  return text;
 }
