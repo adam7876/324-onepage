@@ -115,7 +115,7 @@ export class PayNowLogisticsService {
 
       const orderData = {
         user_account: this.config.userAccount,
-        apicode: this.encryptApiCode(), // COMBO: JSON 內部使用加密的 apicode
+        apicode: this.config.apiCode, // v12: 使用明碼 apicode (根據 C# 範例)
         Logistic_service: request.logisticsService,
         OrderNo: request.orderNumber,
         DeliverMode: request.deliverMode,
@@ -145,7 +145,9 @@ export class PayNowLogisticsService {
       // v12-ECB-ALWAYS-PAD: 回歸 ECB 但改用標準 PKCS7
       // 同時移除 POST Apicode 參數，避免干擾
       
-      const jsonString = JSON.stringify(orderDataEnglish); // 繼續用英文版排除編碼問題
+      // 使用 orderDataEnglish 覆蓋 orderData
+      const finalOrderData = orderDataEnglish; // 顯式使用，避免 lint error
+      const jsonString = JSON.stringify(finalOrderData);
 
       console.log('[NEW-VERSION-v12-ECB-PKCS7-NOPARAM] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
