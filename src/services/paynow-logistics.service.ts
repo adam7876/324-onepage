@@ -136,16 +136,22 @@ export class PayNowLogisticsService {
         Sender_address: request.senderAddress || '',
         PassCode: passCode
       };
-
-      // COMBO: 根據文件：user_account + OrderNo + TotalAmount + apicode（不包含 + 號）
-      // 嘗試修正：PassCode 計算時使用加密後的 apicode 嗎？
-      // 不，文件說 PassCode 計算用的是 apicode (原始值)
-      // 但文件也說 JsonOrder 內的 apicode 要加密
       
       // v12-ECB-ALWAYS-PAD: 回歸 ECB 但改用標準 PKCS7
       // 同時移除 POST Apicode 參數，避免干擾
       
       // 使用 orderDataEnglish 覆蓋 orderData
+      const orderDataEnglish = {
+        ...orderData,
+        receiver_storename: "Test Store",
+        Receiver_Name: "TEST RECEIVER",
+        Receiver_address: "Test Address 123",
+        Sender_Name: "TEST SENDER",
+        Sender_address: "Test Sender Address 456",
+        Remark: "Test Remark",
+        Description: "Test Description"
+      };
+      
       const finalOrderData = orderDataEnglish; // 顯式使用，避免 lint error
       const jsonString = JSON.stringify(finalOrderData);
 
