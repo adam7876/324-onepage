@@ -142,22 +142,12 @@ export class PayNowLogisticsService {
       // 不，文件說 PassCode 計算用的是 apicode (原始值)
       // 但文件也說 JsonOrder 內的 apicode 要加密
       
-      // v11-CBC-PKCS7-FIX: 確保本地解密正確 (PKCS7 Padding Removal)
-      // 同時嘗試純英文 Payload，排除中文編碼問題
-      const orderDataEnglish = {
-        ...orderData,
-        receiver_storename: "Test Store",
-        Receiver_Name: "TEST RECEIVER",
-        Receiver_address: "Test Address 123",
-        Sender_Name: "TEST SENDER",
-        Sender_address: "Test Sender Address 456",
-        Remark: "Test Remark",
-        Description: "Test Description"
-      };
+      // v12-ECB-ALWAYS-PAD: 回歸 ECB 但改用標準 PKCS7
+      // 同時移除 POST Apicode 參數，避免干擾
       
-      const jsonString = JSON.stringify(orderDataEnglish);
+      const jsonString = JSON.stringify(orderDataEnglish); // 繼續用英文版排除編碼問題
 
-      console.log('[NEW-VERSION-v11-CBC-PKCS7-FIX-ENGLISH] PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION-v12-ECB-PKCS7-NOPARAM] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
@@ -178,10 +168,11 @@ export class PayNowLogisticsService {
         console.error('PayNow 本地解密測試失敗:', decryptError);
       }
       
-      // COMBO: POST 資料中 Apicode 留空 - 改回完整 POST 參數
-      // 嘗試加入 user_account 以明確身份，避免系統自動 prepend apicode
-      const postData = `user_account=${this.config.userAccount}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}&Apicode=${this.config.apiCode}`;
-      console.log('[NEW-VERSION-v11-CBC-PKCS7-FIX-ENGLISH] PayNow POST 資料:', postData.substring(0, 200) + '...');
+      // COMBO: POST 資料中 Apicode 移除，只留 JsonOrder 和 PassCode
+      // 我們相信如果不傳 Apicode，PayNow 就不會把它串接在 JSON 前面
+      // 但是 PayNow 需要知道這是哪家店，所以 user_account 一定要留著
+      const postData = `user_account=${this.config.userAccount}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
+      console.log('[NEW-VERSION-v12-ECB-PKCS7-NOPARAM] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);

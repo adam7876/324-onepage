@@ -6,22 +6,22 @@
 import crypto from 'crypto';
 
 /**
- * TripleDES 加密 (3DES-CBC + Zero IV + PKCS7 Padding)
- * 根據 PayNow API 文件要求
+ * TripleDES 加密 (3DES-ECB + PKCS7 Padding)
+ * 回歸文件範例邏輯：ECB 模式，但使用標準 PKCS7 Padding
  */
 export function tripleDESEncrypt(text: string, password: string): string {
   try {
     // 根據 PayNow 附錄一：私鑰格式為 1234567890 + Password + 123456
-    console.log('[CRYPTO-CHECK] Using 3DES-CBC with Zero IV and PKCS7 Padding');
+    console.log('[CRYPTO-CHECK] Using 3DES-ECB with PKCS7 Padding');
     const key = buildTripleDesKey(password);
-    const iv = Buffer.alloc(8, 0); // Zero IV
+    // ECB 模式不需要 IV
     
     // PKCS7 Padding
     const blockSize = 8;
     const pad = blockSize - (text.length % blockSize);
     const paddedText = Buffer.concat([Buffer.from(text, 'utf8'), Buffer.alloc(pad, pad)]);
     
-    const cipher = crypto.createCipheriv('des-ede3-cbc', key, iv);
+    const cipher = crypto.createCipheriv('des-ede3-ecb', key, null);
     cipher.setAutoPadding(false); // We do manual padding
 
     const enc = Buffer.concat([cipher.update(paddedText), cipher.final()]);
@@ -40,15 +40,15 @@ export function tripleDESEncrypt(text: string, password: string): string {
 
 /**
  * TripleDES 解密
- * 必須與加密方法匹配：使用 CBC 模式，Zero IV，並移除 PKCS7 Padding
+ * 必須與加密方法匹配：使用 ECB 模式，並移除 PKCS7 Padding
  */
 export function tripleDESDecrypt(encryptedText: string, password: string): string {
   try {
     const key = buildTripleDesKey(password);
-    const iv = Buffer.alloc(8, 0); // Zero IV
+    // ECB 模式不需要 IV
     const normalizedText = encryptedText.replace(/\s/g, '+');
 
-    const decipher = crypto.createDecipheriv('des-ede3-cbc', key, iv);
+    const decipher = crypto.createDecipheriv('des-ede3-ecb', key, null);
     decipher.setAutoPadding(false);
 
     let decrypted = decipher.update(normalizedText, 'base64', 'utf8');
@@ -112,24 +112,6 @@ function buildTripleDesKey(password: string): Buffer {
   keyBuffer.copy(padded);
   return padded;
 }
-
-/*
-function zeroPad(buffer: Buffer): Buffer {
-  const blockSize = 8;
-  const remainder = buffer.length % blockSize;
-  if (remainder === 0) {
-    return buffer;
-  }
-  const padLen = blockSize - remainder;
-  return Buffer.concat([buffer, Buffer.alloc(padLen, 0x00)]);
-}
-*/
-
-/*
-function removeZeroPadding(text: string): string {
-  return text.replace(/\0+$/, '');
-}
-*/
 
 function removePKCS7Padding(text: string): string {
   if (text.length === 0) return text;
