@@ -141,6 +141,17 @@ export class PayNowLogisticsService {
       // 維持 Plain JSON, 明碼 Apicode, No POST Apicode Param
       // 這是解決 "Unexpected character" 的終極手段
       
+      const orderDataEnglish = {
+        ...orderData, // 顯式使用 orderData
+        receiver_storename: "Test Store",
+        Receiver_Name: "TEST RECEIVER",
+        Receiver_address: "Test Address 123",
+        Sender_Name: "TEST SENDER",
+        Sender_address: "Test Sender Address 456",
+        Remark: "Test Remark",
+        Description: "Test Description"
+      };
+
       const finalOrderData = orderDataEnglish;
       const jsonString = JSON.stringify(finalOrderData);
 
