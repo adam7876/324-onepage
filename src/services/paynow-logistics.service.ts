@@ -137,25 +137,14 @@ export class PayNowLogisticsService {
         PassCode: passCode
       };
       
-      // v13-ECB-PKCS7-AUTO: 使用 Node.js 內建的 PKCS7 (AutoPadding)
-      // 這是為了排除手動 Padding 可能的細微錯誤
+      // v14-UTF16LE: 使用 UTF-16LE 編碼進行加密 (C# String 格式)
+      // 維持 Plain JSON, 明碼 Apicode, No POST Apicode Param
+      // 這是解決 "Unexpected character" 的終極手段
       
-      // 重要：再次檢查 C# 範例
-      // JsonOrder = TripleDes加密(order後字串)
-      // order後字串 = "{\"user_account\":...}"
-      // 我們之前的測試都是對的。
-      
-      // 最後的懷疑：URL Encoding
-      // C# 範例 P.13: byte[] encodedBytes = encode.GetBytes(postData);
-      // 這裡的 postData 已經包含了 JsonOrder=...
-      // 我們的實作是: JsonOrder=${encodeURIComponent(base64Cipher)}
-      // 這應該是等價的。
-      
-      // 嘗試 v13: 繼續使用 v12 的設定，但改用 AutoPadding
-      const finalOrderData = orderData; // 直接使用 orderData
+      const finalOrderData = orderDataEnglish;
       const jsonString = JSON.stringify(finalOrderData);
 
-      console.log('[NEW-VERSION-v13-ECB-PKCS7-AUTO] PayNow 加密前的 JSON 字串:', jsonString);
+      console.log('[NEW-VERSION-v14-UTF16LE] PayNow 加密前的 JSON 字串:', jsonString);
       console.log('PayNow JSON 字串中是否包含 (: ', jsonString.includes('('));
       console.log('PayNow JSON 字串中是否包含禁用字元: ', /['"%|&`^@!\.#()*_+\-;:,]/.test(jsonString));
       
@@ -177,10 +166,8 @@ export class PayNowLogisticsService {
       }
       
       // COMBO: POST 資料中 Apicode 移除，只留 JsonOrder 和 PassCode
-      // 我們相信如果不傳 Apicode，PayNow 就不會把它串接在 JSON 前面
-      // 但是 PayNow 需要知道這是哪家店，所以 user_account 一定要留著
       const postData = `user_account=${this.config.userAccount}&JsonOrder=${encodeURIComponent(base64Cipher)}&PassCode=${passCode}`;
-      console.log('[NEW-VERSION-v13-ECB-PKCS7-AUTO] PayNow POST 資料:', postData.substring(0, 200) + '...');
+      console.log('[NEW-VERSION-v14-UTF16LE] PayNow POST 資料:', postData.substring(0, 200) + '...');
 
       const apiUrl = `${this.config.baseUrl}/api/Orderapi/Add_Order`;
       console.log('PayNow 建立物流訂單 - 請求 URL:', apiUrl);
